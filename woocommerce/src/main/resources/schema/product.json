@@ -1,0 +1,1673 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "permalink": {
+      "type": "string"
+    },
+    "date_created": {
+      "type": "string"
+    },
+    "date_created_gmt": {
+      "type": "string"
+    },
+    "date_modified": {
+      "type": "string"
+    },
+    "date_modified_gmt": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean"
+    },
+    "catalog_visibility": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "short_description": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "price": {
+      "type": "string"
+    },
+    "regular_price": {
+      "type": "string"
+    },
+    "sale_price": {
+      "type": "string"
+    },
+    "date_on_sale_from": {
+      "type": "string"
+    },
+    "date_on_sale_from_gmt": {
+      "type": "string"
+    },
+    "date_on_sale_to": {
+      "type": "string"
+    },
+    "date_on_sale_to_gmt": {
+      "type": "string"
+    },
+    "on_sale": {
+      "type": "boolean"
+    },
+    "purchasable": {
+      "type": "boolean"
+    },
+    "total_sales": {
+      "type": "integer"
+    },
+    "virtual": {
+      "type": "boolean"
+    },
+    "downloadable": {
+      "type": "boolean"
+    },
+    "downloads": {
+      "type": "array",
+      "items": {}
+    },
+    "download_limit": {
+      "type": "integer"
+    },
+    "download_expiry": {
+      "type": "integer"
+    },
+    "external_url": {
+      "type": "string"
+    },
+    "button_text": {
+      "type": "string"
+    },
+    "tax_status": {
+      "type": "string"
+    },
+    "tax_class": {
+      "type": "string"
+    },
+    "manage_stock": {
+      "type": "boolean"
+    },
+    "stock_quantity": {
+      "type": "integer"
+    },
+    "backorders": {
+      "type": "string"
+    },
+    "backorders_allowed": {
+      "type": "boolean"
+    },
+    "backordered": {
+      "type": "boolean"
+    },
+    "low_stock_amount": {
+      "type": "null"
+    },
+    "sold_individually": {
+      "type": "boolean"
+    },
+    "weight": {
+      "type": "string"
+    },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        },
+        "height": {
+          "type": "string"
+        }
+      }
+    },
+    "shipping_required": {
+      "type": "boolean"
+    },
+    "shipping_taxable": {
+      "type": "boolean"
+    },
+    "shipping_class": {
+      "type": "string"
+    },
+    "shipping_class_id": {
+      "type": "integer"
+    },
+    "reviews_allowed": {
+      "type": "boolean"
+    },
+    "average_rating": {
+      "type": "string"
+    },
+    "rating_count": {
+      "type": "integer"
+    },
+    "upsell_ids": {
+      "type": "array",
+      "items": {}
+    },
+    "cross_sell_ids": {
+      "type": "array",
+      "items": {}
+    },
+    "parent_id": {
+      "type": "integer"
+    },
+    "purchase_note": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "slug": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "images": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "date_created": {
+              "type": "string"
+            },
+            "date_created_gmt": {
+              "type": "string"
+            },
+            "date_modified": {
+              "type": "string"
+            },
+            "date_modified_gmt": {
+              "type": "string"
+            },
+            "src": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "alt": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "attributes": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "string"
+            },
+            "position": {
+              "type": "integer"
+            },
+            "visible": {
+              "type": "boolean"
+            },
+            "variation": {
+              "type": "boolean"
+            },
+            "options": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "default_attributes": {
+      "type": "array",
+      "items": {}
+    },
+    "variations": {
+      "type": "array",
+      "items": {}
+    },
+    "grouped_products": {
+      "type": "array",
+      "items": {}
+    },
+    "menu_order": {
+      "type": "integer"
+    },
+    "price_html": {
+      "type": "string"
+    },
+    "related_ids": {
+      "type": "array",
+      "items": {}
+    },
+    "meta_data": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "object",
+              "properties": {
+                "origin": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "integer"
+                },
+                "format": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            },
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "stock_status": {
+      "type": "string"
+    },
+    "has_options": {
+      "type": "boolean"
+    },
+    "jetpack_publicize_connections": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "service_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "connection_id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "service_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "connection_id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "service_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "connection_id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "service_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "connection_id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "service_name": {
+              "type": "string"
+            },
+            "display_name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "connection_id": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "yoast_head": {
+      "type": "string"
+    },
+    "yoast_head_json": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "robots": {
+          "type": "object",
+          "properties": {
+            "index": {
+              "type": "string"
+            },
+            "follow": {
+              "type": "string"
+            },
+            "max-snippet": {
+              "type": "string"
+            },
+            "max-image-preview": {
+              "type": "string"
+            },
+            "max-video-preview": {
+              "type": "string"
+            }
+          }
+        },
+        "canonical": {
+          "type": "string"
+        },
+        "og_locale": {
+          "type": "string"
+        },
+        "og_type": {
+          "type": "string"
+        },
+        "og_title": {
+          "type": "string"
+        },
+        "og_description": {
+          "type": "string"
+        },
+        "og_url": {
+          "type": "string"
+        },
+        "og_site_name": {
+          "type": "string"
+        },
+        "article_publisher": {
+          "type": "string"
+        },
+        "og_image": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "integer"
+                },
+                "height": {
+                  "type": "integer"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "twitter_card": {
+          "type": "string"
+        },
+        "twitter_site": {
+          "type": "string"
+        },
+        "twitter_misc": {
+          "type": "object",
+          "properties": {
+            "Price": {
+              "type": "string"
+            },
+            "Availability": {
+              "type": "string"
+            }
+          }
+        },
+        "schema": {
+          "type": "object",
+          "properties": {
+            "@context": {
+              "type": "string"
+            },
+            "@graph": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string"
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "isPartOf": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "datePublished": {
+                      "type": "string"
+                    },
+                    "dateModified": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "breadcrumb": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "inLanguage": {
+                      "type": "string"
+                    },
+                    "potentialAction": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "target": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string"
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "itemListElement": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "item": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "item": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string"
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "publisher": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "potentialAction": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "target": {
+                              "type": "object",
+                              "properties": {
+                                "@type": {
+                                  "type": "string"
+                                },
+                                "urlTemplate": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "query-input": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "inLanguage": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "logo": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "image": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "sameAs": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "address": {
+                      "type": "object",
+                      "properties": {
+                        "@id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "geo": {
+                      "type": "object",
+                      "properties": {
+                        "@type": {
+                          "type": "string"
+                        },
+                        "latitude": {
+                          "type": "string"
+                        },
+                        "longitude": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "telephone": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "openingHoursSpecification": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "@type": {
+                              "type": "string"
+                            },
+                            "dayOfWeek": {
+                              "type": "array",
+                              "items": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            },
+                            "opens": {
+                              "type": "string"
+                            },
+                            "closes": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "areaServed": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string"
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "streetAddress": {
+                      "type": "string"
+                    },
+                    "addressLocality": {
+                      "type": "string"
+                    },
+                    "postalCode": {
+                      "type": "string"
+                    },
+                    "addressRegion": {
+                      "type": "string"
+                    },
+                    "addressCountry": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "@type": {
+                      "type": "string"
+                    },
+                    "inLanguage": {
+                      "type": "string"
+                    },
+                    "@id": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "contentUrl": {
+                      "type": "string"
+                    },
+                    "caption": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "geo.placename": {
+          "type": "string"
+        },
+        "geo.position": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "string"
+            },
+            "long": {
+              "type": "string"
+            }
+          }
+        },
+        "geo.region": {
+          "type": "string"
+        }
+      }
+    },
+    "_links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "href": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "collection": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "href": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
