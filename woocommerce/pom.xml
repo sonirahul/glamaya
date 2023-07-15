@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>woocommerce</artifactId>
+    <artifactId>glamaya-data-contracts-woocommerce</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
