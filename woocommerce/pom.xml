@@ -28,6 +28,11 @@
             <version>${jackson-databind.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>4.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -36,9 +41,17 @@
                 <groupId>org.jsonschema2pojo</groupId>
                 <artifactId>jsonschema2pojo-maven-plugin</artifactId>
                 <version>${jsonschema2pojo-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.glamaya</groupId>
+                        <artifactId>custom-annotator</artifactId>
+                        <version>1.0-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontract.woocommerce</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.woocommerce</targetPackage>
+                    <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <dateType>java.time.LocalDate</dateType>

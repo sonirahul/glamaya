@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
     <version>${revision}</version>
     <modules>
+        <module>custom-annotator</module>
         <module>woocommerce</module>
     </modules>
 
