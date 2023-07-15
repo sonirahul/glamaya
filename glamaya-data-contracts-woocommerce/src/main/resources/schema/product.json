@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Generated schema for Root",
+  "javaName": "woocommerceProduct",
   "type": "object",
   "properties": {
-    "_id": {
-      "javaName": "id",
+    "id": {
       "type": "integer"
     },
     "attributes": {
@@ -12,8 +12,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "_id": {
-            "javaName": "id",
+          "id": {
             "type": "integer"
           },
           "name": {
@@ -60,8 +59,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "_id": {
-            "javaName": "id",
+          "id": {
             "type": "integer"
           },
           "name": {
@@ -153,8 +151,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "_id": {
-            "javaName": "id",
+          "id": {
             "type": "integer"
           },
           "date_created": {
@@ -193,8 +190,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "_id": {
-            "javaName": "id",
+          "id": {
             "type": "integer"
           },
           "key": {
@@ -284,8 +280,7 @@
       "items": {
         "type": "object",
         "properties": {
-          "_id": {
-            "javaName": "id",
+          "id": {
             "type": "integer"
           },
           "name": {

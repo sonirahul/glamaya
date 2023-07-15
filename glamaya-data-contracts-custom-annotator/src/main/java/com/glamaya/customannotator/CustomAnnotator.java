@@ -16,7 +16,7 @@ public class CustomAnnotator extends AbstractAnnotator {
 
     public CustomAnnotator() {
         primaryKeyFields = new ArrayList<>();
-        primaryKeyFields.add("_id");
+        primaryKeyFields.add("id");
     }
 
     @Override
@@ -24,8 +24,9 @@ public class CustomAnnotator extends AbstractAnnotator {
         super.propertyField(field, clazz, propertyName, propertyNode);
         if (primaryKeyFields.contains(propertyName)) {
             field.annotate(Id.class);
+        } else {
+            field.annotate(Field.class).param("value", propertyName);
         }
-        field.annotate(Field.class).param("value", propertyName);
     }
 
     @Override

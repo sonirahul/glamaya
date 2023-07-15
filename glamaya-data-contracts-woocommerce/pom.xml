@@ -44,7 +44,7 @@
                 <dependencies>
                     <dependency>
                         <groupId>com.glamaya</groupId>
-                        <artifactId>custom-annotator</artifactId>
+                        <artifactId>glamaya-data-contracts-custom-annotator</artifactId>
                         <version>1.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
