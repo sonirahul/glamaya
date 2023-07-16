@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Root",
-  "javaName": "woocommerceProduct",
+  "title": "Generated schema for Woocommerce Product",
   "type": "object",
   "properties": {
     "id": {

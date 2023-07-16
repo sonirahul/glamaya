@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Woocommerce Product Search",
+  "type": "object",
+  "properties": {
+    "after": {
+      "type": "string"
+    },
+    "attribute": {
+      "type": "string"
+    },
+    "attribute_term": {
+      "type": "string"
+    },
+    "before": {
+      "type": "string"
+    },
+    "category": {
+      "type": "integer"
+    },
+    "exclude": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "string"
+    },
+    "include": {
+      "type": "string"
+    },
+    "max_price": {
+      "type": "string"
+    },
+    "min_price": {
+      "type": "string"
+    },
+    "modified_after": {
+      "type": "string"
+    },
+    "offset": {
+      "type": "string"
+    },
+    "on_sale": {
+      "type": "string"
+    },
+    "order": {
+      "type": "string"
+    },
+    "orderby": {
+      "type": "string"
+    },
+    "page": {
+      "type": "integer"
+    },
+    "parent": {
+      "type": "integer"
+    },
+    "parent_exclude": {
+      "type": "string"
+    },
+    "per_page": {
+      "type": "integer"
+    },
+    "search": {
+      "type": "string"
+    },
+    "shipping_class": {
+      "type": "string"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "stock_status": {
+      "type": "string"
+    },
+    "tag": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "string"
+    }
+  }
+}

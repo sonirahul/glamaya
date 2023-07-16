@@ -3,6 +3,8 @@ package com.glamaya.customannotator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
+import feign.Param;
 import org.jsonschema2pojo.AbstractAnnotator;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,6 +29,11 @@ public class CustomAnnotator extends AbstractAnnotator {
         } else {
             field.annotate(Field.class).param("value", propertyName);
         }
+    }
+
+    public void propertyGetter(JMethod getter, JDefinedClass clazz, String propertyName) {
+        super.propertyGetter(getter, clazz, propertyName);
+        getter.annotate(Param.class).param("value", propertyName);
     }
 
     @Override

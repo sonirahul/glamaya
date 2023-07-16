@@ -31,7 +31,12 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
-            <version>4.1.0</version>
+            <version>${spring-data-mongodb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <version>${feign-core.version}</version>
         </dependency>
     </dependencies>
 
@@ -45,7 +50,7 @@
                     <dependency>
                         <groupId>com.glamaya</groupId>
                         <artifactId>glamaya-data-contracts-custom-annotator</artifactId>
-                        <version>1.0-SNAPSHOT</version>
+                        <version>${revision}</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -57,9 +62,10 @@
                     <dateType>java.time.LocalDate</dateType>
                     <dateTimeType>java.time.LocalDateTime</dateTimeType>
                     <generateBuilders>true</generateBuilders>
+                    <useInnerClassBuilders>true</useInnerClassBuilders>
                     <includeAdditionalProperties>false</includeAdditionalProperties>
-                    <includeConstructors>true</includeConstructors>
-                    <constructorsRequiredPropertiesOnly>true</constructorsRequiredPropertiesOnly>
+                    <!--<includeConstructors>true</includeConstructors>
+                    <constructorsRequiredPropertiesOnly>true</constructorsRequiredPropertiesOnly>-->
                 </configuration>
                 <executions>
                     <execution>
