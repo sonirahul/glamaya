@@ -12,6 +12,7 @@
     <modules>
         <module>glamaya-data-contracts-custom-annotator</module>
         <module>glamaya-data-contracts-woocommerce</module>
+        <module>glamaya-data-contracts-wix</module>
     </modules>
 
     <properties>

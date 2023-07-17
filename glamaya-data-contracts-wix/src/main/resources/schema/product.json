@@ -1,0 +1,377 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Root",
+  "type": "object",
+  "properties": {
+    "additionalInfoSections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "brand": {
+      "type": "string"
+    },
+    "collectionIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "convertedPriceData": {
+      "$ref": "#/definitions/convertedPriceData"
+    },
+    "costAndProfitData": {
+      "$ref": "#/definitions/costAndProfitData"
+    },
+    "costRange": {
+      "type": "object",
+      "properties": {
+        "minValue": {
+          "type": "number"
+        },
+        "maxValue": {
+          "type": "number"
+        }
+      }
+    },
+    "createdDate": {
+      "type": "string"
+    },
+    "customTextFields": {
+      "type": "array",
+      "items": {}
+    },
+    "description": {
+      "type": "string"
+    },
+    "discount": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      }
+    },
+    "exportProductId": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "inventoryItemId": {
+      "type": "string"
+    },
+    "lastUpdated": {
+      "type": "string"
+    },
+    "manageVariants": {
+      "type": "boolean"
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "mainMedia": {
+          "type": "object",
+          "properties": {
+            "thumbnail": {
+              "$ref": "#/definitions/thumbnail"
+            },
+            "mediaType": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "image": {
+              "$ref": "#/definitions/image"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "thumbnail": {
+                "$ref": "#/definitions/thumbnail"
+              },
+              "mediaType": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "image": {
+                "$ref": "#/definitions/image"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "name": {
+      "type": "string"
+    },
+    "numericId": {
+      "type": "string"
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "discountedPrice": {
+          "type": "number"
+        },
+        "formatted": {
+          "$ref": "#/definitions/formatted"
+        }
+      }
+    },
+    "priceData": {
+      "$ref": "#/definitions/priceData"
+    },
+    "priceRange": {
+      "type": "object",
+      "properties": {
+        "minValue": {
+          "type": "number"
+        },
+        "maxValue": {
+          "type": "number"
+        }
+      }
+    },
+    "productOptions": {
+      "type": "array",
+      "items": {}
+    },
+    "productPageUrl": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      }
+    },
+    "productType": {
+      "type": "string"
+    },
+    "ribbon": {
+      "type": "string"
+    },
+    "ribbons": {
+      "type": "array",
+      "items": {}
+    },
+    "sku": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "stock": {
+      "$ref": "#/definitions/stock"
+    },
+    "variants": {
+      "type": "array",
+      "javaType": "variants",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "variant": {
+            "$ref": "#/definitions/variant"
+          },
+          "stock": {
+            "$ref": "#/definitions/stock"
+          }
+        }
+      }
+    },
+    "visible": {
+      "type": "boolean"
+    },
+    "weight": {
+      "type": "number"
+    },
+    "weightRange": {
+      "type": "object",
+      "properties": {
+        "minValue": {
+          "type": "number"
+        },
+        "maxValue": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "convertedPriceData": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "discountedPrice": {
+          "type": "number"
+        },
+        "formatted": {
+          "$ref": "#/definitions/formatted"
+        }
+      }
+    },
+    "costAndProfitData": {
+      "type": "object",
+      "properties": {
+        "itemCost": {
+          "type": "number"
+        },
+        "formattedItemCost": {
+          "type": "string"
+        },
+        "profit": {
+          "type": "number"
+        },
+        "formattedProfit": {
+          "type": "string"
+        },
+        "profitMargin": {
+          "type": "number"
+        }
+      }
+    },
+    "formatted": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "string"
+        },
+        "discountedPrice": {
+          "type": "string"
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "priceData": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "discountedPrice": {
+          "type": "number"
+        },
+        "formatted": {
+          "$ref": "#/definitions/formatted"
+        }
+      }
+    },
+    "stock": {
+      "type": "object",
+      "properties": {
+        "trackInventory": {
+          "type": "boolean"
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "inStock": {
+          "type": "boolean"
+        },
+        "inventoryStatus": {
+          "type": "string"
+        }
+      }
+    },
+    "thumbnail": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "properties": {
+        "priceData": {
+          "$ref": "#/definitions/priceData"
+        },
+        "convertedPriceData": {
+          "$ref": "#/definitions/convertedPriceData"
+        },
+        "costAndProfitData": {
+          "$ref": "#/definitions/costAndProfitData"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "sku": {
+          "type": "string"
+        },
+        "visible": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

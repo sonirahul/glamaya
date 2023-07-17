@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>glamaya-data-contracts</artifactId>
-        <groupId>com.glamaya</groupId>
-        <version>${revision}</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.glamaya</groupId>
+        <artifactId>glamaya-data-contracts</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
-    <artifactId>glamaya-data-contracts-woocommerce</artifactId>
+    <artifactId>glamaya-data-contracts-wix</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -56,7 +56,7 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontracts.woocommerce</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.wix</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
