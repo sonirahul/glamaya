@@ -4,7 +4,8 @@
   "type": "object",
   "properties": {
     "after": {
-      "type": "string"
+      "type": "string",
+      "format": "date"
     },
     "attribute": {
       "type": "string"
@@ -13,7 +14,8 @@
       "type": "string"
     },
     "before": {
-      "type": "string"
+      "type": "string",
+      "format": "date"
     },
     "category": {
       "type": "integer"
@@ -22,31 +24,32 @@
       "type": "string"
     },
     "featured": {
-      "type": "string"
+      "type": "boolean"
     },
     "include": {
       "type": "string"
     },
     "max_price": {
-      "type": "string"
+      "type": "number"
     },
     "min_price": {
-      "type": "string"
+      "type": "number"
     },
     "modified_after": {
-      "type": "string"
+      "type": "string",
+      "format": "date"
     },
     "offset": {
-      "type": "string"
+      "type": "integer"
     },
     "on_sale": {
-      "type": "string"
+      "type": "boolean"
     },
     "order": {
-      "type": "string"
+      "$ref": "#/definitions/order"
     },
     "orderby": {
-      "type": "string"
+      "$ref": "#/definitions/orderby"
     },
     "page": {
       "type": "integer"
@@ -73,7 +76,7 @@
       "type": "string"
     },
     "status": {
-      "type": "string"
+      "$ref": "#/definitions/status"
     },
     "stock_status": {
       "type": "string"
@@ -83,6 +86,30 @@
     },
     "type": {
       "type": "string"
+    }
+  },
+  "definitions": {
+    "order": {
+      "javaType": "Order",
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "javaEnums": [
+        "ASCENDING",
+        "DESCENDING"
+      ]
+    },
+    "orderby": {
+      "javaType": "OrderBy",
+      "type": "string",
+      "enum": ["date", "id", "include", "title", "slug", "modified", "popularity", "rating", "menu_order", "price"]
+    },
+    "status": {
+      "javaType": "Status",
+      "type": "string",
+      "enum": ["publish", "pending", "draft", "private", "trash"]
     }
   }
 }

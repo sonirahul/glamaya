@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.glamaya</groupId>
         <artifactId>glamaya-data-contracts</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>glamaya-data-contracts-wix</artifactId>
