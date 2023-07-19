@@ -21,13 +21,13 @@
       "type": "integer"
     },
     "exclude": {
-      "type": "string"
+      "type": "integer"
     },
     "featured": {
       "type": "boolean"
     },
     "include": {
-      "type": "string"
+      "type": "integer"
     },
     "max_price": {
       "type": "number"
@@ -52,7 +52,8 @@
       "$ref": "#/definitions/orderby"
     },
     "page": {
-      "type": "integer"
+      "type": "integer",
+      "default": 1
     },
     "parent": {
       "type": "integer"
@@ -61,7 +62,8 @@
       "type": "string"
     },
     "per_page": {
-      "type": "integer"
+      "type": "integer",
+      "default": 10
     },
     "search": {
       "type": "string"
@@ -91,23 +93,34 @@
   "definitions": {
     "order": {
       "javaType": "Order",
-      "type": "string",
+      "description": "Represents the sorting order",
       "enum": [
         "asc",
         "desc"
       ],
-      "javaEnums": [
-        "ASCENDING",
-        "DESCENDING"
-      ]
+      "default": "desc"
     },
     "orderby": {
       "javaType": "OrderBy",
-      "type": "string",
-      "enum": ["date", "id", "include", "title", "slug", "modified", "popularity", "rating", "menu_order", "price"]
+      "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
+      "enum": ["date", "id", "include", "title", "slug", "modified", "popularity", "rating", "menu_order", "price"],
+      "javaEnums": [
+        {"name": "date_created"},
+        {"name": "id"},
+        {"name": "include"},
+        {"name": "name"},
+        {"name": "slug"},
+        {"name": "date_modified"},
+        {"name": "popularity"},
+        {"name": "rating"},
+        {"name": "menu_order"},
+        {"name": "price"}
+      ],
+      "default": "date"
     },
     "status": {
       "javaType": "Status",
+      "description": "Status of a Product on Woocommerce",
       "type": "string",
       "enum": ["publish", "pending", "draft", "private", "trash"]
     }
