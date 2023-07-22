@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Woocommerce Category Search",
+  "type": "object",
+  "properties": {
+    "context": {
+      "type": "integer"
+    },
+    "exclude": {
+      "type": "integer"
+    },
+    "fetch_latest": {
+      "type": "boolean"
+    },
+    "hide_empty": {
+      "type": "boolean",
+      "default": false
+    },
+    "include": {
+      "type": "integer"
+    },
+    "order": {
+      "$ref": "common-enum-schema.json/#/definitions/order"
+    },
+    "orderby": {
+      "$ref": "#/definitions/orderby"
+    },
+    "page": {
+      "type": "integer",
+      "default": 1
+    },
+    "parent": {
+      "type": "integer"
+    },
+    "product": {
+      "type": "integer"
+    },
+    "per_page": {
+      "type": "integer",
+      "default": 10
+    },
+    "search": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "orderby": {
+      "javaType": "CategoryOrderBy",
+      "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
+      "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],
+      "javaEnums": [
+        {"name": "id"},
+        {"name": "count"},
+        {"name": "description"},
+        {"name": "include"},
+        {"name": "name"},
+        {"name": "slug"},
+        {"name": "term_group"}
+      ],
+      "default": "name"
+    }
+  }
+}

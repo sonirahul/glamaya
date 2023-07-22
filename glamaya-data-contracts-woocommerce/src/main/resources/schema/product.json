@@ -56,18 +56,7 @@
     "categories": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          }
-        }
+        "$ref": "#/definitions/category"
       }
     },
     "cross_sell_ids": {
@@ -148,33 +137,7 @@
     "images": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "date_created": {
-            "type": "string"
-          },
-          "date_created_gmt": {
-            "type": "string"
-          },
-          "date_modified": {
-            "type": "string"
-          },
-          "date_modified_gmt": {
-            "type": "string"
-          },
-          "src": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "alt": {
-            "type": "string"
-          }
-        }
+        "$ref": "#/definitions/image"
       }
     },
     "low_stock_amount": {},
@@ -266,7 +229,7 @@
       "type": "boolean"
     },
     "status": {
-      "$ref": "#/definitions/status"
+      "$ref": "common-enum-schema.json/#/definitions/status"
     },
     "stock_quantity": {
       "type": "integer"
@@ -277,18 +240,7 @@
     "tags": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          }
-        }
+        "$ref": "#/definitions/tag"
       }
     },
     "tax_class": {
@@ -319,17 +271,86 @@
     }
   },
   "definitions": {
-    "status": {
-      "javaType": "Status",
-      "description": "Status of a Product on Woocommerce",
-      "enum": ["draft", "pending", "private", "publish", "trash"],
-      "javaEnums": [
-        {"name": "draft"},
-        {"name": "pending"},
-        {"name": "internal", "description":  "\"private\" has been changed to internal"},
-        {"name": "publish"},
-        {"name": "trash"}
-      ]
+    "category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "image": {
+          "$ref": "#/definitions/image"
+        },
+        "menu_order": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "integer"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "alt": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "date_created_gmt": {
+          "type": "string"
+        },
+        "date_modified": {
+          "type": "string"
+        },
+        "date_modified_gmt": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string"
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
     }
   }
 }
