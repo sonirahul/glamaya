@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Category Search Request to filter Categories",
+  "title": "Woocommerce Tag Search Request to filter Tags",
   "type": "object",
   "properties": {
     "context": {
@@ -33,9 +33,6 @@
       "type": "integer",
       "default": 1
     },
-    "parent": {
-      "type": "integer"
-    },
     "product": {
       "type": "integer"
     },
@@ -52,7 +49,7 @@
   },
   "definitions": {
     "orderby": {
-      "javaType": "CategoryOrderBy",
+      "javaType": "TagOrderBy",
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
       "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],
       "javaEnums": [
