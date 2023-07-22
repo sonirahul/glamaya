@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Woocommerce Product Projection",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "boolean"
+    },
+    "attributes": {
+      "type": "boolean"
+    },
+    "average_rating": {
+      "type": "boolean"
+    },
+    "backordered": {
+      "type": "boolean"
+    },
+    "backorders": {
+      "type": "boolean"
+    },
+    "backorders_allowed": {
+      "type": "boolean"
+    },
+    "button_text": {
+      "type": "boolean"
+    },
+    "catalog_visibility": {
+      "type": "boolean"
+    },
+    "categories": {
+      "type": "boolean"
+    },
+    "cross_sell_ids": {
+      "type": "boolean"
+    },
+    "date_created": {
+      "type": "boolean"
+    },
+    "date_created_gmt": {
+      "type": "boolean"
+    },
+    "date_modified": {
+      "type": "boolean"
+    },
+    "date_modified_gmt": {
+      "type": "boolean"
+    },
+    "date_on_sale_from": {
+      "type": "boolean"
+    },
+    "date_on_sale_from_gmt": {
+      "type": "boolean"
+    },
+    "date_on_sale_to": {
+      "type": "boolean"
+    },
+    "date_on_sale_to_gmt": {
+      "type": "boolean"
+    },
+    "default_attributes": {
+      "type": "boolean"
+    },
+    "description": {
+      "type": "boolean"
+    },
+    "dimensions": {
+      "type": "boolean"
+    },
+    "download_expiry": {
+      "type": "boolean"
+    },
+    "download_limit": {
+      "type": "boolean"
+    },
+    "downloadable": {
+      "type": "boolean"
+    },
+    "downloads": {
+      "type": "boolean"
+    },
+    "external_url": {
+      "type": "boolean"
+    },
+    "featured": {
+      "type": "boolean"
+    },
+    "grouped_products": {
+      "type": "boolean"
+    },
+    "has_options": {
+      "type": "boolean"
+    },
+    "images": {
+      "type": "boolean"
+    },
+    "low_stock_amount": {
+      "type": "boolean"
+    },
+    "manage_stock": {
+      "type": "boolean"
+    },
+    "menu_order": {
+      "type": "boolean"
+    },
+    "meta_data": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "boolean"
+    },
+    "on_sale": {
+      "type": "boolean"
+    },
+    "parent_id": {
+      "type": "boolean"
+    },
+    "permalink": {
+      "type": "boolean"
+    },
+    "price": {
+      "type": "boolean"
+    },
+    "price_html": {
+      "type": "boolean"
+    },
+    "purchasable": {
+      "type": "boolean"
+    },
+    "purchase_note": {
+      "type": "boolean"
+    },
+    "rating_count": {
+      "type": "boolean"
+    },
+    "regular_price": {
+      "type": "boolean"
+    },
+    "related_ids": {
+      "type": "boolean"
+    },
+    "reviews_allowed": {
+      "type": "boolean"
+    },
+    "sale_price": {
+      "type": "boolean"
+    },
+    "shipping_class": {
+      "type": "boolean"
+    },
+    "shipping_class_id": {
+      "type": "boolean"
+    },
+    "shipping_required": {
+      "type": "boolean"
+    },
+    "shipping_taxable": {
+      "type": "boolean"
+    },
+    "short_description": {
+      "type": "boolean"
+    },
+    "sku": {
+      "type": "boolean"
+    },
+    "slug": {
+      "type": "boolean"
+    },
+    "sold_individually": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "stock_quantity": {
+      "type": "boolean"
+    },
+    "stock_status": {
+      "type": "boolean"
+    },
+    "tags": {
+      "type": "boolean"
+    },
+    "tax_class": {
+      "type": "boolean"
+    },
+    "tax_status": {
+      "type": "boolean"
+    },
+    "total_sales": {
+      "type": "boolean"
+    },
+    "type": {
+      "type": "boolean"
+    },
+    "upsell_ids": {
+      "type": "boolean"
+    },
+    "variations": {
+      "type": "boolean"
+    },
+    "virtual": {
+      "type": "boolean"
+    },
+    "weight": {
+      "type": "boolean"
+    }
+  }
+}

@@ -78,7 +78,7 @@
       "type": "string"
     },
     "status": {
-      "$ref": "#/definitions/status"
+      "$ref": "product.json/#/definitions/status"
     },
     "stock_status": {
       "type": "string"
@@ -117,12 +117,6 @@
         {"name": "price"}
       ],
       "default": "date"
-    },
-    "status": {
-      "javaType": "Status",
-      "description": "Status of a Product on Woocommerce",
-      "type": "string",
-      "enum": ["publish", "pending", "draft", "private", "trash"]
     }
   }
 }

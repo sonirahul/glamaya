@@ -266,7 +266,7 @@
       "type": "boolean"
     },
     "status": {
-      "type": "string"
+      "$ref": "#/definitions/status"
     },
     "stock_quantity": {
       "type": "integer"
@@ -316,6 +316,20 @@
     },
     "weight": {
       "type": "string"
+    }
+  },
+  "definitions": {
+    "status": {
+      "javaType": "Status",
+      "description": "Status of a Product on Woocommerce",
+      "enum": ["draft", "pending", "private", "publish", "trash"],
+      "javaEnums": [
+        {"name": "draft"},
+        {"name": "pending"},
+        {"name": "internal", "description":  "\"private\" has been changed to internal"},
+        {"name": "publish"},
+        {"name": "trash"}
+      ]
     }
   }
 }
