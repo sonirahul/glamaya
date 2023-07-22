@@ -7,6 +7,10 @@
         "asc",
         "desc"
       ],
+      "javaEnums": [
+        {"name": "asc"},
+        {"name": "desc"}
+      ],
       "default": "desc"
     },
     "status": {

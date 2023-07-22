@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Woocommerce Product Projection",
+  "title": "Woocommerce Product Projection.\nUsing this class client can specify the fields to be projected for Woocommerce Product",
   "type": "object",
   "properties": {
     "_id": {

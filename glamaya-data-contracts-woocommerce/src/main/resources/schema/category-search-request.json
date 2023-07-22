@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Woocommerce Category Search",
+  "title": "Woocommerce Category Search Request to filter Categories",
   "type": "object",
   "properties": {
     "context": {
@@ -10,7 +10,8 @@
       "type": "integer"
     },
     "fetch_latest": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     },
     "hide_empty": {
       "type": "boolean",

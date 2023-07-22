@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Woocommerce Product Search",
+  "title": "Woocommerce Product Search Request to filter Products",
   "type": "object",
   "properties": {
     "after": {
@@ -24,7 +24,8 @@
       "type": "integer"
     },
     "fetch_latest": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     },
     "featured": {
       "type": "boolean"
