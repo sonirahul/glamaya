@@ -1,0 +1,4 @@
+application:
+  validator:
+    price-object-schema: /schema/price-object.json
+    price-calculator-factor-schema: /schema/price-calculator-factor.json

@@ -59,6 +59,10 @@
         "$ref": "#/definitions/category"
       }
     },
+    "cost_price": {
+      "type": "number",
+      "title": "Cost Price of a Product"
+    },
     "cross_sell_ids": {
       "type": "array",
       "items": {}
@@ -175,7 +179,9 @@
       "type": "string"
     },
     "price": {
-      "type": "string"
+      "type": "number",
+      "title": "Auto Calculated Price of a Product",
+      "readOnly": true
     },
     "price_html": {
       "type": "string"
@@ -190,7 +196,8 @@
       "type": "integer"
     },
     "regular_price": {
-      "type": "string"
+      "type": "number",
+      "title": "MRP of a Product"
     },
     "related_ids": {
       "type": "array",
@@ -198,11 +205,16 @@
         "type": "integer"
       }
     },
+    "resale_price": {
+      "type": "number",
+      "title": "Reselling Price of a Product"
+    },
     "reviews_allowed": {
       "type": "boolean"
     },
     "sale_price": {
-      "type": "string"
+      "type": "number",
+      "title": "Sale Price of a Product"
     },
     "shipping_class": {
       "type": "string"

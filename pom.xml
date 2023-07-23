@@ -13,6 +13,7 @@
         <module>glamaya-data-contracts-custom-annotator</module>
         <module>glamaya-data-contracts-wix</module>
         <module>glamaya-data-contracts-woocommerce</module>
+        <module>glamaya-data-contracts-price-calculator</module>
     </modules>
 
     <properties>
@@ -27,6 +28,8 @@
         <jsonschema2pojo-maven-plugin.version>1.1.3</jsonschema2pojo-maven-plugin.version>
         <spring-data-mongodb.version>4.1.0</spring-data-mongodb.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
+        <lombok.version>1.18.28</lombok.version>
+        <org.everit.json.schema.version>1.5.1</org.everit.json.schema.version>
     </properties>
 
     <build>

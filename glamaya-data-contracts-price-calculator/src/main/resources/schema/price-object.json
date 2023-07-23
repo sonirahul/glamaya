@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Price Object",
+  "type": "object",
+  "properties": {
+    "cost_price": {
+      "type": "integer",
+      "title": "Cost Price of a Product"
+    },
+    "resale_price": {
+      "type": "integer",
+      "title": "Reselling Price of a Product"
+    },
+    "selling_price": {
+      "type": "integer",
+      "title": "Selling Price of a Product on Woocommerce"
+    },
+    "mrp": {
+      "type": "integer",
+      "title": "Mrp Price of a Product on Woocommerce"
+    },
+    "discount_percent": {
+      "type": "number",
+      "maximum": 90,
+      "minimum": 40
+    }
+  },
+  "required": ["cost_price", "resale_price", "selling_price", "mrp"],
+  "excludedFromEqualsAndHashCode" : [ "resale_price", "selling_price", "mrp", "discount_percent" ]
+}
