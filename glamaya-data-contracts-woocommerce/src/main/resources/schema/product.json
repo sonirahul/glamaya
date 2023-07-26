@@ -282,6 +282,7 @@
       "type": "string"
     }
   },
+  "required": ["cost_price", "sku", "resale_price"],
   "definitions": {
     "category": {
       "type": "object",

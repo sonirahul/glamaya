@@ -14,6 +14,7 @@
         <module>glamaya-data-contracts-wix</module>
         <module>glamaya-data-contracts-woocommerce</module>
         <module>glamaya-data-contracts-price-calculator</module>
+        <module>glamaya-data-contracts-open-ai</module>
     </modules>
 
     <properties>

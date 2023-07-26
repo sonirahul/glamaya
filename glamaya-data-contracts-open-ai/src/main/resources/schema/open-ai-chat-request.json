@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Open AI Chat Request",
+  "type": "object",
+  "properties": {
+    "model": {
+      "type": "string"
+    },
+    "n": {
+      "type": "integer"
+    },
+    "temperature": {
+      "type": "number"
+    },
+    "max_tokens": {
+      "type": "integer",
+      "default": 500
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/message"
+      }
+    }
+  },
+  "additionalProperties":false,
+  "required": ["model", "messages"],
+  "definitions": {
+    "message": {
+      "type": "object",
+      "javaType": "Message",
+      "properties": {
+        "role": {
+          "$ref": "common-enum-schema.json/#/definitions/role"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "additionalProperties":false,
+      "required": [
+        "role",
+        "content"
+      ]
+    }
+  }
+}

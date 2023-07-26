@@ -65,8 +65,6 @@
                     <useInnerClassBuilders>true</useInnerClassBuilders>
                     <includeAdditionalProperties>false</includeAdditionalProperties>
                     <inclusionLevel>NON_EMPTY</inclusionLevel>
-                    <!--<includeConstructors>true</includeConstructors>
-                    <constructorsRequiredPropertiesOnly>true</constructorsRequiredPropertiesOnly>-->
                 </configuration>
                 <executions>
                     <execution>

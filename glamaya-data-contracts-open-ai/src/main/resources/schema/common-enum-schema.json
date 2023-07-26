@@ -1,0 +1,21 @@
+{
+  "definitions": {
+    "role": {
+      "javaType": "Role",
+      "description": "Represents the role",
+      "enum": [
+        "assistant",
+        "function",
+        "system",
+        "user"
+      ],
+      "javaEnums": [
+        {"name": "assistant"},
+        {"name": "function"},
+        {"name": "system"},
+        {"name": "user"}
+      ],
+      "default": "user"
+    }
+  }
+}

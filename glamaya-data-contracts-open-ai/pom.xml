@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>glamaya-data-contracts-price-calculator</artifactId>
+    <artifactId>glamaya-data-contracts-open-ai</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -38,16 +38,6 @@
             <artifactId>feign-core</artifactId>
             <version>${feign-core.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>${org.everit.json.schema.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -65,19 +55,17 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontracts.pricecalculator.model</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.openai</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
-                    <usePrimitives>true</usePrimitives>
+                    <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <dateType>java.time.LocalDate</dateType>
                     <dateTimeType>java.time.LocalDateTime</dateTimeType>
                     <generateBuilders>true</generateBuilders>
                     <useInnerClassBuilders>true</useInnerClassBuilders>
-                    <includeAdditionalProperties>false</includeAdditionalProperties>
+                    <includeAdditionalProperties>true</includeAdditionalProperties>
                     <inclusionLevel>NON_EMPTY</inclusionLevel>
-                    <includeConstructors>true</includeConstructors>
-                    <constructorsRequiredPropertiesOnly>true</constructorsRequiredPropertiesOnly>
                 </configuration>
                 <executions>
                     <execution>
