@@ -58,6 +58,7 @@
                     <targetPackage>com.glamaya.datacontracts.woocommerce</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
+                    <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <dateType>java.time.LocalDate</dateType>
                     <dateTimeType>java.time.LocalDateTime</dateTimeType>
