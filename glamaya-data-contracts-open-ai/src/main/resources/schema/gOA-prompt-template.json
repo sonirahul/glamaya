@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Glamaya Open Ai Prompt Template Collection",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+    },
+    "name": {
+      "$ref": "#/definitions/gOA_prompt_template_type"
+    },
+    "value": {
+      "type": "string"
+    },
+    "ser_bi_func": {
+      "description": "Contains Serializable Bi Function",
+      "title": "Contains Serializable Bi Function"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "definitions": {
+    "gOA_prompt_template_type": {
+      "javaType": "GOAPromptTemplateType",
+      "description": "Represents the Glamaya Open Ai Prompt Template Type",
+      "enum": [
+        "AI_GEN_KEYWORD_PROMPT",
+        "TEST"
+      ],
+      "javaEnums": [
+        {"name": "AI_GEN_KEYWORD_PROMPT"},
+        {"name": "TEST"}
+      ]
+    }
+  },
+  "additionalProperties":false,
+  "required": [ "name", "value" ]
+}

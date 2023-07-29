@@ -48,6 +48,11 @@
             <artifactId>org.everit.json.schema</artifactId>
             <version>${org.everit.json.schema.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-commons</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     <build>
