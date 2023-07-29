@@ -21,7 +21,7 @@
             "type": "number"
           },
           "message": {
-            "$ref": "open-ai-chat-request.json/#/definitions/message"
+            "$ref": "open-ai-chat-request.json#/definitions/message"
           },
           "finish_reason": {
             "type": "string"

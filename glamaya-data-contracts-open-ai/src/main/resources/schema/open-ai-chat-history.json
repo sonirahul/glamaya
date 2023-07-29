@@ -3,14 +3,14 @@
   "title": "Generated schema for Open AI Chat History",
   "type": "object",
   "properties": {
-    "template_version": {
+    "id": {
       "type": "string"
     },
-    "product_id": {
-      "type": "integer"
-    },
-    "sku": {
+    "entity_id": {
       "type": "string"
+    },
+    "entity_type": {
+      "$ref": "common-enum-schema.json#/definitions/entity_type"
     },
     "chat": {
       "type": "object",
@@ -24,32 +24,19 @@
         "messages": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/message"
+            "$ref": "open-ai-chat-request.json#/definitions/message"
           }
-        }
-      }
-    }
-
-  },
-  "additionalProperties":false,
-  "required": ["model", "messages"],
-  "definitions": {
-    "message": {
-      "type": "object",
-      "javaType": "Message",
-      "properties": {
-        "role": {
-          "$ref": "common-enum-schema.json/#/definitions/role"
         },
-        "content": {
+        "template_version": {
+          "type": "string"
+        },
+        "template_name": {
           "type": "string"
         }
       },
-      "additionalProperties":false,
-      "required": [
-        "role",
-        "content"
-      ]
+      "additionalProperties":false
     }
-  }
+
+  },
+  "additionalProperties":false
 }

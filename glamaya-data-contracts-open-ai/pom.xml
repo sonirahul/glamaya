@@ -64,7 +64,7 @@
                     <dateTimeType>java.time.LocalDateTime</dateTimeType>
                     <generateBuilders>true</generateBuilders>
                     <useInnerClassBuilders>true</useInnerClassBuilders>
-                    <includeAdditionalProperties>true</includeAdditionalProperties>
+                    <includeAdditionalProperties>false</includeAdditionalProperties>
                     <inclusionLevel>NON_EMPTY</inclusionLevel>
                 </configuration>
                 <executions>

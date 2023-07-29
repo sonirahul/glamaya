@@ -241,7 +241,7 @@
       "type": "boolean"
     },
     "status": {
-      "$ref": "common-enum-schema.json/#/definitions/status"
+      "$ref": "common-enum-schema.json#/definitions/status"
     },
     "stock_quantity": {
       "type": "integer"

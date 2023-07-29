@@ -9,19 +9,16 @@
         "type": "string"
       }
     },
-    "keywords": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "entity_id": {
+      "type": "string"
+    },
+    "entity_type": {
+      "$ref": "common-enum-schema.json#/definitions/entity_type"
     },
     "name": {
       "type": "string"
     },
     "prompt": {
-      "type": "string"
-    },
-    "sku": {
       "type": "string"
     },
     "tags": {

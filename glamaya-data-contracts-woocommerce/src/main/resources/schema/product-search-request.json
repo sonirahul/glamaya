@@ -50,7 +50,7 @@
       "type": "boolean"
     },
     "order": {
-      "$ref": "common-enum-schema.json/#/definitions/order"
+      "$ref": "common-enum-schema.json#/definitions/order"
     },
     "orderby": {
       "$ref": "#/definitions/orderby"
@@ -82,7 +82,7 @@
       "type": "string"
     },
     "status": {
-      "$ref": "common-enum-schema.json/#/definitions/status"
+      "$ref": "common-enum-schema.json#/definitions/status"
     },
     "stock_status": {
       "type": "string"

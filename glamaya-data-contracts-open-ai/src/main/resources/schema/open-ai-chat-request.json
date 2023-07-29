@@ -31,7 +31,7 @@
       "javaType": "Message",
       "properties": {
         "role": {
-          "$ref": "common-enum-schema.json/#/definitions/role"
+          "$ref": "common-enum-schema.json#/definitions/role"
         },
         "content": {
           "type": "string"

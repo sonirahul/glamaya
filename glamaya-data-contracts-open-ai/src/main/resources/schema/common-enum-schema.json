@@ -16,6 +16,22 @@
         {"name": "user"}
       ],
       "default": "user"
+    },
+    "entity_type": {
+      "javaType": "EntityType",
+      "description": "Represents the Entity Type",
+      "enum": [
+        "product",
+        "category",
+        "tag",
+        "other"
+      ],
+      "javaEnums": [
+        {"name": "product"},
+        {"name": "category"},
+        {"name": "tag"},
+        {"name": "other"}
+      ]
     }
   }
 }
