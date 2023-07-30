@@ -6,15 +6,11 @@
     "entity": {
       "description": "placeholder for any type of object"
     },
-    "prompt": {
-      "type": "string"
-    },
-    "template_name": {
-      "$ref": "gOA-prompt-template.json#/definitions/gOA_prompt_template_type"
-    },
-    "template_version": {
-      "type": "string",
-      "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
+    "templates": {
+      "type": "array",
+      "items": {
+        "$ref": "gOA-prompt-template.json"
+      }
     }
   },
   "additionalProperties":false

@@ -13,8 +13,8 @@
     "name": {
       "$ref": "#/definitions/gOA_prompt_template_type"
     },
-    "ser_bi_func": {
-      "description": "Contains Serializable Bi Function"
+    "prompt_bi_func": {
+      "description": "Serializable Bi Function to generate prompt"
     },
     "value": {
       "type": "string"
@@ -30,11 +30,13 @@
       "description": "Represents the Glamaya Open Ai Prompt Template Type",
       "enum": [
         "AI_GEN_KEYWORD_PROMPT",
-        "TEST"
+        "AI_GEN_SLUG_PROMPT",
+        "AI_GEN_DESCRIPTION_PROMPT"
       ],
       "javaEnums": [
         {"name": "AI_GEN_KEYWORD_PROMPT"},
-        {"name": "TEST"}
+        {"name": "AI_GEN_SLUG_PROMPT"},
+        {"name": "AI_GEN_DESCRIPTION_PROMPT"}
       ]
     }
   },
