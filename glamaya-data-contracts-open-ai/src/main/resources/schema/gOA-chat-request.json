@@ -3,41 +3,19 @@
   "title": "Generated schema for Glamaya Open Ai Chat Request",
   "type": "object",
   "properties": {
-    "categories": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "entity_id": {
-      "type": "string"
-    },
-    "entity_type": {
-      "$ref": "common-enum-schema.json#/definitions/entity_type"
-    },
-    "name": {
-      "type": "string"
+    "entity": {
+      "description": "placeholder for any type of object"
     },
     "prompt": {
       "type": "string"
     },
-    "tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
     "template_name": {
-      "type": "string"
+      "$ref": "gOA-prompt-template.json#/definitions/gOA_prompt_template_type"
     },
     "template_version": {
       "type": "string",
       "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
-    },
-    "weight": {
-      "type": "string"
     }
   },
-  "additionalProperties":false,
-  "required": ["name", "categories", "tags"]
+  "additionalProperties":false
 }
