@@ -11,7 +11,7 @@
       "format": "date-time"
     },
     "name": {
-      "$ref": "#/definitions/gOA_prompt_template_type"
+      "$ref": "#/definitions/goa_prompt_template_type"
     },
     "prompt_bi_func": {
       "description": "Serializable Bi Function to generate prompt"
@@ -25,17 +25,21 @@
     }
   },
   "definitions": {
-    "gOA_prompt_template_type": {
-      "javaType": "GOAPromptTemplateType",
+    "goa_prompt_template_type": {
+      "javaType": "GoaPromptTemplateType",
       "description": "Represents the Glamaya Open Ai Prompt Template Type",
       "enum": [
         "AI_GEN_KEYWORD_PROMPT",
+        "AI_GEN_TITLE_PROMPT",
         "AI_GEN_SLUG_PROMPT",
+        "AI_GEN_META_PROMPT",
         "AI_GEN_DESCRIPTION_PROMPT"
       ],
       "javaEnums": [
         {"name": "AI_GEN_KEYWORD_PROMPT"},
+        {"name": "AI_GEN_TITLE_PROMPT"},
         {"name": "AI_GEN_SLUG_PROMPT"},
+        {"name": "AI_GEN_META_PROMPT"},
         {"name": "AI_GEN_DESCRIPTION_PROMPT"}
       ]
     }

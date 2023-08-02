@@ -12,26 +12,33 @@
     "entity_type": {
       "$ref": "common-enum-schema.json#/definitions/entity_type"
     },
+    "history": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/chat"
+      }
+    }
+  },
+  "definitions": {
     "chat": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string"
-        },
         "created": {
-          "type": "integer"
+          "type": "string",
+          "format": "date-time"
         },
-        "messages": {
-          "type": "array",
-          "items": {
-            "$ref": "open-ai-chat-request.json#/definitions/message"
-          }
+        "open_ai_chat_request": {
+            "$ref": "open-ai-chat-request.json"
         },
-        "template_version": {
-          "type": "string"
+        "open_ai_chat_response": {
+          "$ref": "open-ai-chat-response.json"
         },
         "template_name": {
-          "type": "string"
+          "$ref": "goa-prompt-template.json#/definitions/goa_prompt_template_type"
+        },
+        "template_version": {
+          "type": "string",
+          "pattern": "^(\\d+)\\.(\\d+)\\.(\\d+)$"
         }
       },
       "additionalProperties":false

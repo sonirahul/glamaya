@@ -125,6 +125,9 @@
       "type": "array",
       "items": {}
     },
+    "edit_lock": {
+      "type": "boolean"
+    },
     "external_url": {
       "type": "string"
     },
@@ -202,7 +205,7 @@
       "type": "integer"
     },
     "regular_price": {
-      "type": "number",
+      "type": "string",
       "title": "MRP of a Product"
     },
     "related_ids": {
@@ -219,7 +222,7 @@
       "type": "boolean"
     },
     "sale_price": {
-      "type": "number",
+      "type": "string",
       "title": "Sale Price of a Product"
     },
     "shipping_class": {

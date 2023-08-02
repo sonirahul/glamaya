@@ -9,8 +9,12 @@
     "templates": {
       "type": "array",
       "items": {
-        "$ref": "gOA-prompt-template.json"
+        "$ref": "goa-prompt-template.json"
       }
+    },
+    "regenerate": {
+      "type": "boolean",
+      "default": false
     }
   },
   "additionalProperties":false
