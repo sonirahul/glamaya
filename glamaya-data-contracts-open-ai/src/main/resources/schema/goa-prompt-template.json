@@ -6,6 +6,9 @@
     "id": {
       "type": "string"
     },
+    "append_prompt": {
+      "type": "string"
+    },
     "created_at": {
       "type": "string",
       "format": "date-time"
@@ -15,6 +18,10 @@
     },
     "prompt_bi_func": {
       "description": "Serializable Bi Function to generate prompt"
+    },
+    "regenerate": {
+      "type": "boolean",
+      "default": false
     },
     "value": {
       "type": "string"
@@ -31,14 +38,12 @@
       "enum": [
         "AI_GEN_KEYWORD_PROMPT",
         "AI_GEN_TITLE_PROMPT",
-        "AI_GEN_SLUG_PROMPT",
         "AI_GEN_META_PROMPT",
         "AI_GEN_DESCRIPTION_PROMPT"
       ],
       "javaEnums": [
         {"name": "AI_GEN_KEYWORD_PROMPT"},
         {"name": "AI_GEN_TITLE_PROMPT"},
-        {"name": "AI_GEN_SLUG_PROMPT"},
         {"name": "AI_GEN_META_PROMPT"},
         {"name": "AI_GEN_DESCRIPTION_PROMPT"}
       ]

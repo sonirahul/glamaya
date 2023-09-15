@@ -11,10 +11,6 @@
       "items": {
         "$ref": "goa-prompt-template.json"
       }
-    },
-    "regenerate": {
-      "type": "boolean",
-      "default": false
     }
   },
   "additionalProperties":false
