@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce Media",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "date_gmt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "guid": {
+      "type": "object",
+      "properties": {
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "modified_gmt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "link": {
+      "type": "string"
+    },
+    "title": {
+      "type": "object",
+      "properties": {
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "author": {
+      "type": "integer"
+    },
+    "comment_status": {
+      "type": "string"
+    },
+    "ping_status": {
+      "type": "string"
+    },
+    "template": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object"
+    },
+    "description": {
+      "type": "object",
+      "properties": {
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "caption": {
+      "type": "object",
+      "properties": {
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "alt_text": {
+      "type": "string"
+    },
+    "media_type": {
+      "type": "string"
+    },
+    "mime_type": {
+      "type": "string"
+    },
+    "media_details": {
+      "type": "object",
+      "properties": {
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "file": {
+          "type": "string"
+        },
+        "sizes": {
+          "type": "object"
+        },
+        "image_meta": {
+          "type": "object"
+        }
+      }
+    },
+    "post": {
+      "type": "integer"
+    },
+    "source_url": {
+      "type": "string"
+    }
+  }
+}

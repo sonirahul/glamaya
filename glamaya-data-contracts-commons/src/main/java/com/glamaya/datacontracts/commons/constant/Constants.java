@@ -51,4 +51,8 @@ public class Constants {
 
     public static final String NEW = "new";
     public static final String NO = "no";
+    public static final String _ID = "_id";
+    public static final String ID = "id";
+    public static final String DATE_MODIFIED = "date_modified";
+    public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 }

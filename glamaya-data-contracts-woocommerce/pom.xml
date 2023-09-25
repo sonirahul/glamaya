@@ -19,24 +19,24 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>${validation-api.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <version>${spring-data-mongodb.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-core</artifactId>
-            <version>${feign-core.version}</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -60,6 +60,7 @@
                     <useBigDecimals>true</useBigDecimals>
                     <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
+                    <useJakartaValidation>true</useJakartaValidation>
                     <dateType>java.time.LocalDate</dateType>
                     <dateTimeType>java.time.LocalDateTime</dateTimeType>
                     <generateBuilders>true</generateBuilders>

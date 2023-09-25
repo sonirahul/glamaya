@@ -92,6 +92,13 @@
     },
     "type": {
       "type": "string"
+    },
+    "update_db": {
+      "type": "boolean",
+      "default": false
+    },
+    "_fields": {
+      "type": "string"
     }
   },
   "definitions": {
