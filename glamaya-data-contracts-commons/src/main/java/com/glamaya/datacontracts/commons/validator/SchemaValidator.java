@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaClient;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -19,12 +20,18 @@ public class SchemaValidator {
     private final ObjectMapper objectMapper;
 
     private Schema getSchema(String schemaPath) {
+
         var schemaInputStream = this.getClass().getResourceAsStream(schemaPath);
         if (schemaInputStream == null) {
             throw new RuntimeException(String.format("Error loading JSON schema: %s", schemaPath));
         }
         var rawSchema = new JSONObject(new JSONTokener(schemaInputStream));
-        return SchemaLoader.load(rawSchema);
+
+        return SchemaLoader.builder()
+                .schemaClient(SchemaClient.classPathAwareClient())
+                .schemaJson(rawSchema)
+                .resolutionScope("classpath://schema/") // setting the default resolution scope
+                .build().load().build();
     }
 
     public void validate(Object object, String schemaPath) {

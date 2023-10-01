@@ -33,6 +33,8 @@ public class Constants {
     public static final String B_SLASH = "\\";
     public static final String F = "F";
 
+    public static final String PRODUCT = "product";
+    public static final String PRODUCT_AI = "product-ai";
     public static final String OXIDIZED_TAG = "#ox";
     public static final String COMBO_SET_CATEGORY = "#cs";
     public static final String SHORT_DESCRIPTION = "Short Description";

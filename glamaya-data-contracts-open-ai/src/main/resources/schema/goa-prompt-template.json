@@ -13,6 +13,9 @@
       "type": "string",
       "format": "date-time"
     },
+    "entity_type": {
+      "$ref": "common-enum-schema.json#/definitions/entity_type"
+    },
     "name": {
       "$ref": "#/definitions/goa_prompt_template_type"
     },
@@ -36,16 +39,16 @@
       "javaType": "GoaPromptTemplateType",
       "description": "Represents the Glamaya Open Ai Prompt Template Type",
       "enum": [
-        "AI_GEN_KEYWORD_PROMPT",
-        "AI_GEN_TITLE_PROMPT",
-        "AI_GEN_META_PROMPT",
-        "AI_GEN_DESCRIPTION_PROMPT"
+        "AI_GEN_PRODUCT_KEYWORD_PROMPT",
+        "AI_GEN_PRODUCT_TITLE_PROMPT",
+        "AI_GEN_PRODUCT_META_PROMPT",
+        "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"
       ],
       "javaEnums": [
-        {"name": "AI_GEN_KEYWORD_PROMPT"},
-        {"name": "AI_GEN_TITLE_PROMPT"},
-        {"name": "AI_GEN_META_PROMPT"},
-        {"name": "AI_GEN_DESCRIPTION_PROMPT"}
+        {"name": "AI_GEN_PRODUCT_KEYWORD_PROMPT"},
+        {"name": "AI_GEN_PRODUCT_TITLE_PROMPT"},
+        {"name": "AI_GEN_PRODUCT_META_PROMPT"},
+        {"name": "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"}
       ]
     }
   },

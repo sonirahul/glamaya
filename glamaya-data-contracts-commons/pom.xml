@@ -25,9 +25,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>${org.everit.json.schema.version}</version>
+            <groupId>com.github.erosb</groupId>
+            <artifactId>everit-json-schema</artifactId>
+            <version>${everit-json-schema.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections</artifactId>

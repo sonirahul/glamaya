@@ -21,7 +21,8 @@
       "type": "integer"
     },
     "exclude": {
-      "type": "integer"
+      "description": "Comma separated list of ids",
+      "type": "string"
     },
     "fetch_latest": {
       "type": "boolean",
@@ -31,7 +32,8 @@
       "type": "boolean"
     },
     "include": {
-      "type": "integer"
+      "description": "Comma separated list of ids",
+      "type": "string"
     },
     "max_price": {
       "type": "number"
@@ -92,10 +94,6 @@
     },
     "type": {
       "type": "string"
-    },
-    "update_db": {
-      "type": "boolean",
-      "default": false
     },
     "_fields": {
       "type": "string"
