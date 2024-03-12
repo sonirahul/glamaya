@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Woocommerce Media Delete Response",
   "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "deleted": {
       "type": "boolean"

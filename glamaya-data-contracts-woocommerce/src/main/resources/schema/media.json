@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Woocommerce Media",
   "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "id": {
       "type": "integer"
@@ -16,6 +17,7 @@
     },
     "guid": {
       "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
         "rendered": {
           "type": "string"
@@ -44,6 +46,7 @@
     },
     "title": {
       "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
         "rendered": {
           "type": "string"
@@ -63,10 +66,12 @@
       "type": "string"
     },
     "meta": {
-      "type": "object"
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"]
     },
     "description": {
       "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
         "rendered": {
           "type": "string"
@@ -75,6 +80,7 @@
     },
     "caption": {
       "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
         "rendered": {
           "type": "string"
@@ -92,6 +98,7 @@
     },
     "media_details": {
       "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
         "width": {
           "type": "integer"
@@ -103,10 +110,12 @@
           "type": "string"
         },
         "sizes": {
-          "type": "object"
+          "type": "object",
+          "javaInterfaces" : ["java.io.Serializable", "Cloneable"]
         },
         "image_meta": {
-          "type": "object"
+          "type": "object",
+          "javaInterfaces" : ["java.io.Serializable", "Cloneable"]
         }
       }
     },

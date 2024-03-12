@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Woocommerce Tag Search Request to filter Tags",
   "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "context": {
       "type": "integer"
@@ -55,6 +56,7 @@
     "orderby": {
       "javaType": "TagOrderBy",
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],
       "javaEnums": [
         {"name": "id"},

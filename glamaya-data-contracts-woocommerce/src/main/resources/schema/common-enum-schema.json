@@ -3,6 +3,7 @@
     "order": {
       "javaType": "Order",
       "description": "Represents the sorting order",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "enum": [
         "asc",
         "desc"
@@ -16,6 +17,7 @@
     "status": {
       "javaType": "Status",
       "description": "Status of a Product on Woocommerce",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "enum": ["draft", "pending", "private", "publish", "trash"],
       "javaEnums": [
         {"name": "draft"},
