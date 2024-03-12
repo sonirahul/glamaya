@@ -96,7 +96,7 @@
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
-                        <phase>install</phase>
+                        <phase>package</phase>
                     </execution>
                 </executions>
             </plugin>
