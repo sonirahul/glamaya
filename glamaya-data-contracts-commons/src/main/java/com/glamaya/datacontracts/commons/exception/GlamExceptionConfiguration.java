@@ -13,7 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Configuration
-public class ExceptionConfiguration {
+public class GlamExceptionConfiguration {
 
     @ControllerAdvice
     @Slf4j

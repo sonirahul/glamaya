@@ -44,6 +44,11 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-woocommerce</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     <build>
