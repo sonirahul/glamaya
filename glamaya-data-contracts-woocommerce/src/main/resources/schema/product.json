@@ -129,7 +129,9 @@
       "items": {}
     },
     "edit_lock": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Lock status of the product. Default is 'false'. Applicable only for db products not for woocommerce products",
+      "default": false
     },
     "external_url": {
       "type": "string"

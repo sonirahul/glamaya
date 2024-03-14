@@ -79,6 +79,9 @@
     "downloads": {
       "type": "boolean"
     },
+    "edit_lock": {
+      "type": "boolean"
+    },
     "external_url": {
       "type": "boolean"
     },
