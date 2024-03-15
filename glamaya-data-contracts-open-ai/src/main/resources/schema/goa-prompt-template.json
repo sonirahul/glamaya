@@ -42,13 +42,15 @@
         "AI_GEN_PRODUCT_KEYWORD_PROMPT",
         "AI_GEN_PRODUCT_TITLE_PROMPT",
         "AI_GEN_PRODUCT_META_PROMPT",
-        "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"
+        "AI_GEN_PRODUCT_DESCRIPTION_PROMPT",
+        "AI_GEN_PRODUCT_SLUG_PROMPT"
       ],
       "javaEnums": [
         {"name": "AI_GEN_PRODUCT_KEYWORD_PROMPT"},
         {"name": "AI_GEN_PRODUCT_TITLE_PROMPT"},
         {"name": "AI_GEN_PRODUCT_META_PROMPT"},
-        {"name": "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"}
+        {"name": "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"},
+        {"name": "AI_GEN_PRODUCT_SLUG_PROMPT"}
       ]
     }
   },
