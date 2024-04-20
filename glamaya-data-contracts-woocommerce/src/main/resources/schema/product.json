@@ -223,6 +223,12 @@
       "type": "number",
       "title": "Reselling Price of a Product"
     },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/review"
+      }
+    },
     "reviews_allowed": {
       "type": "boolean"
     },
@@ -314,6 +320,10 @@
         "display": {
           "type": "string"
         },
+        "edit_lock": {
+          "type": "boolean",
+          "description": "Lock status of the category. Default is 'false'. Applicable only for db categories not for woocommerce categories"
+        },
         "image": {
           "$ref": "#/definitions/image"
         },
@@ -374,10 +384,47 @@
         "description": {
           "type": "string"
         },
+        "edit_lock": {
+          "type": "boolean",
+          "description": "Lock status of the tag. Default is 'false'. Applicable only for db tags not for woocommerce tags"
+        },
         "name": {
           "type": "string"
         },
         "slug": {
+          "type": "string"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "date_created_gmt": {
+          "type": "string"
+        },
+        "product_id": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        },
+        "reviewer": {
+          "type": "string"
+        },
+        "reviewer_email": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "integer"
+        },
+        "review": {
           "type": "string"
         }
       }

@@ -142,6 +142,9 @@
     "related_ids": {
       "type": "boolean"
     },
+    "reviews": {
+      "type": "boolean"
+    },
     "reviews_allowed": {
       "type": "boolean"
     },

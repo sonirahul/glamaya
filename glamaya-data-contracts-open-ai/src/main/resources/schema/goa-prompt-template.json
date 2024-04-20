@@ -22,6 +22,12 @@
     "prompt_bi_func": {
       "description": "Serializable Bi Function to generate prompt"
     },
+    "previous_prompt": {
+      "type": "array",
+      "items": {
+          "$ref": "#/definitions/goa_prompt_template_type"
+      }
+    },
     "regenerate": {
       "type": "boolean",
       "default": false
@@ -43,14 +49,18 @@
         "AI_GEN_PRODUCT_TITLE_PROMPT",
         "AI_GEN_PRODUCT_META_PROMPT",
         "AI_GEN_PRODUCT_DESCRIPTION_PROMPT",
-        "AI_GEN_PRODUCT_SLUG_PROMPT"
+        "AI_GEN_PRODUCT_SLUG_PROMPT",
+        "AI_GEN_PRODUCT_REVIEW_PROMPT",
+        "AI_GEN_UX_BLOCKS_DESCRIPTION_PROMPT"
       ],
       "javaEnums": [
         {"name": "AI_GEN_PRODUCT_KEYWORD_PROMPT"},
         {"name": "AI_GEN_PRODUCT_TITLE_PROMPT"},
         {"name": "AI_GEN_PRODUCT_META_PROMPT"},
         {"name": "AI_GEN_PRODUCT_DESCRIPTION_PROMPT"},
-        {"name": "AI_GEN_PRODUCT_SLUG_PROMPT"}
+        {"name": "AI_GEN_PRODUCT_SLUG_PROMPT"},
+        {"name": "AI_GEN_PRODUCT_REVIEW_PROMPT"},
+        {"name": "AI_GEN_UX_BLOCKS_DESCRIPTION_PROMPT"}
       ]
     }
   },

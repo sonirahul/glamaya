@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce Ux Blocks",
+  "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "content": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "rendered": {
+          "type": "string"
+        },
+        "protected": {
+          "type": "boolean"
+        }
+      }
+    },
+    "date": {
+      "type": "string"
+    },
+    "date_gmt": {
+      "type": "string"
+    },
+    "edit_lock": {
+      "type": "boolean",
+      "description": "Lock status of the product. Default is 'false'. Applicable only for db products not for woocommerce products"
+    },
+    "link": {
+      "type": "string"
+    },
+    "modified": {
+      "type": "string"
+    },
+    "modified_gmt": {
+      "type": "string"
+    },
+    "parent": {
+      "type": "integer"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "status": {
+      "$ref": "common-enum-schema.json#/definitions/status"
+    }
+  }
+}

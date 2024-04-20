@@ -8,7 +8,8 @@
       "type": "integer"
     },
     "exclude": {
-      "type": "integer"
+      "description": "Comma separated list of ids",
+      "type": "string"
     },
     "fetch_latest": {
       "type": "boolean",
@@ -19,7 +20,8 @@
       "default": false
     },
     "include": {
-      "type": "integer"
+      "description": "Comma separated list of ids",
+      "type": "string"
     },
     "offset": {
       "type": "integer"
@@ -34,12 +36,12 @@
       "type": "integer",
       "default": 1
     },
-    "product": {
-      "type": "integer"
-    },
     "per_page": {
       "type": "integer",
       "default": 10
+    },
+    "product": {
+      "type": "integer"
     },
     "search": {
       "type": "string"
@@ -50,6 +52,9 @@
     "update_db": {
       "type": "boolean",
       "default": false
+    },
+    "_fields": {
+      "type": "string"
     }
   },
   "definitions": {
