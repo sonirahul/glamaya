@@ -11,11 +11,11 @@
       "type": "object",
       "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "properties": {
-        "rendered": {
+        "raw": {
           "type": "string"
         },
-        "protected": {
-          "type": "boolean"
+        "rendered": {
+          "type": "string"
         }
       }
     },
@@ -25,9 +25,17 @@
     "date_gmt": {
       "type": "string"
     },
-    "edit_lock": {
-      "type": "boolean",
-      "description": "Lock status of the product. Default is 'false'. Applicable only for db products not for woocommerce products"
+    "entity_id": {
+      "type": "integer",
+      "description": "Id of the Entity. Used internally only to create a UX block, not for woocommerce"
+    },
+    "entity_name": {
+      "type": "string",
+      "description": "Name of the Entity. Used internally only to create a UX block, not for woocommerce"
+    },
+    "entity_type": {
+      "$ref": "common-enum-schema.json#/definitions/entity_type",
+      "description": "Type of the Entity. Used internally only to create a UX block, not for woocommerce"
     },
     "link": {
       "type": "string"
@@ -43,6 +51,9 @@
     },
     "slug": {
       "type": "string"
+    },
+    "title": {
+      "$ref": "media.json#/definitions/title"
     },
     "status": {
       "$ref": "common-enum-schema.json#/definitions/status"

@@ -53,7 +53,7 @@
       "type": "boolean"
     },
     "order": {
-      "$ref": "common-enum-schema.json#/definitions/order"
+      "$ref": "common-enum-schema.json#/definitions/sort_order"
     },
     "orderby": {
       "$ref": "#/definitions/orderby"
@@ -85,7 +85,7 @@
       "type": "string"
     },
     "status": {
-      "$ref": "common-enum-schema.json#/definitions/status"
+      "$ref": "common-enum-schema.json#/definitions/product_status"
     },
     "stock_status": {
       "type": "string"

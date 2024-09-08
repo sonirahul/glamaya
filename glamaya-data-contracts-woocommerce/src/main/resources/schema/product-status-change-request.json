@@ -5,7 +5,7 @@
   "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "status": {
-      "$ref": "common-enum-schema.json#/definitions/status"
+      "$ref": "common-enum-schema.json#/definitions/product_status"
     }
   }
 }

@@ -1,0 +1,434 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Glamaya E-Commerce Contact",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "type": "string"
+        },
+        "wixAppID": {
+          "type": "string"
+        },
+        "appID": {
+          "type": "string"
+        }
+      }
+    },
+    "createdDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastActivity": {
+      "type": "object",
+      "properties": {
+        "activityDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activityType": {
+          "$ref": "#/definitions/activityType"
+        }
+      }
+    },
+    "primaryInfo": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "object",
+          "properties": {
+            "first": {
+              "type": "string"
+            },
+            "last": {
+              "type": "string"
+            }
+          }
+        },
+        "emails": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/emailItem"
+              }
+            }
+          }
+        },
+        "phones": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/phone"
+              }
+            }
+          }
+        },
+        "locale": {
+          "type": "string"
+        },
+        "extendedFields": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "contacts.displayByLastName": {
+                  "type": "string"
+                },
+                "emailSubscriptions.deliverabilityStatus": {
+                  "type": "string"
+                },
+                "emailSubscriptions.subscriptionStatus": {
+                  "type": "string"
+                },
+                "emailSubscriptions.effectiveEmail": {
+                  "type": "string"
+                },
+                "contacts.displayByFirstName": {
+                  "type": "string"
+                },
+                "ecom.lastPurchaseDate": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "ecom.numOfPurchases": {
+                  "type": "integer"
+                },
+                "ecom.totalSpentAmount": {
+                  "type": "number"
+                },
+                "ecom.totalSpentCurrency": {
+                  "type": "string"
+                },
+                "members.membershipStatus": {
+                  "type": "string"
+                },
+                "members.mobile": {
+                  "type": "boolean"
+                },
+                "contacts.type": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "addresses": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/addressItem"
+              }
+            }
+          }
+        },
+        "labelKeys": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "picture": {
+      "$ref": "product.json#/definitions/image"
+    },
+    "resourceName": {
+      "type": "string"
+    },
+    "updateRequired": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "addressItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        }
+      }
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            }
+          }
+        },
+        "country": {
+          "type": "string"
+        },
+        "subdivision": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "zipCode": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "addressLine": {
+          "type": "string"
+        },
+        "formattedAddress": {
+          "type": "string"
+        },
+        "countryFullname": {
+          "type": "string"
+        },
+        "subdivisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "typeInfo": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "streetAddress": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "activityType": {
+      "javaType": "ActivityType",
+      "description": "Activity Type",
+      "javaInterfaces": [
+        "java.io.Serializable",
+        "Cloneable"
+      ],
+      "enum": [
+        "INVOICE_WAS_SET",
+        "MERCHANT_COMMENT",
+        "ORDER_FULFILLED",
+        "ORDER_NOT_FULFILLED",
+        "ORDER_PAID",
+        "ORDER_PLACED",
+        "SHIPPING_ADDRESS_EDITED",
+        "SHIPPING_CONFIRMATION_EMAIL_SENT",
+        "TRACKING_LINK_WAS_SET",
+        "TRACKING_NUMBER_ADDED",
+        "TRACKING_NUMBER_EDITED",
+        "CONTACT_CREATED",
+        "ECOM_PURCHASE",
+        "INVOICE_PAY",
+        "MEMBER_LOGIN",
+        "MEMBER_REGISTER",
+        "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED",
+        "NEWSLETTER_SUBSCRIPTION_NOT_SET",
+        "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE",
+        "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE",
+        "INBOX_MESSAGE_FROM_CUSTOMER",
+        "INBOX_MESSAGE_TO_CUSTOMER",
+        "FORM_SUBMITTED",
+        "INBOX_FORM_SUBMITTED",
+        "CONTACT_MERGED"
+      ],
+      "javaEnums": [
+        {
+          "name": "INVOICE_WAS_SET"
+        },
+        {
+          "name": "MERCHANT_COMMENT"
+        },
+        {
+          "name": "ORDER_FULFILLED"
+        },
+        {
+          "name": "ORDER_NOT_FULFILLED"
+        },
+        {
+          "name": "ORDER_PAID"
+        },
+        {
+          "name": "ORDER_PLACED"
+        },
+        {
+          "name": "SHIPPING_ADDRESS_EDITED"
+        },
+        {
+          "name": "SHIPPING_CONFIRMATION_EMAIL_SENT"
+        },
+        {
+          "name": "TRACKING_LINK_WAS_SET"
+        },
+        {
+          "name": "TRACKING_NUMBER_ADDED"
+        },
+        {
+          "name": "TRACKING_NUMBER_EDITED"
+        },
+        {
+          "name": "CONTACT_CREATED"
+        },
+        {
+          "name": "ECOM_PURCHASE"
+        },
+        {
+          "name": "INVOICE_PAY"
+        },
+        {
+          "name": "MEMBER_LOGIN"
+        },
+        {
+          "name": "MEMBER_REGISTER"
+        },
+        {
+          "name": "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED"
+        },
+        {
+          "name": "NEWSLETTER_SUBSCRIPTION_NOT_SET"
+        },
+        {
+          "name": "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE"
+        },
+        {
+          "name": "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE"
+        },
+        {
+          "name": "INBOX_MESSAGE_FROM_CUSTOMER"
+        },
+        {
+          "name": "INBOX_MESSAGE_TO_CUSTOMER"
+        },
+        {
+          "name": "FORM_SUBMITTED"
+        },
+        {
+          "name": "INBOX_FORM_SUBMITTED"
+        },
+        {
+          "name": "CONTACT_MERGED"
+        }
+      ]
+    },
+    "emailItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "primary": {
+          "type": "boolean"
+        }
+      }
+    },
+    "phone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "formattedPhone": {
+          "type": "string"
+        },
+        "primary": {
+          "type": "boolean"
+        },
+        "e164Phone": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

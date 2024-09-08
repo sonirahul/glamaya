@@ -1,39 +1,38 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generated schema for Wix Product",
+  "title": "Generated schema for Glamaya E-Commerce Product",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     },
-    "name": {
+    "wixId": {
       "type": "string"
     },
-    "slug": {
+    "wooId": {
       "type": "string"
     },
-    "visible": {
-      "type": "boolean"
-    },
-    "productType": {
+    "wixSku": {
       "type": "string"
     },
-    "description": {
-      "type": "string"
-    },
-    "sku": {
-      "type": "string"
-    },
-    "brand": {
-      "type": "string"
-    },
-    "woosku": {
+    "wooSku": {
       "type": "string",
       "description": "woocommerce fields"
     },
-    "wooId": {
-      "type": "integer",
-      "description": "woocommerce fields"
+    "wixName": {
+      "type": "string"
+    },
+    "wooName": {
+      "type": "string"
+    },
+    "wixSlug": {
+      "type": "string"
+    },
+    "wooSlug": {
+      "type": "string"
+    },
+    "price": {
+      "$ref": "#/definitions/price"
     },
     "weight": {
       "type": "number"
@@ -50,48 +49,6 @@
         "inStock": {
           "type": "boolean"
         }
-      }
-    },
-    "price": {
-      "$ref": "#/definitions/price"
-    },
-    "costRange": {
-      "type": "object",
-      "properties": {
-        "minValue": {
-          "type": "integer"
-        },
-        "maxValue": {
-          "type": "integer"
-        }
-      }
-    },
-    "additionalInfoSections": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "ribbons": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {}
-      }
-    },
-    "media": {
-      "$ref": "#/definitions/media"
-    },
-    "customTextFields": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {}
       }
     },
     "manageVariants": {
@@ -119,50 +76,13 @@
                 "description": {
                   "type": "string"
                 },
-                "media": {
-                  "$ref": "#/definitions/media"
-                },
                 "inStock": {
-                  "type": "boolean"
-                },
-                "visible": {
                   "type": "boolean"
                 }
               }
             }
           }
         }
-      }
-    },
-    "productPageUrl": {
-      "type": "object",
-      "properties": {
-        "base": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        }
-      }
-    },
-    "numericID": {
-      "type": "string"
-    },
-    "inventoryItemID": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "collectionIds": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "private Discount discount; "
-    },
-    "collections": {
-      "type": "array",
-      "items": {
-        "type": "string"
       }
     },
     "variants": {
@@ -203,20 +123,6 @@
           }
         }
       }
-    },
-    "lastUpdated": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "createdDate": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "ribbon": {
-      "type": "string"
-    },
-    "migrationDone": {
-      "type": "boolean"
     }
   },
   "definitions": {
@@ -226,7 +132,7 @@
         "id": {
           "type": "string"
         },
-        "mediaId": {
+        "mediaID": {
           "type": "string"
         },
         "url": {
@@ -246,17 +152,6 @@
         }
       }
     },
-    "imageInfo": {
-      "type": "object",
-      "properties": {
-        "image": {
-          "$ref": "#/definitions/image"
-        },
-        "imageProvider": {
-          "type": "string"
-        }
-      }
-    },
     "price": {
       "type": "object",
       "properties": {
@@ -265,7 +160,7 @@
         },
         "costPrice": {
           "type": "integer",
-          "description": "Custom fields "
+          "description": "Custom fields"
         },
         "resellingPrice": {
           "type": "integer"
@@ -275,40 +170,12 @@
         },
         "wixMrp": {
           "type": "integer"
-        }
-      }
-    },
-    "media": {
-      "type": "object",
-      "properties": {
-        "mainMedia": {
-          "$ref": "#/definitions/mainMedia"
         },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/mainMedia"
-          }
-        }
-      }
-    },
-    "mainMedia": {
-      "type": "object",
-      "properties": {
-        "thumbnail": {
-          "$ref": "#/definitions/image"
+        "wooSellingPrice": {
+          "type": "integer"
         },
-        "mediaType": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "image": {
-          "$ref": "#/definitions/image"
-        },
-        "id": {
-          "type": "string"
+        "wooMrp": {
+          "type": "integer"
         }
       }
     }

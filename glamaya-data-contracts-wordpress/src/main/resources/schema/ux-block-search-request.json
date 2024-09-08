@@ -1,21 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Category Search Request to filter Categories",
+  "title": "Woocommerce UxBlock Search Request to filter UxBlocks",
   "type": "object",
   "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
-    "context": {
-      "type": "integer"
-    },
     "exclude": {
       "description": "Comma separated list of ids",
       "type": "string"
     },
     "fetch_latest": {
-      "type": "boolean",
-      "default": false
-    },
-    "hide_empty": {
       "type": "boolean",
       "default": false
     },
@@ -46,18 +39,11 @@
       "type": "integer",
       "default": 10
     },
-    "product": {
-      "type": "integer"
-    },
-    "search": {
-      "type": "string"
-    },
     "slug": {
       "type": "string"
     },
-    "update_db": {
-      "type": "boolean",
-      "default": false
+    "status": {
+      "$ref": "common-enum-schema.json#/definitions/status"
     },
     "_fields": {
       "type": "string"
@@ -65,20 +51,20 @@
   },
   "definitions": {
     "orderby": {
-      "javaType": "CategoryOrderBy",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "javaType": "UxBlocksOrderBy",
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
-      "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": ["id", "date", "include", "modified", "parent", "slug", "title"],
       "javaEnums": [
         {"name": "id"},
-        {"name": "count"},
-        {"name": "description"},
+        {"name": "date"},
         {"name": "include"},
-        {"name": "name"},
+        {"name": "modified"},
+        {"name": "parent"},
         {"name": "slug"},
-        {"name": "term_group"}
+        {"name": "title"}
       ],
-      "default": "name"
+      "default": "id"
     }
   }
 }

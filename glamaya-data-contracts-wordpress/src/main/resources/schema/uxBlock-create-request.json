@@ -1,11 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Category Search Request to filter Categories",
+  "title": "Woocommerce UxBlock Create Request",
   "type": "object",
   "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "context": {
       "type": "integer"
+    },
+    "entity_type": {
+      "$ref": "common-enum-schema.json#/definitions/entity_type"
     },
     "exclude": {
       "description": "Comma separated list of ids",
@@ -42,12 +45,19 @@
     "parent_exclude": {
       "type": "string"
     },
+    "prompt_version": {
+      "type": "string"
+    },
     "per_page": {
       "type": "integer",
       "default": 10
     },
     "product": {
       "type": "integer"
+    },
+    "regenerate": {
+      "type": "boolean",
+      "default": false
     },
     "search": {
       "type": "string"
@@ -65,7 +75,7 @@
   },
   "definitions": {
     "orderby": {
-      "javaType": "CategoryOrderBy",
+      "javaType": "UxBlockOrderBy",
       "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
       "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],

@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce Order Projection.\nUsing this class client can specify the fields to be projected for Woocommerce Order",
+  "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+  "properties": {
+    "id": {
+      "type": "boolean"
+    },
+    "billing": {
+      "type": "boolean"
+    },
+    "cart_hash": {
+      "type": "boolean"
+    },
+    "cart_tax": {
+      "type": "boolean"
+    },
+    "coupon_lines": {
+      "type": "boolean"
+    },
+    "created_via": {
+      "type": "boolean"
+    },
+    "customer_id": {
+      "type": "boolean"
+    },
+    "customer_ip_address": {
+      "type": "boolean"
+    },
+    "customer_note": {
+      "type": "boolean"
+    },
+    "currency": {
+      "type": "boolean"
+    },
+    "currency_symbol": {
+      "type": "boolean"
+    },
+    "customer_user_agent": {
+      "type": "boolean"
+    },
+    "date_completed": {
+      "type": "boolean"
+    },
+    "date_completed_gmt": {
+      "type": "boolean"
+    },
+    "date_created": {
+      "type": "boolean"
+    },
+    "date_created_gmt": {
+      "type": "boolean"
+    },
+    "date_modified": {
+      "type": "boolean"
+    },
+    "date_modified_gmt": {
+      "type": "boolean"
+    },
+    "date_paid": {
+      "type": "boolean"
+    },
+    "date_paid_gmt": {
+      "type": "boolean"
+    },
+    "discount_tax": {
+      "type": "boolean"
+    },
+    "discount_total": {
+      "type": "boolean"
+    },
+    "fee_lines": {
+      "type": "boolean"
+    },
+    "is_editable": {
+      "type": "boolean"
+    },
+    "line_items": {
+      "type": "boolean"
+    },
+    "meta_data": {
+      "type": "boolean"
+    },
+    "needs_payment": {
+      "type": "boolean"
+    },
+    "needs_processing": {
+      "type": "boolean"
+    },
+    "number": {
+      "type": "boolean"
+    },
+    "order_key": {
+      "type": "boolean"
+    },
+    "parent_id": {
+      "type": "boolean"
+    },
+    "payment_method": {
+      "type": "boolean"
+    },
+    "payment_method_title": {
+      "type": "boolean"
+    },
+    "payment_url": {
+      "type": "boolean"
+    },
+    "prices_include_tax": {
+      "type": "boolean"
+    },
+    "refunds": {
+      "type": "boolean"
+    },
+    "shipping": {
+      "type": "boolean"
+    },
+    "shipping_lines": {
+      "type": "boolean"
+    },
+    "shipping_tax": {
+      "type": "boolean"
+    },
+    "shipping_total": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "boolean"
+    },
+    "tax_lines": {
+      "type": "boolean"
+    },
+    "total": {
+      "type": "boolean"
+    },
+    "total_tax": {
+      "type": "boolean"
+    },
+    "transaction_id": {
+      "type": "boolean"
+    },
+    "version": {
+      "type": "boolean"
+    },
+    "_links": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce Order Search Request to filter Orders",
+  "type": "object",
+  "javaInterfaces": ["java.io.Serializable", "Cloneable"],
+  "properties": {
+    "_fields": {
+      "type": "string"
+    },
+    "after": {
+      "type": "string",
+      "description": "Limit response to resources published after a given ISO8601 compliant date."
+    },
+    "before": {
+      "type": "string",
+      "description": "Limit response to resources published before a given ISO8601 compliant date."
+    },
+    "context": {
+      "type": "integer"
+    },
+    "customer": {
+      "type": "string",
+      "description": "Limit result set to orders assigned a specific customer ID."
+    },
+    "dates_are_gmt": {
+      "type": "boolean",
+      "description": "Set to true to interpret dates in GMT timezone.",
+      "default": false
+    },
+    "dp": {
+      "type": "integer",
+      "description": "Number of decimal points to use in each resource. Default is 2",
+      "default": 2
+    },
+    "exclude": {
+      "description": "Comma separated list of ids",
+      "type": "string"
+    },
+    "fetch_latest": {
+      "type": "boolean",
+      "default": false
+    },
+    "include": {
+      "description": "Comma separated list of ids",
+      "type": "string"
+    },
+    "modified_after": {
+      "type": "string",
+      "description": "Limit response to resources modified after a given ISO8601 compliant date."
+    },
+    "modified_before": {
+      "type": "string",
+      "description": "Limit response to resources modified before a given ISO8601 compliant date."
+    },
+    "offset": {
+      "type": "integer",
+      "description": "Offset the result set by a specific number of items."
+    },
+    "order": {
+      "$ref": "common-enum-schema.json#/definitions/sort_order"
+    },
+    "orderby": {
+      "$ref": "#/definitions/orderby"
+    },
+    "page": {
+      "type": "integer",
+      "description": "Page number of results to return.",
+      "default": 1
+    },
+    "parent": {
+      "type": "string",
+      "description": "Limit result set to those of particular parent IDs."
+    },
+    "parent_exclude": {
+      "type": "string",
+      "description": "Limit result set to all items except those of a particular parent ID."
+    },
+    "per_page": {
+      "type": "integer",
+      "description": "Maximum number of items to be returned in result set.",
+      "default": 10
+    },
+    "product": {
+      "type": "integer",
+      "description": "Limit result set to orders assigned a specific product ID."
+    },
+    "search": {
+      "type": "string",
+      "description": "Limit results to those matching a string."
+    },
+    "status": {
+      "$ref": "common-enum-schema.json#/definitions/order_status"
+    }
+  },
+  "definitions": {
+    "orderby": {
+      "javaType": "OrderOrderBy",
+      "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
+      "javaInterfaces": ["java.io.Serializable", "Cloneable"],
+      "enum": ["date", "id", "include", "title", "slug"],
+      "javaEnums": [
+        {"name": "date_created"},
+        {"name": "id"},
+        {"name": "include"},
+        {"name": "name"},
+        {"name": "slug"}
+      ],
+      "default": "date"
+    }
+  }
+}

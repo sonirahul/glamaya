@@ -1,40 +1,39 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Ux Blocks Projection. \nUsing this class client can specify the fields to be projected for Woocommerce UX Blocks",
+  "title": "Generated schema for Wix Contact Projection",
   "type": "object",
-  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
-    "_id": {
+    "id": {
       "type": "boolean"
     },
-    "content": {
+    "revision": {
       "type": "boolean"
     },
-    "date": {
+    "source": {
       "type": "boolean"
     },
-    "date_gmt": {
+    "createdDate": {
       "type": "boolean"
     },
-    "edit_lock": {
+    "updatedDate": {
       "type": "boolean"
     },
-    "link": {
+    "lastActivity": {
       "type": "boolean"
     },
-    "modified": {
+    "primaryInfo": {
       "type": "boolean"
     },
-    "modified_gmt": {
+    "info": {
       "type": "boolean"
     },
-    "parent": {
+    "picture": {
       "type": "boolean"
     },
-    "slug": {
+    "resourceName": {
       "type": "boolean"
     },
-    "status": {
+    "updateRequired": {
       "type": "boolean"
     }
   }

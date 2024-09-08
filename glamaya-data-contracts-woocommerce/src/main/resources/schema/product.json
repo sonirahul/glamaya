@@ -165,20 +165,7 @@
       "type": "integer"
     },
     "meta_data": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "key": {
-            "type": "string"
-          },
-          "value": {}
-        }
-      }
+      "$ref": "#/definitions/meta_data"
     },
     "name": {
       "type": "string"
@@ -261,7 +248,7 @@
       "type": "boolean"
     },
     "status": {
-      "$ref": "common-enum-schema.json#/definitions/status"
+      "$ref": "common-enum-schema.json#/definitions/product_status"
     },
     "stock_quantity": {
       "type": "integer"
@@ -368,6 +355,28 @@
         },
         "src": {
           "type": "string"
+        }
+      }
+    },
+    "meta_data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+          },
+          "display_key": {
+            "type": "string"
+          },
+          "display_value": {
+          }
         }
       }
     },

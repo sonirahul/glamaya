@@ -7,12 +7,14 @@
         "product",
         "category",
         "tag",
+        "uxblock",
         "other"
       ],
       "javaEnums": [
         {"name": "product"},
         {"name": "category"},
         {"name": "tag"},
+        {"name": "uxblock"},
         {"name": "other"}
       ]
     },

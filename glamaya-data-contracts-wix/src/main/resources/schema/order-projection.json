@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Wix Order Projection",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "boolean"
+    },
+    "orderNumber": {
+      "type": "boolean"
+    },
+    "orderNumberString": {
+      "type": "boolean"
+    },
+    "shiprocketId": {
+      "type": "boolean"
+    },
+    "dateCreated": {
+      "type": "boolean"
+    },
+    "buyerInfo": {
+      "type": "boolean"
+    },
+    "currency": {
+      "type": "boolean"
+    },
+    "weightUnit": {
+      "type": "boolean"
+    },
+    "totals": {
+      "type": "boolean"
+    },
+    "billingInfo": {
+      "type": "boolean"
+    },
+    "shippingInfo": {
+      "type": "boolean"
+    },
+    "read": {
+      "type": "boolean"
+    },
+    "archived": {
+      "type": "boolean"
+    },
+    "paymentStatus": {
+      "type": "boolean"
+    },
+    "fulfillmentStatus": {
+      "type": "boolean"
+    },
+    "lineItems": {
+      "type": "boolean"
+    },
+    "activities": {
+      "type": "boolean"
+    },
+    "fulfillments": {
+      "type": "boolean"
+    },
+    "cartID": {
+      "type": "boolean"
+    },
+    "channelInfo": {
+      "type": "boolean"
+    },
+    "enteredBy": {
+      "type": "boolean"
+    },
+    "lastUpdated": {
+      "type": "boolean"
+    },
+    "numericID": {
+      "type": "boolean"
+    },
+    "refunds": {
+      "type": "boolean"
+    },
+    "isInternalOrderCreate": {
+      "type": "boolean"
+    },
+    "buyerLanguage": {
+      "type": "boolean"
+    },
+    "invoiceInfo": {
+      "type": "boolean"
+    },
+    "discount": {
+      "type": "boolean"
+    },
+    "buyerNote": {
+      "type": "boolean"
+    }
+  }
+}

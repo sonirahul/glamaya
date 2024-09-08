@@ -1,10 +1,24 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Category Search Request to filter Categories",
+  "title": "Wix Product Search Request to filter Products",
   "type": "object",
   "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
-    "context": {
+    "after": {
+      "type": "string",
+      "format": "date"
+    },
+    "attribute": {
+      "type": "string"
+    },
+    "attribute_term": {
+      "type": "string"
+    },
+    "before": {
+      "type": "string",
+      "format": "date"
+    },
+    "category": {
       "type": "integer"
     },
     "exclude": {
@@ -15,16 +29,28 @@
       "type": "boolean",
       "default": false
     },
-    "hide_empty": {
-      "type": "boolean",
-      "default": false
+    "featured": {
+      "type": "boolean"
     },
     "include": {
       "description": "Comma separated list of ids",
       "type": "string"
     },
+    "max_price": {
+      "type": "number"
+    },
+    "min_price": {
+      "type": "number"
+    },
+    "modified_after": {
+      "type": "string",
+      "format": "date"
+    },
     "offset": {
       "type": "integer"
+    },
+    "on_sale": {
+      "type": "boolean"
     },
     "order": {
       "$ref": "common-enum-schema.json#/definitions/sort_order"
@@ -46,18 +72,29 @@
       "type": "integer",
       "default": 10
     },
-    "product": {
-      "type": "integer"
-    },
     "search": {
+      "type": "string"
+    },
+    "shipping_class": {
+      "type": "string"
+    },
+    "sku": {
       "type": "string"
     },
     "slug": {
       "type": "string"
     },
-    "update_db": {
-      "type": "boolean",
-      "default": false
+    "status": {
+      "$ref": "common-enum-schema.json#/definitions/product_status"
+    },
+    "stock_status": {
+      "type": "string"
+    },
+    "tag": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "string"
     },
     "_fields": {
       "type": "string"
@@ -65,20 +102,23 @@
   },
   "definitions": {
     "orderby": {
-      "javaType": "CategoryOrderBy",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "javaType": "ProductOrderBy",
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
-      "enum": ["id", "count", "description", "include", "name", "slug", "term_group"],
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": ["date", "id", "include", "title", "slug", "modified", "popularity", "rating", "menu_order", "price"],
       "javaEnums": [
+        {"name": "date_created"},
         {"name": "id"},
-        {"name": "count"},
-        {"name": "description"},
         {"name": "include"},
         {"name": "name"},
         {"name": "slug"},
-        {"name": "term_group"}
+        {"name": "date_modified"},
+        {"name": "popularity"},
+        {"name": "rating"},
+        {"name": "menu_order"},
+        {"name": "price"}
       ],
-      "default": "name"
+      "default": "date"
     }
   }
 }

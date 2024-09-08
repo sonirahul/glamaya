@@ -7,76 +7,11 @@
     "id": {
       "type": "integer"
     },
-    "date": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "date_gmt": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "guid": {
-      "type": "object",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "properties": {
-        "rendered": {
-          "type": "string"
-        }
-      }
-    },
-    "modified": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "modified_gmt": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "slug": {
+    "alt_text": {
       "type": "string"
-    },
-    "status": {
-      "type": "string"
-    },
-    "type": {
-      "type": "string"
-    },
-    "link": {
-      "type": "string"
-    },
-    "title": {
-      "type": "object",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "properties": {
-        "rendered": {
-          "type": "string"
-        }
-      }
     },
     "author": {
       "type": "integer"
-    },
-    "comment_status": {
-      "type": "string"
-    },
-    "ping_status": {
-      "type": "string"
-    },
-    "template": {
-      "type": "string"
-    },
-    "meta": {
-      "type": "object",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"]
-    },
-    "description": {
-      "type": "object",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "properties": {
-        "rendered": {
-          "type": "string"
-        }
-      }
     },
     "caption": {
       "type": "object",
@@ -87,13 +22,36 @@
         }
       }
     },
-    "alt_text": {
+    "comment_status": {
       "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "date_gmt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "description": {
+      "$ref": "#/definitions/description"
+    },
+    "guid": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "link": {
+      "type": "string"
+    },
+    "title": {
+      "$ref": "#/definitions/title"
     },
     "media_type": {
-      "type": "string"
-    },
-    "mime_type": {
       "type": "string"
     },
     "media_details": {
@@ -119,11 +77,67 @@
         }
       }
     },
+    "meta": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"]
+    },
+    "mime_type": {
+      "type": "string"
+    },
+    "modified": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "modified_gmt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ping_status": {
+      "type": "string"
+    },
     "post": {
       "type": "integer"
     },
+    "slug": {
+      "type": "string"
+    },
     "source_url": {
       "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "template": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "description": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "raw": {
+          "type": "string"
+        },
+        "rendered": {
+          "type": "string"
+        }
+      }
+    },
+    "title": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "raw": {
+          "type": "string"
+        },
+        "rendered": {
+          "type": "string"
+        }
+      }
     }
   }
 }

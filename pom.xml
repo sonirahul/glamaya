@@ -38,8 +38,10 @@
     <modules>
         <module>glamaya-data-contracts-custom-annotator</module>
         <module>glamaya-data-contracts-commons</module>
+        <module>glamaya-data-contracts-ecommerce</module>
         <module>glamaya-data-contracts-wix</module>
         <module>glamaya-data-contracts-woocommerce</module>
+        <module>glamaya-data-contracts-wordpress</module>
         <module>glamaya-data-contracts-price-calculator</module>
         <module>glamaya-data-contracts-open-ai</module>
     </modules>

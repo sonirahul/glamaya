@@ -1,5 +1,7 @@
 package com.glamaya.datacontracts.commons.constant;
 
+import java.time.format.DateTimeFormatter;
+
 public class Constants {
 
     public static final int ZERO = 0;
@@ -39,8 +41,13 @@ public class Constants {
     public static final String CATEGORY_AI = "category-ai";
     public static final String TAG = "tag";
     public static final String TAG_AI = "tag-ai";
-    public static final String UX_BLOCK = "ux-block";
-    public static final String UX_BLOCK_AI = "ux-block-ai";
+    public static final String UX_BLOCK = "uxblock";
+    public static final String UX_BLOCK_AI = "uxblock-ai";
+    public static final String USER = "user";
+    public static final String USER_CREATED_BY_SYSTEM = "system";
+    public static final String USER_CREATED_BY_MANUAL = "manual";
+    public static final String ORDER = "order";
+
     public static final String OXIDIZED_TAG = "#ox";
     public static final String COMBO_SET_CATEGORY = "#cs";
     public static final String SHORT_DESCRIPTION = "Short Description";
@@ -75,6 +82,7 @@ public class Constants {
     public static final String ID = "id";
     public static final String DATE_MODIFIED = "date_modified";
     public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
     public static final String YITH_COG_COST_META = "yith_cog_cost";
     public static final String YOAST_WPSEO_METADESC_META = "_yoast_wpseo_metadesc";

@@ -1,9 +1,18 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Woocommerce Product Search Request to filter Products",
+  "title": "Woocommerce User Search Request to filter Users",
   "type": "object",
-  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+  "javaInterfaces": ["java.io.Serializable", "Cloneable"],
   "properties": {
+    "_fields": {
+      "type": "string"
+    },
+    "context": {
+      "type": "integer"
+    },
+    "email": {
+      "type": "string"
+    },
     "exclude": {
       "description": "Comma separated list of ids",
       "type": "string"
@@ -20,7 +29,7 @@
       "type": "integer"
     },
     "order": {
-      "$ref": "common-enum-schema.json#/definitions/order"
+      "$ref": "common-enum-schema.json#/definitions/sort_order"
     },
     "orderby": {
       "$ref": "#/definitions/orderby"
@@ -29,42 +38,30 @@
       "type": "integer",
       "default": 1
     },
-    "parent": {
-      "type": "integer"
-    },
-    "parent_exclude": {
-      "type": "string"
-    },
     "per_page": {
       "type": "integer",
       "default": 10
     },
-    "slug": {
-      "type": "string"
+    "role": {
+      "$ref": "common-enum-schema.json#/definitions/user_role"
     },
-    "status": {
-      "$ref": "common-enum-schema.json#/definitions/status"
-    },
-    "_fields": {
+    "search": {
       "type": "string"
     }
   },
   "definitions": {
     "orderby": {
-      "javaType": "UxBlocksOrderBy",
+      "javaType": "UserOrderBy",
       "description": "Represents the field to be sorted by. The \"name\" to be used in sorting from DB, \"value\" to be used to sort from Woo API",
-      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "enum": ["id", "date", "include", "modified", "parent", "slug", "title"],
+      "javaInterfaces": ["java.io.Serializable", "Cloneable"],
+      "enum": ["id", "include", "name", "registered_date"],
       "javaEnums": [
         {"name": "id"},
-        {"name": "date"},
         {"name": "include"},
-        {"name": "modified"},
-        {"name": "parent"},
-        {"name": "slug"},
-        {"name": "title"}
+        {"name": "name"},
+        {"name": "registered_date"}
       ],
-      "default": "id"
+      "default": "name"
     }
   }
 }

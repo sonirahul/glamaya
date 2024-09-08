@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce Ux Blocks Projection. \nUsing this class client can specify the fields to be projected for Woocommerce UX Blocks",
+  "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+  "properties": {
+    "_id": {
+      "type": "boolean"
+    },
+    "content": {
+      "type": "boolean"
+    },
+    "date": {
+      "type": "boolean"
+    },
+    "date_gmt": {
+      "type": "boolean"
+    },
+    "link": {
+      "type": "boolean"
+    },
+    "modified": {
+      "type": "boolean"
+    },
+    "modified_gmt": {
+      "type": "boolean"
+    },
+    "parent": {
+      "type": "boolean"
+    },
+    "slug": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "boolean"
+    }
+  }
+}

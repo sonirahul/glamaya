@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>glamaya-data-contracts-open-ai</artifactId>
+    <artifactId>glamaya-data-contracts-wordpress</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -38,22 +38,6 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.glamaya</groupId>
-            <artifactId>glamaya-data-contracts-woocommerce</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.glamaya</groupId>
-            <artifactId>glamaya-data-contracts-wordpress</artifactId>
-            <version>${revision}</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -71,8 +55,9 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontracts.openai</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.wordpress</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
+                    <serializable>true</serializable>
                     <useBigDecimals>true</useBigDecimals>
                     <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>

@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Woocommerce User",
+  "type": "object",
+  "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "billing": {
+      "$ref": "#/definitions/address"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "date_created": {
+      "type": "string"
+    },
+    "date_created_gmt": {
+      "type": "string"
+    },
+    "date_modified": {
+      "type": "string"
+    },
+    "date_modified_gmt": {
+      "type": "string"
+    },
+    "edit_lock": {
+      "type": "boolean",
+      "description": "Lock status of the user. Default is 'false'. Applicable only for db users not for woocommerce users"
+    },
+    "email": {
+      "type": "string"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "is_paying_customer": {
+      "type": "boolean"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "meta_data": {
+      "$ref": "product.json#/definitions/meta_data"
+    },
+    "role": {
+      "$ref": "common-enum-schema.json#/definitions/user_role"
+    },
+    "shipping": {
+      "$ref": "#/definitions/address"
+    },
+    "username": {
+      "type": "string"
+    },
+    "_links": {
+      "$ref": "#/definitions/_links"
+    }
+  },
+  "definitions": {
+    "address": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "address_1": {
+          "type": "string"
+        },
+        "address_2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "hrefArray": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+        "properties": {
+          "href": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "_links": {
+      "type": "object",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "properties": {
+        "collection": {
+          "$ref": "#/definitions/hrefArray"
+        },
+        "customer": {
+          "$ref": "#/definitions/hrefArray"
+        },
+        "self": {
+          "$ref": "#/definitions/hrefArray"
+        }
+      }
+    }
+  }
+}

@@ -27,7 +27,7 @@
       "type": "integer"
     },
     "order": {
-      "$ref": "common-enum-schema.json#/definitions/order"
+      "$ref": "common-enum-schema.json#/definitions/sort_order"
     },
     "orderby": {
       "$ref": "#/definitions/orderby"
