@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Wix Contact Query Request",
+  "type": "object",
+  "properties": {
+    "query": {
+      "$ref": "#/definitions/contactQuery"
+    }
+  },
+  "definitions": {
+    "contactQuery": {
+      "type": "object",
+      "properties": {
+        "paging": {
+          "$ref": "product-query-request.json#/definitions/paging"
+        },
+        "filter": {},
+        "sort": {
+          "$ref": "order-query-request.json#/definitions/sort"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fieldSets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

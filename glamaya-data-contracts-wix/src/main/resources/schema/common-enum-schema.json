@@ -23,14 +23,14 @@
       "description": "Represents the sorting order",
       "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
       "enum": [
-        "asc",
-        "desc"
+        "ASC",
+        "DESC"
       ],
       "javaEnums": [
-        {"name": "asc"},
-        {"name": "desc"}
+        {"name": "ASC"},
+        {"name": "DESC"}
       ],
-      "default": "desc"
+      "default": "DESC"
     },
     "product_status": {
       "javaType": "ProductStatus",
@@ -64,21 +64,69 @@
     },
     "order_status": {
       "javaType": "OrderStatus",
-      "description": "Status of a Order on Woocommerce",
+      "description": "Status of a Order on Wix",
       "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "enum": ["any", "pending", "processing", "on-hold", "completed", "cancelled", "refunded", "failed", "trash"],
+      "enum": ["REJECTED", "PENDING", "CANCELED", "APPROVED", "INITIALIZED"],
       "javaEnums": [
-          {"name": "any"},
-          {"name": "pending"},
-          {"name": "processing"},
-          {"name": "on_hold"},
-          {"name": "completed"},
-          {"name": "cancelled"},
-          {"name": "refunded"},
-          {"name": "failed"},
-          {"name": "trash"}
-        ],
-        "default": "any"
+        {"name": "REJECTED"},
+        {"name": "PENDING"},
+        {"name": "CANCELED"},
+        {"name": "APPROVED"},
+        {"name": "INITIALIZED"}
+        ]
+    },
+    "payment_option": {
+      "javaType": "PaymentOption",
+      "description": "Payment Option of a Order on Wix",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": ["MEMBERSHIP_OFFLINE", "DEPOSIT_ONLINE", "MEMBERSHIP", "FULL_PAYMENT_OFFLINE", "FULL_PAYMENT_ONLINE"],
+      "javaEnums": [
+        {"name": "MEMBERSHIP_OFFLINE"},
+        {"name": "DEPOSIT_ONLINE"},
+        {"name": "MEMBERSHIP"},
+        {"name": "FULL_PAYMENT_OFFLINE"},
+        {"name": "FULL_PAYMENT_ONLINE"}
+      ]
+    },
+    "payment_status": {
+      "javaType": "PaymentStatus",
+      "description": "Payment Status of a Order on Wix",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": ["DECLINED", "CANCELED", "PENDING_MERCHANT", "PARTIALLY_PAID", "PENDING", "FULLY_REFUNDED", "PARTIALLY_REFUNDED", "PAID", "NOT_PAID", "UNSPECIFIED"],
+      "javaEnums": [
+        {"name": "DECLINED"},
+        {"name": "CANCELED"},
+        {"name": "PENDING_MERCHANT"},
+        {"name": "PARTIALLY_PAID"},
+        {"name": "PENDING"},
+        {"name": "FULLY_REFUNDED"},
+        {"name": "PARTIALLY_REFUNDED"},
+        {"name": "PAID"},
+        {"name": "NOT_PAID"},
+        {"name": "UNSPECIFIED"}
+      ]
+    },
+    "fulfillment_status": {
+        "javaType": "FulfillmentStatus",
+        "description": "Fulfillment Status of a Order on Wix",
+        "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+        "enum": ["NOT_FULFILLED", "PARTIALLY_FULFILLED", "FULFILLED"],
+        "javaEnums": [
+            {"name": "NOT_FULFILLED"},
+            {"name": "PARTIALLY_FULFILLED"},
+            {"name": "FULFILLED"}
+        ]
+    },
+    "discount_type": {
+      "javaType": "DiscountType",
+      "description": "Discount Type of a Order on Wix",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": ["GLOBAL", "SPECIFIC_ITEMS", "SHIPPING"],
+      "javaEnums": [
+        {"name": "GLOBAL"},
+        {"name": "SPECIFIC_ITEMS"},
+        {"name": "SHIPPING"}
+      ]
     }
   }
 }

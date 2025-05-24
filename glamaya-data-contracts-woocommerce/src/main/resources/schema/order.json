@@ -53,7 +53,7 @@
       "type": "string"
     },
     "customer_id": {
-      "type": "integer"
+      "type": "string"
     },
     "customer_ip_address": {
       "type": "string"
@@ -259,7 +259,7 @@
       "type": "string"
     },
     "status": {
-      "type": "string"
+      "$ref": "common-enum-schema.json#/definitions/order_status"
     },
     "tax_lines": {
       "type": "array",

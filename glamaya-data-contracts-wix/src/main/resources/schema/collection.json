@@ -11,6 +11,18 @@
     },
     "media": {
       "$ref": "product.json#/definitions/media"
+    },
+    "numberOfProducts": {
+      "type": "integer"
+    },
+    "description": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "visible": {
+      "type": "boolean"
     }
   }
 }

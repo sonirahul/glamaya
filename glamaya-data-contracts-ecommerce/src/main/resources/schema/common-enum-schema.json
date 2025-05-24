@@ -1,0 +1,32 @@
+{
+  "definitions": {
+    "address_type": {
+      "javaType": "AddressType",
+      "description": "Represents the address type",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": [
+        "BILLING",
+        "SHIPPING"
+      ],
+      "javaEnums": [
+        {"name": "BILLING"},
+        {"name": "SHIPPING"}
+      ]
+    },
+    "source_type": {
+        "javaType": "SourceType",
+        "description": "Represents the source type",
+        "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+        "enum": [
+            "WOOCOMMERCE_ORDER",
+            "WOOCOMMERCE_USER",
+            "WIX"
+        ],
+        "javaEnums": [
+            {"name": "WOOCOMMERCE_ORDER"},
+            {"name": "WOOCOMMERCE_USER"},
+            {"name": "WIX"}
+        ]
+    }
+  }
+}

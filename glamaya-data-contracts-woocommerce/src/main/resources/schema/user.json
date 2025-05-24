@@ -5,7 +5,8 @@
   "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
   "properties": {
     "id": {
-      "type": "integer"
+      "type": "string",
+      "description": "Unique identifier for the user in the system, has to be a string to support orders without user id"
     },
     "avatar_url": {
       "type": "string"
@@ -55,6 +56,26 @@
     },
     "username": {
       "type": "string"
+    },
+    "extendedFields": {
+      "type": "object",
+      "properties": {
+        "lastPurchaseDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "numOfPurchases": {
+          "type": "integer",
+          "default": 0
+        },
+        "totalSpentAmount": {
+          "type": "number",
+          "default": 0
+        },
+        "totalSpentCurrency": {
+          "type": "string"
+        }
+      }
     },
     "_links": {
       "$ref": "#/definitions/_links"

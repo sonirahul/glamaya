@@ -25,6 +25,11 @@
       "description": "Comma separated list of ids",
       "type": "string"
     },
+    "modified_after": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Limit response to resources published before a given ISO8601 compliant date."
+    },
     "offset": {
       "type": "integer"
     },

@@ -7,10 +7,13 @@
       "type": "string"
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
     },
     "slug": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "visible": {
       "type": "boolean"
@@ -19,41 +22,23 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 8000
     },
     "sku": {
-      "type": "string"
-    },
-    "brand": {
-      "type": "string"
-    },
-    "woosku": {
       "type": "string",
-      "description": "woocommerce fields"
-    },
-    "wooId": {
-      "type": "integer",
-      "description": "woocommerce fields"
+      "maxLength": 40
     },
     "weight": {
-      "type": "number"
+      "type": "number",
+      "minimum": 0,
+      "maximum": 999999999.99
     },
     "stock": {
-      "type": "object",
-      "properties": {
-        "trackInventory": {
-          "type": "boolean"
-        },
-        "quantity": {
-          "type": "integer"
-        },
-        "inStock": {
-          "type": "boolean"
-        }
-      }
+      "$ref": "#/definitions/stock"
     },
-    "price": {
-      "$ref": "#/definitions/price"
+    "priceData": {
+      "$ref": "#/definitions/priceData"
     },
     "costRange": {
       "type": "object",
@@ -67,21 +52,17 @@
       }
     },
     "additionalInfoSections": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "ribbons": {
       "type": "array",
       "items": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
       }
     },
     "media": {
@@ -91,7 +72,17 @@
       "type": "array",
       "items": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "maxLength": {
+            "type": "integer"
+          },
+          "mandatory": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "manageVariants": {
@@ -152,6 +143,17 @@
       "type": "string",
       "format": "uuid"
     },
+    "discount": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
     "collectionIds": {
       "type": "array",
       "items": {
@@ -185,10 +187,10 @@
             "type": "object",
             "properties": {
               "priceData": {
-                "$ref": "#/definitions/price"
+                "$ref": "#/definitions/priceData"
               },
               "convertedPriceData": {
-                "$ref": "#/definitions/price"
+                "$ref": "#/definitions/priceData"
               },
               "weight": {
                 "type": "number"
@@ -200,23 +202,24 @@
                 "type": "boolean"
               }
             }
+          },
+          "stock": {
+            "$ref": "#/definitions/stock"
           }
         }
       }
     },
     "lastUpdated": {
-      "type": "string",
-      "format": "date-time"
+      "type": "string"
     },
     "createdDate": {
-      "type": "string",
-      "format": "date-time"
+      "type": "string"
     },
     "ribbon": {
       "type": "string"
     },
-    "migrationDone": {
-      "type": "boolean"
+    "brand": {
+      "type": "string"
     }
   },
   "definitions": {
@@ -243,6 +246,9 @@
         },
         "mediaType": {
           "type": "string"
+        },
+        "fileName": {
+          "type": "string"
         }
       }
     },
@@ -257,24 +263,17 @@
         }
       }
     },
-    "price": {
+    "priceData": {
       "type": "object",
       "properties": {
         "currency": {
           "type": "string"
         },
-        "costPrice": {
-          "type": "integer",
-          "description": "Custom fields "
+        "price": {
+          "type": "number"
         },
-        "resellingPrice": {
-          "type": "integer"
-        },
-        "wixSellingPrice": {
-          "type": "integer"
-        },
-        "wixMrp": {
-          "type": "integer"
+        "discountedPrice": {
+          "type": "number"
         }
       }
     },
@@ -308,6 +307,26 @@
           "$ref": "#/definitions/image"
         },
         "id": {
+          "type": "string"
+        }
+      }
+    },
+    "stock": {
+      "type": "object",
+      "properties": {
+        "trackQuantity": {
+          "type": "boolean"
+        },
+        "trackInventory": {
+          "type": "boolean"
+        },
+        "quantity": {
+          "type": "integer"
+        },
+        "inStock": {
+          "type": "boolean"
+        },
+        "inventoryStatus": {
           "type": "string"
         }
       }

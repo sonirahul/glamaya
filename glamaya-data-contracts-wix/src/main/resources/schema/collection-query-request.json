@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Wix Collection Query Request",
+  "type": "object",
+  "properties": {
+    "query": {
+      "$ref": "#/definitions/collectionQuery"
+    },
+    "includeNumberOfProducts": {
+      "type": "boolean"
+    },
+    "includeDescription": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "collectionQuery": {
+      "type": "object",
+      "properties": {
+        "paging": {
+          "$ref": "product-query-request.json#/definitions/paging"
+        },
+        "filter": {
+          "type": "string"
+        },
+        "sort": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

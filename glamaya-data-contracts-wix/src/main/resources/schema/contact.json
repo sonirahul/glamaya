@@ -15,28 +15,25 @@
         "sourceType": {
           "type": "string"
         },
-        "wixAppID": {
+        "wixAppId": {
           "type": "string"
         },
-        "appID": {
+        "appId": {
           "type": "string"
         }
       }
     },
     "createdDate": {
-      "type": "string",
-      "format": "date-time"
+      "type": "string"
     },
     "updatedDate": {
-      "type": "string",
-      "format": "date-time"
+      "type": "string"
     },
     "lastActivity": {
       "type": "object",
       "properties": {
         "activityDate": {
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         },
         "activityType": {
           "$ref": "#/definitions/activityType"
@@ -90,6 +87,26 @@
             }
           }
         },
+        "addresses": {
+          "type": "object",
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/addressItem"
+              }
+            }
+          }
+        },
+        "company": {
+          "type": "string"
+        },
+        "jobTitle": {
+          "type": "string"
+        },
+        "birthday": {
+          "type": "string"
+        },
         "locale": {
           "type": "string"
         },
@@ -115,8 +132,7 @@
                   "type": "string"
                 },
                 "ecom.lastPurchaseDate": {
-                  "type": "string",
-                  "format": "date-time"
+                  "type": "string"
                 },
                 "ecom.numOfPurchases": {
                   "type": "integer"
@@ -136,17 +152,6 @@
                 "contacts.type": {
                   "type": "string"
                 }
-              }
-            }
-          }
-        },
-        "addresses": {
-          "type": "object",
-          "properties": {
-            "items": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/addressItem"
               }
             }
           }
@@ -195,17 +200,6 @@
     "address": {
       "type": "object",
       "properties": {
-        "fullName": {
-          "type": "object",
-          "properties": {
-            "firstName": {
-              "type": "string"
-            },
-            "lastName": {
-              "type": "string"
-            }
-          }
-        },
         "country": {
           "type": "string"
         },
@@ -215,25 +209,13 @@
         "city": {
           "type": "string"
         },
-        "zipCode": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "email": {
+        "postalCode": {
           "type": "string"
         },
         "addressLine1": {
           "type": "string"
         },
         "addressLine2": {
-          "type": "string"
-        },
-        "company": {
-          "type": "string"
-        },
-        "postalCode": {
           "type": "string"
         },
         "addressLine": {
@@ -286,6 +268,47 @@
         "Cloneable"
       ],
       "enum": [
+        "PHONE_SUBSCRIPTION_UNSUBSCRIBE",
+        "PHONE_SUBSCRIPTION_NOT_SET",
+        "PHONE_SUBSCRIPTION_PENDING",
+        "PHONE_SUBSCRIPTION_SUBSCRIBE",
+        "NEWSLETTER_SUBSCRIPTION_NOT_SET",
+        "NEWSLETTER_SUBSCRIPTION_PENDING",
+        "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE",
+        "CONTACT_MERGED",
+        "SHOUTOUT_CLICK",
+        "SHOUTOUT_OPEN",
+        "RESTAURANTS_RESERVATION",
+        "RESTAURANTS_ORDER",
+        "PRICE_QUOTE_EXPIRE",
+        "PRICE_QUOTE_ACCEPT",
+        "INVOICE_OVERDUE",
+        "INVOICE_PAY",
+        "EVENTS_RSVP",
+        "ARENA_NEW_LEAD",
+        "CASHIER_BUTTON_PURCHASE",
+        "VIDEO_RENT",
+        "VIDEO_PURCHASE",
+        "HOTELS_CANCEL",
+        "HOTELS_CONFIRMATION",
+        "HOTELS_PURCHASE",
+        "HOTELS_RESERVATION",
+        "BOOKINGS_APPOINTMENT",
+        "ECOM_CHECKOUT_BUYER",
+        "ECOM_CART_ABANDON",
+        "ECOM_PURCHASE",
+        "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE",
+        "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED",
+        "INBOX_MESSAGE_FROM_CUSTOMER",
+        "INBOX_MESSAGE_TO_CUSTOMER",
+        "INBOX_PAYMENT_REQUEST_PAID",
+        "INBOX_FORM_SUBMITTED",
+        "FORM_SUBMITTED",
+        "MEMBER_STATUS_CHANGED",
+        "MEMBER_REGISTER",
+        "MEMBER_LOGIN",
+        "CONTACT_CREATED",
+        "GENERAL",
         "INVOICE_WAS_SET",
         "MERCHANT_COMMENT",
         "ORDER_FULFILLED",
@@ -296,98 +319,61 @@
         "SHIPPING_CONFIRMATION_EMAIL_SENT",
         "TRACKING_LINK_WAS_SET",
         "TRACKING_NUMBER_ADDED",
-        "TRACKING_NUMBER_EDITED",
-        "CONTACT_CREATED",
-        "ECOM_PURCHASE",
-        "INVOICE_PAY",
-        "MEMBER_LOGIN",
-        "MEMBER_REGISTER",
-        "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED",
-        "NEWSLETTER_SUBSCRIPTION_NOT_SET",
-        "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE",
-        "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE",
-        "INBOX_MESSAGE_FROM_CUSTOMER",
-        "INBOX_MESSAGE_TO_CUSTOMER",
-        "FORM_SUBMITTED",
-        "INBOX_FORM_SUBMITTED",
-        "CONTACT_MERGED"
+        "TRACKING_NUMBER_EDITED"
       ],
       "javaEnums": [
-        {
-          "name": "INVOICE_WAS_SET"
-        },
-        {
-          "name": "MERCHANT_COMMENT"
-        },
-        {
-          "name": "ORDER_FULFILLED"
-        },
-        {
-          "name": "ORDER_NOT_FULFILLED"
-        },
-        {
-          "name": "ORDER_PAID"
-        },
-        {
-          "name": "ORDER_PLACED"
-        },
-        {
-          "name": "SHIPPING_ADDRESS_EDITED"
-        },
-        {
-          "name": "SHIPPING_CONFIRMATION_EMAIL_SENT"
-        },
-        {
-          "name": "TRACKING_LINK_WAS_SET"
-        },
-        {
-          "name": "TRACKING_NUMBER_ADDED"
-        },
-        {
-          "name": "TRACKING_NUMBER_EDITED"
-        },
-        {
-          "name": "CONTACT_CREATED"
-        },
-        {
-          "name": "ECOM_PURCHASE"
-        },
-        {
-          "name": "INVOICE_PAY"
-        },
-        {
-          "name": "MEMBER_LOGIN"
-        },
-        {
-          "name": "MEMBER_REGISTER"
-        },
-        {
-          "name": "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED"
-        },
-        {
-          "name": "NEWSLETTER_SUBSCRIPTION_NOT_SET"
-        },
-        {
-          "name": "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE"
-        },
-        {
-          "name": "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE"
-        },
-        {
-          "name": "INBOX_MESSAGE_FROM_CUSTOMER"
-        },
-        {
-          "name": "INBOX_MESSAGE_TO_CUSTOMER"
-        },
-        {
-          "name": "FORM_SUBMITTED"
-        },
-        {
-          "name": "INBOX_FORM_SUBMITTED"
-        },
-        {
-          "name": "CONTACT_MERGED"
-        }
+        {"name": "PHONE_SUBSCRIPTION_UNSUBSCRIBE"},
+        {"name": "PHONE_SUBSCRIPTION_NOT_SET"},
+        {"name": "PHONE_SUBSCRIPTION_PENDING"},
+        {"name": "PHONE_SUBSCRIPTION_SUBSCRIBE"},
+        {"name": "NEWSLETTER_SUBSCRIPTION_NOT_SET"},
+        {"name": "NEWSLETTER_SUBSCRIPTION_PENDING"},
+        {"name": "NEWSLETTER_SUBSCRIPTION_SUBSCRIBE"},
+        {"name": "CONTACT_MERGED"},
+        {"name": "SHOUTOUT_CLICK"},
+        {"name": "SHOUTOUT_OPEN"},
+        {"name": "RESTAURANTS_RESERVATION"},
+        {"name": "RESTAURANTS_ORDER"},
+        {"name": "PRICE_QUOTE_EXPIRE"},
+        {"name": "PRICE_QUOTE_ACCEPT"},
+        {"name": "INVOICE_OVERDUE"},
+        {"name": "INVOICE_PAY"},
+        {"name": "EVENTS_RSVP"},
+        {"name": "ARENA_NEW_LEAD"},
+        {"name": "CASHIER_BUTTON_PURCHASE"},
+        {"name": "VIDEO_RENT"},
+        {"name": "VIDEO_PURCHASE"},
+        {"name": "HOTELS_CANCEL"},
+        {"name": "HOTELS_CONFIRMATION"},
+        {"name": "HOTELS_PURCHASE"},
+        {"name": "HOTELS_RESERVATION"},
+        {"name": "BOOKINGS_APPOINTMENT"},
+        {"name": "ECOM_CHECKOUT_BUYER"},
+        {"name": "ECOM_CART_ABANDON"},
+        {"name": "ECOM_PURCHASE"},
+        {"name": "NEWSLETTER_SUBSCRIPTION_UNSUBSCRIBE"},
+        {"name": "NEWSLETTER_SUBSCRIPTION_FORM_SUBMITTED"},
+        {"name": "INBOX_MESSAGE_FROM_CUSTOMER"},
+        {"name": "INBOX_MESSAGE_TO_CUSTOMER"},
+        {"name": "INBOX_PAYMENT_REQUEST_PAID"},
+        {"name": "INBOX_FORM_SUBMITTED"},
+        {"name": "FORM_SUBMITTED"},
+        {"name": "MEMBER_STATUS_CHANGED"},
+        {"name": "MEMBER_REGISTER"},
+        {"name": "MEMBER_LOGIN"},
+        {"name": "CONTACT_CREATED"},
+        {"name": "GENERAL"},
+        {"name": "INVOICE_WAS_SET"},
+        {"name": "MERCHANT_COMMENT"},
+        {"name": "ORDER_FULFILLED"},
+        {"name": "ORDER_NOT_FULFILLED"},
+        {"name": "ORDER_PAID"},
+        {"name": "ORDER_PLACED"},
+        {"name": "SHIPPING_ADDRESS_EDITED"},
+        {"name": "SHIPPING_CONFIRMATION_EMAIL_SENT"},
+        {"name": "TRACKING_LINK_WAS_SET"},
+        {"name": "TRACKING_NUMBER_ADDED"},
+        {"name": "TRACKING_NUMBER_EDITED"}
       ]
     },
     "emailItem": {

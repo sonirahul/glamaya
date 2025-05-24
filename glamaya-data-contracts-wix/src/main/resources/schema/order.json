@@ -6,31 +6,815 @@
     "id": {
       "type": "string"
     },
-    "orderNumber": {
-      "type": "integer"
-    },
-    "orderNumberString": {
+    "number": {
       "type": "string"
     },
-    "shiprocketId": {
-      "type": "integer"
+    "createdDate": {
+      "type": "string"
     },
-    "dateCreated": {
-      "type": "string",
-      "format": "date-time"
+    "updatedDate": {
+      "type": "string"
+    },
+    "lineItems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "object",
+            "properties": {
+              "original": {
+                "type": "string"
+              },
+              "translated": {
+                "type": "string"
+              }
+            }
+          },
+          "catalogReference": {
+            "type": "object",
+            "properties": {
+              "catalogItemId": {
+                "type": "string"
+              },
+              "appId": {
+                "type": "string"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "options": {
+                    "type": "object",
+                    "properties": {}
+                  },
+                  "variantId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "totalDiscount": {
+            "$ref": "#/definitions/price"
+          },
+          "descriptionLines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "object",
+                  "properties": {
+                    "original": {
+                      "type": "string"
+                    },
+                    "translated": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "plainText": {
+                  "type": "object",
+                  "properties": {
+                    "original": {
+                      "type": "string"
+                    },
+                    "translated": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "colorInfo": {
+                  "type": "object",
+                  "properties": {
+                    "original": {
+                      "type": "string"
+                    },
+                    "translated": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "image": {
+            "$ref": "product.json#/definitions/image"
+          },
+          "physicalProperties": {
+            "type": "object",
+            "properties": {
+              "weight": {
+                "type": "number"
+              },
+              "sku": {
+                "type": "string"
+              },
+              "shippable": {
+                "type": "boolean"
+              }
+            }
+          },
+          "itemType": {
+            "type": "object",
+            "properties": {
+              "preset": {
+                "type": "string"
+              },
+              "custom": {
+                "type": "string"
+              }
+            }
+          },
+          "fulfillerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "refundQuantity": {
+            "type": "number"
+          },
+          "restockQuantity": {
+            "type": "number"
+          },
+          "price": {
+            "$ref": "#/definitions/price"
+          },
+          "priceBeforeDiscounts": {
+            "$ref": "#/definitions/price"
+          },
+          "totalPriceBeforeTax": {
+            "$ref": "#/definitions/price"
+          },
+          "totalPriceAfterTax": {
+            "$ref": "#/definitions/price"
+          },
+          "paymentOption": {
+            "$ref": "common-enum-schema.json#/definitions/payment_option"
+          },
+          "taxDetails": {
+            "$ref": "#/definitions/taxDetails",
+            "deprecationMessage": "Deprecated"
+          },
+          "taxInfo": {
+            "$ref": "#/definitions/taxInfo"
+          },
+          "digitalFile": {
+            "type": "object",
+            "properties": {
+              "fileId": {
+                "type": "string"
+              },
+              "link": {
+                "type": "string"
+              },
+              "expirationDate": {
+                "type": "string"
+              }
+            }
+          },
+          "subscriptionInfo": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "cycleNumber": {
+                "type": "integer"
+              },
+              "subscriptionOptionTitle": {
+                "type": "string"
+              },
+              "subscriptionOptionDescription": {
+                "type": "string"
+              },
+              "subscriptionSettings": {
+                "type": "object",
+                "properties": {
+                  "frequency": {
+                    "type": "string"
+                  },
+                  "interval": {
+                    "type": "integer"
+                  },
+                  "autoRenewal": {
+                    "type": "boolean"
+                  },
+                  "billingCycles": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "priceDescription": {
+            "type": "object",
+            "properties": {
+              "original": {
+                "type": "string"
+              },
+              "translated": {
+                "type": "string"
+              }
+            }
+          },
+          "depositAmount": {
+            "$ref": "#/definitions/price"
+          },
+          "locations": {
+            "type": "array",
+            "items": {}
+          },
+          "lineItemPrice": {
+            "$ref": "#/definitions/price"
+          },
+          "customLineItem": {
+            "type": "boolean"
+          },
+          "rootCatalogItemId": {
+            "type": "string"
+          }
+        }
+      }
     },
     "buyerInfo": {
       "type": "object",
       "properties": {
-        "id": {
+        "contactId": {
           "type": "string"
         },
+        "email": {
+          "type": "string"
+        },
+        "visitorId": {
+          "type": "string"
+        },
+        "memberId": {
+          "type": "string"
+        }
+      }
+    },
+    "paymentStatus": {
+      "$ref": "common-enum-schema.json#/definitions/payment_status"
+    },
+    "fulfillmentStatus": {
+      "$ref": "common-enum-schema.json#/definitions/fulfillment_status"
+    },
+    "buyerLanguage": {
+      "type": "string"
+    },
+    "weightUnit": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string"
+    },
+    "taxIncludedInPrices": {
+      "type": "boolean"
+    },
+    "siteLanguage": {
+      "type": "string"
+    },
+    "priceSummary": {
+      "type": "object",
+      "properties": {
+        "subtotal": {
+          "$ref": "#/definitions/price"
+        },
+        "shipping": {
+          "$ref": "#/definitions/price"
+        },
+        "tax": {
+          "$ref": "#/definitions/price"
+        },
+        "discount": {
+          "$ref": "#/definitions/price"
+        },
+        "totalPrice": {
+          "$ref": "#/definitions/price"
+        },
+        "total": {
+          "$ref": "#/definitions/price"
+        },
+        "totalWithGiftCard": {
+          "$ref": "#/definitions/price"
+        },
+        "totalWithoutGiftCard": {
+          "$ref": "#/definitions/price"
+        },
+        "totalAdditionalFees": {
+          "$ref": "#/definitions/price"
+        }
+      }
+    },
+    "billingInfo": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/addressObject"
+        },
+        "contactDetails": {
+          "$ref": "#/definitions/contactDetailsObject"
+        }
+      }
+    },
+    "shippingInfo": {
+      "type": "object",
+      "properties": {
+        "carrierId": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "logistics": {
+          "type": "object",
+          "properties": {
+            "deliveryTime": {
+              "type": "string"
+            },
+            "instructions": {
+              "type": "string"
+            },
+            "deliverByDate": {
+              "type": "string"
+            },
+            "deliveryTimeSlot": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                }
+              }
+            },
+            "shippingDestination": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "$ref": "#/definitions/addressObject"
+                },
+                "contactDetails": {
+                  "$ref": "#/definitions/contactDetailsObject"
+                }
+              }
+            },
+            "pickupDetails": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "$ref": "#/definitions/addressObject"
+                },
+                "pickupMethod": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "cost": {
+          "type": "object",
+          "properties": {
+            "price": {
+              "$ref": "#/definitions/price"
+            },
+            "totalPriceBeforeTax": {
+              "$ref": "#/definitions/price"
+            },
+            "totalPriceAfterTax": {
+              "$ref": "#/definitions/price"
+            },
+            "taxDetails": {
+              "$ref": "#/definitions/taxDetails"
+            },
+            "discount": {
+              "$ref": "#/definitions/price"
+            }
+          }
+        },
+        "region": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "buyerNote": {
+      "type": "string"
+    },
+    "status": {
+      "$ref": "common-enum-schema.json#/definitions/order_status"
+    },
+    "archived": {
+      "type": "boolean"
+    },
+    "taxSummary": {
+      "type": "object",
+      "properties": {
+        "totalTax": {
+          "$ref": "#/definitions/price"
+        },
+        "manualTaxRate": {
+          "type": "string"
+        }
+      }
+    },
+    "taxInfo": {
+      "$ref": "#/definitions/taxInfo"
+    },
+    "appliedDiscounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "discountType": {
+            "$ref": "common-enum-schema.json#/definitions/discount_type"
+          },
+          "id": {
+            "type": "string"
+          },
+          "coupon": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "amount": {
+                "$ref": "#/definitions/price"
+              }
+            }
+          },
+          "merchantDiscount": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "$ref": "#/definitions/price"
+              },
+              "discountReason": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          },
+          "discountRule": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "object",
+                "properties": {
+                  "original": {
+                    "type": "string"
+                  },
+                  "translated": {
+                    "type": "string"
+                  }
+                }
+              },
+              "amount": {
+                "$ref": "#/definitions/price"
+              }
+            }
+          }
+        }
+      }
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "authorEmail": {
+            "type": "string"
+          },
+          "createdDate": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "customActivity": {
+            "type": "object",
+            "properties": {
+              "appId": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "additionalData": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          "merchantComment": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            }
+          },
+          "orderRefunded": {
+            "type": "object",
+            "properties": {
+              "manual": {
+                "type": "boolean"
+              },
+              "amount": {
+                "$ref": "#/definitions/price"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "attributionSource": {
+      "type": "string"
+    },
+    "createdBy": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "memberId": {
+          "type": "string"
+        },
+        "visitorId": {
+          "type": "string"
+        },
+        "appId": {
+          "type": "string"
+        }
+      }
+    },
+    "channelInfo": {
+      "type": "object",
+      "properties": {
         "type": {
           "type": "string"
         },
-        "identityType": {
+        "externalOrderId": {
           "type": "string"
         },
+        "externalOrderUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "seenByAHuman": {
+      "type": "boolean"
+    },
+    "checkoutId": {
+      "type": "string"
+    },
+    "customFields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {}
+          },
+          "title": {
+            "type": "string"
+          },
+          "translatedTitle": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cartId": {
+      "type": "string"
+    },
+    "isInternalOrderCreate": {
+      "type": "boolean"
+    },
+    "payNow": {
+      "type": "object",
+      "properties": {
+        "subtotal": {
+          "$ref": "#/definitions/price"
+        },
+        "shipping": {
+          "$ref": "#/definitions/price"
+        },
+        "tax": {
+          "$ref": "#/definitions/price"
+        },
+        "discount": {
+          "$ref": "#/definitions/price"
+        },
+        "totalPrice": {
+          "$ref": "#/definitions/price"
+        },
+        "total": {
+          "$ref": "#/definitions/price"
+        },
+        "totalWithGiftCard": {
+          "$ref": "#/definitions/price"
+        },
+        "totalWithoutGiftCard": {
+          "$ref": "#/definitions/price"
+        },
+        "totalAdditionalFees": {
+          "$ref": "#/definitions/price"
+        }
+      }
+    },
+    "balanceSummary": {
+      "type": "object",
+      "properties": {
+        "balance": {
+          "$ref": "#/definitions/price"
+        },
+        "paid": {
+          "$ref": "#/definitions/price"
+        },
+        "refunded": {
+          "$ref": "#/definitions/price"
+        },
+        "authorized": {
+          "$ref": "#/definitions/price"
+        },
+        "pending": {
+          "$ref": "#/definitions/price"
+        }
+      }
+    },
+    "additionalFees": {
+      "type": "array",
+      "items": {}
+    },
+    "purchaseFlowId": {
+      "type": "string"
+    },
+    "recipientInfo": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/addressObject"
+        },
+        "contactDetails": {
+          "$ref": "#/definitions/contactDetailsObject"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "taxInfo": {
+      "type": "object",
+      "properties": {
+        "taxAmount": {
+          "$ref": "#/definitions/price"
+        },
+        "taxableAmount": {
+          "$ref": "#/definitions/price"
+        },
+        "taxRate": {
+          "type": "string"
+        },
+        "taxIncludedInPrice": {
+          "type": "boolean"
+        },
+        "taxBreakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "jurisdiction": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "string"
+              },
+              "taxAmount": {
+                "$ref": "#/definitions/price"
+              },
+              "taxType": {
+                "type": "string"
+              },
+              "taxName": {
+                "type": "string"
+              },
+              "jurisdictionType": {
+                "type": "string"
+              },
+              "nonTaxableAmount": {
+                "$ref": "#/definitions/price"
+              },
+              "taxableAmount": {
+                "$ref": "#/definitions/price"
+              }
+            }
+          }
+        }
+      }
+    },
+    "taxDetails": {
+      "type": "object",
+      "properties": {
+        "taxableAmount": {
+          "$ref": "#/definitions/price"
+        },
+        "taxRate": {
+          "type": "string"
+        },
+        "totalTax": {
+          "$ref": "#/definitions/price"
+        }
+      }
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "formattedAmount": {
+          "type": "string"
+        }
+      }
+    },
+    "addressObject": {
+      "type": "object",
+      "properties": {
+        "country": {
+          "type": "string"
+        },
+        "subdivision": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "streetAddress": {
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "addressLine": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "countryFullname": {
+          "type": "string"
+        },
+        "subdivisionFullname": {
+          "type": "string"
+        }
+      }
+    },
+    "contactDetailsObject": {
+      "type": "object",
+      "properties": {
         "firstName": {
           "type": "string"
         },
@@ -40,397 +824,19 @@
         "phone": {
           "type": "string"
         },
-        "email": {
+        "company": {
           "type": "string"
         },
-        "contactID": {
-          "type": "string"
-        }
-      }
-    },
-    "currency": {
-      "type": "string"
-    },
-    "weightUnit": {
-      "type": "string"
-    },
-    "totals": {
-      "type": "object",
-      "properties": {
-        "subtotal": {
-          "type": "string"
-        },
-        "shipping": {
-          "type": "string"
-        },
-        "tax": {
-          "type": "string"
-        },
-        "discount": {
-          "type": "string"
-        },
-        "total": {
-          "type": "string"
-        },
-        "weight": {
-          "type": "string"
-        },
-        "quantity": {
-          "type": "integer"
-        },
-        "refund": {
-          "type": "string"
-        }
-      }
-    },
-    "billingInfo": {
-      "type": "object",
-      "properties": {
-        "paymentMethod": {
-          "type": "string"
-        },
-        "paymentGatewayTransactionId": {
-          "type": "string"
-        },
-        "address": {
-          "$ref": "contact.json#/definitions/address"
-        },
-        "paidDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "externalTransactionId": {
-          "type": "string"
-        },
-        "paymentProviderTransactionId": {
-          "type": "string"
-        },
-        "refundableByPaymentProvider": {
-          "type": "boolean"
-        }
-      }
-    },
-    "shippingInfo": {
-      "type": "object",
-      "properties": {
-        "deliveryOption": {
-          "type": "string"
-        },
-        "estimatedDeliveryTime": {
-          "type": "string"
-        },
-        "shippingRegion": {
-          "type": "string"
-        },
-        "code": {
-          "type": "string"
-        },
-        "shipmentDetails": {
+        "vatId": {
           "type": "object",
           "properties": {
-            "address": {
-              "$ref": "contact.json#/definitions/address"
-            },
-            "trackingInfo": {
-              "$ref": "#/definitions/trackingInfo"
-            },
-            "discount": {
+            "id": {
               "type": "string"
             },
-            "tax": {
-              "type": "string"
-            },
-            "priceData": {
-              "$ref": "#/definitions/lineItemPriceData"
-            }
-          }
-        }
-      }
-    },
-    "read": {
-      "type": "boolean"
-    },
-    "archived": {
-      "type": "boolean"
-    },
-    "paymentStatus": {
-      "type": "string"
-    },
-    "fulfillmentStatus": {
-      "type": "string"
-    },
-    "lineItems": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/lineItem"
-      }
-    },
-    "activities": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "author": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "fulfillments": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lineItems": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/lineItem"
-            }
-          },
-          "trackingInfo": {
-            "$ref": "#/definitions/trackingInfo"
-          }
-        }
-      }
-    },
-    "cartID": {
-      "type": "string"
-    },
-    "channelInfo": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "enteredBy": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "identityType": {
-          "type": "string"
-        }
-      }
-    },
-    "lastUpdated": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "numericId": {
-      "type": "string"
-    },
-    "refunds": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "dateCreated": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "string"
-          },
-          "reason": {
-            "type": "string"
-          },
-          "isManual": {
-            "type": "boolean"
-          },
-          "refundID": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "externalRefund": {
-            "type": "boolean"
-          }
-        }
-      }
-    },
-    "checkoutId": {
-      "type": "string"
-    },
-    "isInternalOrderCreate": {
-      "type": "boolean"
-    },
-    "buyerLanguage": {
-      "type": "string"
-    },
-    "invoiceInfo": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "source": {
-          "type": "string"
-        }
-      }
-    },
-    "discount": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        },
-        "appliedCoupon": {
-          "type": "object",
-          "properties": {
-            "couponID": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "code": {
+            "type": {
               "type": "string"
             }
           }
-        }
-      }
-    },
-    "buyerNote": {
-      "type": "string"
-    }
-  },
-  "definitions": {
-    "fullName": {
-      "type": "object",
-      "properties": {
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        }
-      }
-    },
-    "lineItem": {
-      "type": "object",
-      "properties": {
-        "index": {
-          "type": "integer"
-        },
-        "quantity": {
-          "type": "integer"
-        },
-        "price": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "translatedName": {
-          "type": "string"
-        },
-        "productID": {
-          "type": "string"
-        },
-        "totalPrice": {
-          "type": "string"
-        },
-        "lineItemType": {
-          "type": "string"
-        },
-        "options": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "option": {
-                "type": "string"
-              },
-              "selection": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "customTextFields": {
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
-        },
-        "weight": {
-          "type": "string"
-        },
-        "mediaItem": {
-          "$ref": "product.json#/definitions/image"
-        },
-        "sku": {
-          "type": "string"
-        },
-        "variantID": {
-          "type": "string"
-        },
-        "discount": {
-          "type": "string"
-        },
-        "tax": {
-          "type": "string"
-        },
-        "taxIncludedInPrice": {
-          "type": "boolean"
-        },
-        "priceData": {
-          "$ref": "#/definitions/lineItemPriceData"
-        },
-        "refundedQuantity": {
-          "type": "integer"
-        }
-      }
-    },
-    "lineItemPriceData": {
-      "type": "object",
-      "properties": {
-        "taxIncludedInPrice": {
-          "type": "boolean"
-        },
-        "price": {
-          "type": "string"
-        },
-        "totalPrice": {
-          "type": "string"
-        }
-      }
-    },
-    "trackingInfo": {
-      "type": "object",
-      "properties": {
-        "trackingNumber": {
-          "type": "string"
-        },
-        "shippingProvider": {
-          "type": "string"
-        },
-        "trackingLink": {
-          "type": "string"
         }
       }
     }

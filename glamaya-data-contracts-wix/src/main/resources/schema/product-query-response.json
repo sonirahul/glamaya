@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Wix Product Query Response",
+  "type": "object",
+  "properties": {
+    "products": {
+      "type": "array",
+      "items": {
+        "$ref": "product.json"
+      }
+    },
+    "metadata": {
+      "$ref": "#/definitions/metadata"
+    },
+    "totalResults": {
+      "type": "integer"
+    }
+  },
+  "definitions": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "integer"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "tooManyToCount": {
+          "type": "boolean"
+        },
+        "cursors": {
+          "type": "object",
+          "properties": {
+            "next": {
+              "type": "string"
+            },
+            "previous": {
+              "type": "string"
+            }
+          }
+        },
+        "hasNext": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

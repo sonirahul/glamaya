@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generated schema for Wix Order Query Request",
+  "type": "object",
+  "properties": {
+    "search": {
+      "type": "object",
+      "properties": {
+        "filter": {
+        },
+        "sort": {
+          "$ref": "#/definitions/sort"
+        },
+        "cursorPaging": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer"
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "sort": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fieldName": {
+            "type": "string"
+          },
+          "order": {
+            "$ref": "common-enum-schema.json#/definitions/sort_order"
+          }
+        }
+      }
+    }
+  }
+}

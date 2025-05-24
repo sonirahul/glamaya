@@ -6,7 +6,8 @@
   "properties": {
     "after": {
       "type": "string",
-      "format": "date"
+      "format": "date-time",
+      "description": "Limit response to resources published before a given ISO8601 compliant date."
     },
     "attribute": {
       "type": "string"
@@ -16,7 +17,8 @@
     },
     "before": {
       "type": "string",
-      "format": "date"
+      "format": "date-time",
+      "description": "Limit response to resources published before a given ISO8601 compliant date."
     },
     "category": {
       "type": "integer"
@@ -44,7 +46,7 @@
     },
     "modified_after": {
       "type": "string",
-      "format": "date"
+      "format": "date-time"
     },
     "offset": {
       "type": "integer"

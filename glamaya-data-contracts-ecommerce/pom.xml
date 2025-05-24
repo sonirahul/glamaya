@@ -11,12 +11,6 @@
 
     <artifactId>glamaya-data-contracts-ecommerce</artifactId>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -38,6 +32,31 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-woocommerce</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-wix</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- Google phone number lib dependency -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>${libphonenumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -55,9 +74,10 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontracts.wix</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.ecommerce</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
+                    <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <useJakartaValidation>true</useJakartaValidation>
                     <dateType>java.time.LocalDate</dateType>
