@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -60,11 +61,6 @@ public class WooOrderToContactMapperFactoryImpl implements ContactMapperFactory<
             address.setEmail(email);
         });
 
-        var sources = List.of(Source.builder()
-                .withSourceName(sourceAccountName)
-                .withSourceType(SourceType.WOOCOMMERCE_ORDER)
-                .withSourceId(order.getCustomerId()).build());
-
         var extendedFields = ExtendedFields.builder()
                 .withNumOfPurchases(1L)
                 .withLastPurchaseDate(LocalDateTime.parse(order.getDateCreated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
@@ -72,12 +68,23 @@ public class WooOrderToContactMapperFactoryImpl implements ContactMapperFactory<
                 .withTotalSpentCurrency(order.getCurrency())
                 .build();
 
+        var source = Source.builder()
+                .withSourceName(sourceAccountName)
+                .withSourceType(SourceType.WOOCOMMERCE_ORDER)
+                .withSourceId(String.valueOf(order.getId()))
+                .withUserId(order.getCustomerId()).build();
+        var sources = List.of(source);
+
+        String uuid = UUID.nameUUIDFromBytes((source.getSourceName() + "-" + source.getSourceType()
+                + "-" + source.getSourceId() + "-" + source.getUserId()).toUpperCase()
+                .getBytes(StandardCharsets.UTF_8)).toString();
+
         return Contact.builder()
                 .withPhones(phones)
                 .withEmails(emails)
                 .withAddresses(addresses)
                 .withSources(sources)
-                .withId(UUID.randomUUID().toString())
+                .withId(uuid)
                 .withName(buildName(order))
                 .withCreatedDate(StringUtils.hasText(order.getDateCreated()) ? LocalDateTime.parse(order.getDateCreated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null)
                 .withUpdatedDate(StringUtils.hasText(order.getDateModified()) ? LocalDateTime.parse(order.getDateModified(), DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null)

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -60,20 +61,26 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
             address.setEmail(email);
         });
 
-        var sources = List.of(Source.builder()
+        var source = Source.builder()
                 .withSourceName(sourceAccountName)
                 .withSourceType(SourceType.WOOCOMMERCE_USER)
-                .withSourceId(user.getId()).build());
+                .withSourceId(user.getId())
+                .withUserId(user.getId()).build();
+        var sources = List.of(source);
+
+        String uuid = UUID.nameUUIDFromBytes((source.getSourceName() + "-" + source.getSourceType()
+                + "-" + source.getSourceId() + "-" + source.getUserId()).toUpperCase()
+                .getBytes(StandardCharsets.UTF_8)).toString();
 
         return Contact.builder()
-                .withId(UUID.randomUUID().toString())
                 .withEmails(emails)
                 .withPhones(phones)
                 .withAddresses(addresses)
+                .withSources(sources)
+                .withId(uuid)
                 .withName(buildName(user))
                 .withCreatedDate(StringUtils.hasText(user.getDateCreated()) ? LocalDateTime.parse(user.getDateCreated(), FORMATTER) : null)
                 .withUpdatedDate(StringUtils.hasText(user.getDateModified()) ? LocalDateTime.parse(user.getDateModified(), FORMATTER) : null)
-                .withSources(sources)
                 .build();
     }
 

@@ -4,10 +4,12 @@
   "type": "object",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "string",
+      "description": "Unique identifier for the contact"
     },
     "mergedIds": {
       "type": "array",
+      "description": "List of IDs that this contact has been merged with",
       "items": {
         "type": "string"
       }
@@ -160,7 +162,12 @@
           "$ref": "common-enum-schema.json#/definitions/source_type"
         },
         "sourceId": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique identifier for the source, e.g., WooCommerce order ID or user ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier for the user in the source system, if applicable"
         }
       }
     }
