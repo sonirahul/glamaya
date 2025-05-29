@@ -210,10 +210,12 @@
       }
     },
     "lastUpdated": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "createdDate": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "ribbon": {
       "type": "string"

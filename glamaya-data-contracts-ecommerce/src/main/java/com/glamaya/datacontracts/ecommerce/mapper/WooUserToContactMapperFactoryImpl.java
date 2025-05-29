@@ -14,18 +14,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_TO_INSTANT_FUNCTION;
+
 @Service
 @RequiredArgsConstructor
 public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<User> {
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Override
     public Contact toGlamayaContact(User user, String sourceAccountName) {
@@ -77,10 +75,12 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
                 .withPhones(phones)
                 .withAddresses(addresses)
                 .withSources(sources)
+                .withMergedIds(List.of(uuid))
                 .withId(uuid)
                 .withName(buildName(user))
-                .withCreatedDate(StringUtils.hasText(user.getDateCreated()) ? LocalDateTime.parse(user.getDateCreated(), FORMATTER) : null)
-                .withUpdatedDate(StringUtils.hasText(user.getDateModified()) ? LocalDateTime.parse(user.getDateModified(), FORMATTER) : null)
+                // GMT date is used to ensure consistency with other date fields
+                .withCreatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(user.getDateCreatedGmt()))
+                .withUpdatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(user.getDateModifiedGmt()))
                 .build();
     }
 

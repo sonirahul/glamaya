@@ -64,23 +64,12 @@
       }
     },
     "extendedFields": {
-      "type": "object",
-      "properties": {
-        "lastPurchaseDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "numOfPurchases": {
-          "type": "integer",
-          "default": 0
-        },
-        "totalSpentAmount": {
-          "type": "number",
-          "default": 0
-        },
-        "totalSpentCurrency": {
-          "type": "string"
-        }
+      "$ref": "#/definitions/purchaseItem"
+    },
+    "purchaseHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/purchaseItem"
       }
     }
   },
@@ -168,6 +157,26 @@
         "userId": {
           "type": "string",
           "description": "Unique identifier for the user in the source system, if applicable"
+        }
+      }
+    },
+    "purchaseItem": {
+      "type": "object",
+      "properties": {
+        "lastPurchaseDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "numOfPurchases": {
+          "type": "integer",
+          "default": 0
+        },
+        "totalSpentAmount": {
+          "type": "number",
+          "default": 0
+        },
+        "totalSpentCurrency": {
+          "type": "string"
         }
       }
     }

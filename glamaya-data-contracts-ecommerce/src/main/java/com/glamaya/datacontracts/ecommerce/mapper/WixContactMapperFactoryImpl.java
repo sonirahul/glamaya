@@ -4,9 +4,9 @@ import com.glamaya.datacontracts.ecommerce.Address;
 import com.glamaya.datacontracts.ecommerce.AddressType;
 import com.glamaya.datacontracts.ecommerce.Contact;
 import com.glamaya.datacontracts.ecommerce.Email;
-import com.glamaya.datacontracts.ecommerce.ExtendedFields;
 import com.glamaya.datacontracts.ecommerce.Name;
 import com.glamaya.datacontracts.ecommerce.Phone;
+import com.glamaya.datacontracts.ecommerce.PurchaseItem;
 import com.glamaya.datacontracts.ecommerce.Source;
 import com.glamaya.datacontracts.ecommerce.SourceType;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -59,28 +57,29 @@ public class WixContactMapperFactoryImpl implements ContactMapperFactory<com.gla
                 .withSourceName(sourceAccountName)
                 .withSourceType(SourceType.WIX)
                 .withSourceId(user.getId())
+                .withUserId(user.getId())
                 .build());
 
         return Contact.builder()
-                .withId(UUID.randomUUID().toString())
                 .withEmails(emails)
                 .withPhones(phones)
                 .withAddresses(addresses)
-                .withName(name)
-                .withCreatedDate(LocalDateTime.parse(user.getCreatedDate(), FORMATTER))
-                .withUpdatedDate(LocalDateTime.parse(user.getUpdatedDate(), FORMATTER))
-                .withExtendedFields(extendedFields)
                 .withSources(sources)
+                .withMergedIds(List.of(user.getId()))
+                .withId(user.getId())
+                .withName(name)
+                .withCreatedDate(user.getCreatedDate())
+                .withUpdatedDate(user.getUpdatedDate())
+                .withPurchaseHistory(List.of(extendedFields))
                 .build();
     }
 
-    private ExtendedFields buildExtendedFields(com.glamaya.datacontracts.wix.Contact user) {
+    private PurchaseItem buildExtendedFields(com.glamaya.datacontracts.wix.Contact user) {
         var wixExtendedFields = user.getInfo().getExtendedFields().getItems();
 
-        return ExtendedFields.builder()
+        return PurchaseItem.builder()
                 .withNumOfPurchases(wixExtendedFields.getEcomNumOfPurchases())
-                .withLastPurchaseDate(StringUtils.hasText(wixExtendedFields.getEcomLastPurchaseDate()) ?
-                        LocalDateTime.parse(wixExtendedFields.getEcomLastPurchaseDate(), FORMATTER) : null)
+                .withLastPurchaseDate(wixExtendedFields.getEcomLastPurchaseDate())
                 .withTotalSpentAmount(wixExtendedFields.getEcomTotalSpentAmount())
                 .withTotalSpentCurrency(wixExtendedFields.getEcomTotalSpentCurrency())
                 .build();

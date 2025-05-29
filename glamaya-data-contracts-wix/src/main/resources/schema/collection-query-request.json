@@ -20,11 +20,9 @@
         "paging": {
           "$ref": "product-query-request.json#/definitions/paging"
         },
-        "filter": {
-          "type": "string"
-        },
+        "filter": {},
         "sort": {
-          "type": "string"
+          "$ref": "order-query-request.json#/definitions/sort"
         }
       }
     }

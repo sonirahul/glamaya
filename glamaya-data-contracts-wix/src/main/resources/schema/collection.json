@@ -6,6 +6,10 @@
     "id": {
       "type": "string"
     },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time"
+    },
     "name": {
       "type": "string"
     },

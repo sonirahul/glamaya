@@ -1,8 +1,20 @@
 package com.glamaya.datacontracts.commons.constant;
 
+import org.springframework.util.StringUtils;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class Constants {
+
+    private Constants() {
+        // Prevent instantiation
+    }
 
     public static final int ZERO = 0;
     public static final int ONE = 1;
@@ -80,9 +92,20 @@ public class Constants {
     public static final String NEWBORN = "newborn";
     public static final String _ID = "_id";
     public static final String ID = "id";
+
+    // Date and time related constants
     public static final String DATE_MODIFIED = "date_modified";
     public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
+    public static final ZoneId IST_ZONE = ZoneId.of(ZoneId.SHORT_IDS.get("IST"));
+    public static final Function<String, Instant> STRING_DATE_TO_INSTANT_FUNCTION = date ->
+            Optional.ofNullable(date).filter(StringUtils::hasText)
+                    .map(d -> LocalDateTime.parse(d, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZoneOffset.UTC))
+                    .orElse(null);
+    public static final Function<String, Instant> STRING_DATE_TO_INSTANT_IST_FUNCTION = date ->
+            Optional.ofNullable(date).filter(StringUtils::hasText)
+                    .map(d -> LocalDateTime.parse(d, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(IST_ZONE).toInstant())
+                    .orElse(null);
 
     public static final String YITH_COG_COST_META = "yith_cog_cost";
     public static final String YOAST_WPSEO_METADESC_META = "_yoast_wpseo_metadesc";

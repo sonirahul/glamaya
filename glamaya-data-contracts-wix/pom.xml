@@ -27,10 +27,11 @@
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
+            <scope>provided</scope>
+        </dependency>-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -59,8 +60,8 @@
                     <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <useJakartaValidation>true</useJakartaValidation>
-                    <dateType>java.time.LocalDate</dateType>
-                    <dateTimeType>java.time.LocalDateTime</dateTimeType>
+                    <dateType>java.time.Instant</dateType>
+                    <dateTimeType>java.time.Instant</dateTimeType>
                     <generateBuilders>true</generateBuilders>
                     <useInnerClassBuilders>true</useInnerClassBuilders>
                     <includeAdditionalProperties>false</includeAdditionalProperties>

@@ -19,19 +19,19 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.glamaya</groupId>
             <artifactId>glamaya-data-contracts-woocommerce</artifactId>
@@ -40,6 +40,11 @@
         <dependency>
             <groupId>com.glamaya</groupId>
             <artifactId>glamaya-data-contracts-wix</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-commons</artifactId>
             <version>${revision}</version>
         </dependency>
         <!-- Google phone number lib dependency -->
@@ -51,7 +56,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -80,8 +86,8 @@
                     <useLongIntegers>true</useLongIntegers>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <useJakartaValidation>true</useJakartaValidation>
-                    <dateType>java.time.LocalDate</dateType>
-                    <dateTimeType>java.time.LocalDateTime</dateTimeType>
+                    <dateType>java.time.Instant</dateType>
+                    <dateTimeType>java.time.Instant</dateTimeType>
                     <generateBuilders>true</generateBuilders>
                     <useInnerClassBuilders>true</useInnerClassBuilders>
                     <includeAdditionalProperties>false</includeAdditionalProperties>

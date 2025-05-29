@@ -1,3 +1,4 @@
+/*
 package com.glamaya.datacontracts.commons.exception;
 
 import feign.FeignException;
@@ -65,3 +66,4 @@ public class GlamExceptionConfiguration {
     }
 
 }
+*/

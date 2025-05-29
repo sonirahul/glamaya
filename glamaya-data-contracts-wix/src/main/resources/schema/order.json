@@ -10,10 +10,12 @@
       "type": "string"
     },
     "createdDate": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "updatedDate": {
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "lineItems": {
       "type": "array",
@@ -177,7 +179,8 @@
                 "type": "string"
               },
               "expirationDate": {
-                "type": "string"
+                "type": "string",
+                "format": "date-time"
               }
             }
           },
@@ -348,7 +351,8 @@
               "type": "string"
             },
             "deliverByDate": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "deliveryTimeSlot": {
               "type": "object",
@@ -517,7 +521,8 @@
             "type": "string"
           },
           "createdDate": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "type": {
             "type": "string"

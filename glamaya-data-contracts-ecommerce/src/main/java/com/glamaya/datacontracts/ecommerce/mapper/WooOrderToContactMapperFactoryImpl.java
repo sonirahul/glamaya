@@ -4,9 +4,9 @@ import com.glamaya.datacontracts.ecommerce.Address;
 import com.glamaya.datacontracts.ecommerce.AddressType;
 import com.glamaya.datacontracts.ecommerce.Contact;
 import com.glamaya.datacontracts.ecommerce.Email;
-import com.glamaya.datacontracts.ecommerce.ExtendedFields;
 import com.glamaya.datacontracts.ecommerce.Name;
 import com.glamaya.datacontracts.ecommerce.Phone;
+import com.glamaya.datacontracts.ecommerce.PurchaseItem;
 import com.glamaya.datacontracts.ecommerce.Source;
 import com.glamaya.datacontracts.ecommerce.SourceType;
 import com.glamaya.datacontracts.woocommerce.Order;
@@ -16,12 +16,12 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+
+import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_TO_INSTANT_FUNCTION;
 
 @Service
 @RequiredArgsConstructor
@@ -61,9 +61,10 @@ public class WooOrderToContactMapperFactoryImpl implements ContactMapperFactory<
             address.setEmail(email);
         });
 
-        var extendedFields = ExtendedFields.builder()
+        var extendedFields = PurchaseItem.builder()
                 .withNumOfPurchases(1L)
-                .withLastPurchaseDate(LocalDateTime.parse(order.getDateCreated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                // GMT date is used to ensure consistency with other date fields
+                .withLastPurchaseDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(order.getDateCreatedGmt()))
                 .withTotalSpentAmount(BigDecimal.valueOf(Double.parseDouble(order.getTotal())))
                 .withTotalSpentCurrency(order.getCurrency())
                 .build();
@@ -84,11 +85,13 @@ public class WooOrderToContactMapperFactoryImpl implements ContactMapperFactory<
                 .withEmails(emails)
                 .withAddresses(addresses)
                 .withSources(sources)
+                .withMergedIds(List.of(uuid))
                 .withId(uuid)
                 .withName(buildName(order))
-                .withCreatedDate(StringUtils.hasText(order.getDateCreated()) ? LocalDateTime.parse(order.getDateCreated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null)
-                .withUpdatedDate(StringUtils.hasText(order.getDateModified()) ? LocalDateTime.parse(order.getDateModified(), DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null)
-                .withExtendedFields(extendedFields)
+                // GMT date is used to ensure consistency with other date fields
+                .withCreatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(order.getDateCreatedGmt()))
+                .withUpdatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(order.getDateModifiedGmt()))
+                .withPurchaseHistory(List.of(extendedFields))
                 .build();
     }
 
