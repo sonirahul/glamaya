@@ -1,0 +1,34 @@
+{
+  "definitions": {
+    "sort_order": {
+      "javaType": "SortOrder",
+      "description": "Represents the sorting order",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "javaEnums": [
+        {"name": "asc"},
+        {"name": "desc"}
+      ],
+      "default": "desc"
+    },
+    "sort_by": {
+      "javaType": "SortBy",
+      "description": "Sort by field for sorting operations",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": [
+        "conversationTimestamp",
+        "id",
+        "name"
+      ],
+      "javaEnums": [
+        {"name": "conversationTimestamp"},
+        {"name": "id"},
+        {"name": "name"}
+      ],
+      "default": "conversationTimestamp"
+    }
+  }
+}

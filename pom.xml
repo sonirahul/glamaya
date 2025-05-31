@@ -13,7 +13,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <revision>1.0-SNAPSHOT</revision>
 
-        <spring.boot.version>3.4.4</spring.boot.version>
+        <spring.boot.version>3.5.0</spring.boot.version>
         <spring.cloud.version>2024.0.0</spring.cloud.version>
         <flatten-maven-plugin.version>1.7.0</flatten-maven-plugin.version>
         <jsonschema2pojo-core.version>1.2.2</jsonschema2pojo-core.version>
@@ -55,6 +55,7 @@
     <modules>
         <module>glamaya-data-contracts-custom-annotator</module>
         <module>glamaya-data-contracts-commons</module>
+        <module>glamaya-data-contracts-whatsapp</module>
         <module>glamaya-data-contracts-wix</module>
         <module>glamaya-data-contracts-woocommerce</module>
         <module>glamaya-data-contracts-wordpress</module>

@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chat Summary",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "picture": { "type": ["string", "null"] },
+    "lastMessage": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "integer" },
+        "from": { "type": "string" },
+        "fromMe": { "type": "boolean" },
+        "source": { "type": "string" },
+        "body": { "type": "string" },
+        "to": { "type": "string" },
+        "participant": { "type": "string" },
+        "hasMedia": { "type": "boolean" },
+        "media": { "type": ["object", "null"] },
+        "ack": { "type": "integer" },
+        "ackName": { "type": "string" },
+        "replyTo": { "type": ["string", "null"] },
+        "_data": {
+          "type": "object",
+          "properties": {
+            "Info": {
+              "type": "object",
+              "properties": {
+                "Chat": { "type": "string" },
+                "Sender": { "type": "string" },
+                "IsFromMe": { "type": "boolean" },
+                "IsGroup": { "type": "boolean" },
+                "AddressingMode": { "type": "string" },
+                "SenderAlt": { "type": "string" },
+                "RecipientAlt": { "type": "string" },
+                "BroadcastListOwner": { "type": "string" },
+                "ID": { "type": "string" },
+                "ServerID": { "type": "integer" },
+                "Type": { "type": "string" },
+                "PushName": { "type": "string" },
+                "Timestamp": { "type": "string" },
+                "Category": { "type": "string" },
+                "Multicast": { "type": "boolean" },
+                "MediaType": { "type": "string" },
+                "Edit": { "type": "string" },
+                "MsgBotInfo": {
+                  "type": "object",
+                  "properties": {
+                    "EditType": { "type": "string" },
+                    "EditTargetID": { "type": "string" },
+                    "EditSenderTimestampMS": { "type": "string" }
+                  },
+                  "required": [
+                    "EditType",
+                    "EditTargetID",
+                    "EditSenderTimestampMS"
+                  ]
+                },
+                "MsgMetaInfo": {
+                  "type": "object",
+                  "properties": {
+                    "TargetID": { "type": "string" },
+                    "TargetSender": { "type": "string" },
+                    "DeprecatedLIDSession": { "type": ["string", "null"] },
+                    "ThreadMessageID": { "type": "string" },
+                    "ThreadMessageSenderJID": { "type": "string" }
+                  },
+                  "required": [
+                    "TargetID",
+                    "TargetSender",
+                    "DeprecatedLIDSession",
+                    "ThreadMessageID",
+                    "ThreadMessageSenderJID"
+                  ]
+                },
+                "VerifiedName": { "type": ["string", "null"] },
+                "DeviceSentMeta": { "type": ["object", "null"] }
+              },
+              "required": [
+                "Chat", "Sender", "IsFromMe", "IsGroup", "AddressingMode", "SenderAlt", "RecipientAlt",
+                "BroadcastListOwner", "ID", "ServerID", "Type", "PushName", "Timestamp", "Category",
+                "Multicast", "MediaType", "Edit", "MsgBotInfo", "MsgMetaInfo", "VerifiedName", "DeviceSentMeta"
+              ]
+            },
+            "Message": {
+              "type": "object",
+              "properties": {
+                "conversation": { "type": "string" },
+                "messageContextInfo": {
+                  "$ref": "#/definitions/messageContextInfo"
+                }
+              },
+              "required": ["conversation", "messageContextInfo"]
+            },
+            "IsEphemeral": { "type": "boolean" },
+            "IsViewOnce": { "type": "boolean" },
+            "IsViewOnceV2": { "type": "boolean" },
+            "IsViewOnceV2Extension": { "type": "boolean" },
+            "IsDocumentWithCaption": { "type": "boolean" },
+            "IsLottieSticker": { "type": "boolean" },
+            "IsEdit": { "type": "boolean" },
+            "SourceWebMsg": { "type": ["object", "null"] },
+            "UnavailableRequestID": { "type": "string" },
+            "RetryCount": { "type": "integer" },
+            "NewsletterMeta": { "type": ["object", "null"] },
+            "RawMessage": {
+              "type": "object",
+              "properties": {
+                "conversation": { "type": "string" },
+                "messageContextInfo": {
+                  "$ref": "#/definitions/messageContextInfo"
+                }
+              },
+              "required": ["conversation", "messageContextInfo"]
+            },
+            "IsReal": { "type": "boolean" },
+            "Status": { "type": "integer" }
+          },
+          "required": [
+            "Info", "Message", "IsEphemeral", "IsViewOnce", "IsViewOnceV2", "IsViewOnceV2Extension",
+            "IsDocumentWithCaption", "IsLottieSticker", "IsEdit", "SourceWebMsg", "UnavailableRequestID",
+            "RetryCount", "NewsletterMeta", "RawMessage", "IsReal", "Status"
+          ]
+        }
+      },
+      "required": [
+        "id", "timestamp", "from", "fromMe", "source", "body", "to", "participant", "hasMedia", "media",
+        "ack", "ackName", "replyTo", "_data"
+      ]
+    },
+    "_chat": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "conversationTimestamp": { "type": "integer" },
+        "conversationDateTime": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "conversationTimestamp"]
+    }
+  },
+  "required": ["id", "name", "picture", "lastMessage", "_chat"],
+  "definitions": {
+    "messageContextInfo": {
+      "type": "object",
+      "properties": {
+        "messageSecret": { "type": "string" }
+      },
+      "required": ["messageSecret"]
+    }
+  }
+}

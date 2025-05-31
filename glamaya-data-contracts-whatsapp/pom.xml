@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>glamaya-data-contracts</artifactId>
         <groupId>com.glamaya</groupId>
@@ -9,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>glamaya-data-contracts-ecommerce</artifactId>
+    <artifactId>glamaya-data-contracts-whatsapp</artifactId>
 
     <dependencies>
         <dependency>
@@ -27,36 +26,10 @@
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <scope>provided</scope>
-        </dependency>-->
-        <dependency>
-            <groupId>com.glamaya</groupId>
-            <artifactId>glamaya-data-contracts-woocommerce</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.glamaya</groupId>
-            <artifactId>glamaya-data-contracts-wix</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.glamaya</groupId>
-            <artifactId>glamaya-data-contracts-whatsapp</artifactId>
-            <version>${revision}</version>
-        </dependency>
         <dependency>
             <groupId>com.glamaya</groupId>
             <artifactId>glamaya-data-contracts-commons</artifactId>
             <version>${revision}</version>
-        </dependency>
-        <!-- Google phone number lib dependency -->
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>libphonenumber</artifactId>
-            <version>${libphonenumber.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -65,8 +38,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
     </dependencies>
 
@@ -85,7 +58,7 @@
                 </dependencies>
                 <configuration>
                     <sourceDirectory>${basedir}/src/main/resources/schema</sourceDirectory>
-                    <targetPackage>com.glamaya.datacontracts.ecommerce</targetPackage>
+                    <targetPackage>com.glamaya.datacontracts.whatsapp</targetPackage>
                     <customAnnotator>com.glamaya.customannotator.CustomAnnotator</customAnnotator>
                     <useBigDecimals>true</useBigDecimals>
                     <useLongIntegers>true</useLongIntegers>

@@ -28,23 +28,32 @@ public interface ContactMapperFactory<T> {
         return this.getClass().getGenericInterfaces()[0].getTypeName().contains(classType);
     }
 
-    default String formatPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) return null;
-
-        String rawNumber = phoneNumber.replaceAll("[\\s\\-()]|^\\+91|^0", "");
-        return rawNumber.length() == 10 ? rawNumber : null;
-    }
-
     default String formatPhoneNumber(String phoneNumber, String countryCode) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) return null;
 
-        phoneNumber = formatPhoneNumber(phoneNumber);
-        if (phoneNumber == null) return null;
-        try {
-            Phonenumber.PhoneNumber number = phoneUtil.parse(phoneNumber, countryCode);
-            return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
-        } catch (NumberParseException e) {
-            return phoneNumber;
+        // Remove all non-digit and non-plus characters
+        String sanitized = phoneNumber.replaceAll("[^\\d+]", "");
+
+        // If starts with '91' and is 12 digits, treat as Indian number
+        if (sanitized.matches("^91\\d{10}$")) {
+            sanitized = "+" + sanitized;
+            countryCode = "IN";
         }
+        // If exactly 10 digits, treat as Indian number
+        else if (sanitized.matches("^\\d{10}$")) {
+            sanitized = "+91" + sanitized;
+            countryCode = "IN";
+        }
+
+        try {
+            Phonenumber.PhoneNumber number = phoneUtil.parse(sanitized, countryCode);
+            if (phoneUtil.isValidNumber(number)) {
+                return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
+            }
+        } catch (NumberParseException e) {
+            // Ignore and return null below
+        }
+        return null;
     }
 
     default String formatEmail(String email) {

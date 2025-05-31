@@ -20,12 +20,14 @@
         "enum": [
             "WOOCOMMERCE_ORDER",
             "WOOCOMMERCE_USER",
-            "WIX"
+            "WIX",
+            "WHATSAPP_CHAT"
         ],
         "javaEnums": [
             {"name": "WOOCOMMERCE_ORDER"},
             {"name": "WOOCOMMERCE_USER"},
-            {"name": "WIX"}
+            {"name": "WIX"},
+            {"name": "WHATSAPP_CHAT"}
         ]
     }
   }

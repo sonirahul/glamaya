@@ -106,6 +106,10 @@ public class Constants {
             Optional.ofNullable(date).filter(StringUtils::hasText)
                     .map(d -> LocalDateTime.parse(d, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(IST_ZONE).toInstant())
                     .orElse(null);
+    public static final Function<Long, Instant> EPOCH_LONG_TO_INSTANT_FUNCTION = epoch ->
+            Optional.ofNullable(epoch)
+                    .map(Instant::ofEpochSecond)
+                    .orElse(null);
 
     public static final String YITH_COG_COST_META = "yith_cog_cost";
     public static final String YOAST_WPSEO_METADESC_META = "_yoast_wpseo_metadesc";
