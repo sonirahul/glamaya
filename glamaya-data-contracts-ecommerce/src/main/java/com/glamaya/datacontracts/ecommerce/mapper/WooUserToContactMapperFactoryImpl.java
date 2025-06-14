@@ -41,23 +41,15 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
                 .filter(Objects::nonNull)
                 .toList();
 
-        var email = formatEmail(user.getEmail());
-        var phone = formatPhoneNumber(Objects.nonNull(user.getBilling()) ?
-                user.getBilling().getPhone() : null, findCountryCode(addresses));
-
-        if (email == null && phone == null) {
-            throw new IllegalArgumentException(String.format("Woocommerce user id: %d - email and phone are null", user.getId()));
-        }
+        var email = user.getBilling().getEmail();
+        var phone = user.getBilling().getPhone();
 
         var emails = StringUtils.hasText(email) ?
-                List.of(Email.builder().withEmail(email).withPrimary(true).build()) : List.of();
+                List.of(Email.builder().withEmail(email).withPrimary(true)
+                        .withIsEmailValid(user.getBilling().getIsEmailValid()).build()) : List.of();
         var phones = StringUtils.hasText(phone) ?
-                List.of(Phone.builder().withPhone(phone).withPrimary(true).build()) : List.of();
-
-        addresses.forEach(address -> {
-            address.setPhone(phone);
-            address.setEmail(email);
-        });
+                List.of(Phone.builder().withPhone(phone).withPrimary(true)
+                        .withIsPhoneValid(user.getBilling().getIsPhoneValid()).build()) : List.of();
 
         var source = Source.builder()
                 .withSourceName(sourceAccountName)
@@ -84,21 +76,8 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
                 .build();
     }
 
-    private boolean isAddressEmpty(com.glamaya.datacontracts.woocommerce.Address address) {
-        return address == null ||
-                (address.getAddress1() == null &&
-                        address.getAddress2() == null &&
-                        address.getCity() == null &&
-                        address.getCountry() == null &&
-                        address.getFirstName() == null &&
-                        address.getLastName() == null &&
-                        address.getPhone() == null &&
-                        address.getPostcode() == null &&
-                        address.getState() == null);
-    }
-
     private Address buildAddress(com.glamaya.datacontracts.woocommerce.Address address, AddressType type) {
-        if (isAddressEmpty(address)) {
+        if (address == null) {
             return null;
         }
 
@@ -106,20 +85,24 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
                 .withType(type)
                 .withAddressLine1(address.getAddress1())
                 .withAddressLine2(address.getAddress2())
-                .withCity(toUpperCamelCase(address.getCity()))
+                .withCity(address.getCity())
+                .withState(address.getState())
                 .withCountry(address.getCountry())
+                .withZipCode(address.getPostcode())
                 .withFirstName(address.getFirstName())
                 .withLastName(address.getLastName())
-                .withZipCode(address.getPostcode())
-                .withState(toUpperCamelCase(address.getState()))
+                .withPhone(address.getPhone())
+                .withIsPhoneValid(address.getIsPhoneValid())
+                .withEmail(address.getEmail())
+                .withIsEmailValid(address.getIsEmailValid())
                 .build();
     }
 
     private Name buildName(User user) {
         return Name.builder()
-                .withFirst(toUpperCamelCase(user.getFirstName()))
-                .withLast(toUpperCamelCase(user.getLastName()))
-                .withFull(toUpperCamelCase(user.getFirstName() + " " + user.getLastName()))
+                .withFirst(user.getFirstName())
+                .withLast(user.getLastName())
+                .withFull(user.getFirstName() + " " + user.getLastName())
                 .build();
     }
 }

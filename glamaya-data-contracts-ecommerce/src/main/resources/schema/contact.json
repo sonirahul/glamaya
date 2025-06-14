@@ -101,8 +101,16 @@
         "phone": {
           "type": "string"
         },
+        "isPhoneValid": {
+          "type": "boolean",
+          "default": false
+        },
         "email": {
           "type": "string"
+        },
+        "isEmailValid": {
+          "type": "boolean",
+          "default": false
         },
         "addressLine1": {
           "type": "string"
@@ -126,6 +134,10 @@
         },
         "primary": {
           "type": "boolean"
+        },
+        "isPhoneValid": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -138,6 +150,10 @@
         },
         "primary": {
           "type": "boolean"
+        },
+        "isEmailValid": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -177,6 +193,12 @@
         },
         "totalSpentCurrency": {
           "type": "string"
+        },
+        "orderStatus": {
+          "$ref": "common-enum-schema.json#/definitions/order_status"
+        },
+        "paymentStatus": {
+          "$ref": "common-enum-schema.json#/definitions/payment_status"
         }
       }
     }

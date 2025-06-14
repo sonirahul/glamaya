@@ -104,6 +104,11 @@
         "email": {
           "type": "string"
         },
+        "is_email_valid": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates whether the email is valid or not. Default is 'false'. Applicable only for db users not for woocommerce users"
+        },
         "first_name": {
           "type": "string"
         },
@@ -112,6 +117,11 @@
         },
         "phone": {
           "type": "string"
+        },
+        "is_phone_valid": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates whether the phone is valid or not. Default is 'false'. Applicable only for db users not for woocommerce users"
         },
         "postcode": {
           "type": "string"

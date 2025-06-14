@@ -29,6 +29,52 @@
             {"name": "WIX"},
             {"name": "WHATSAPP_CHAT"}
         ]
+    },
+    "order_status": {
+      "javaType": "OrderStatus",
+      "description": "Represents the order status",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": [
+          "approved",
+          "cancelled",
+          "cancel-request",
+          "completed",
+          "failed",
+          "partial-paid",
+          "pending",
+          "processing",
+          "refunded"
+      ],
+      "javaEnums": [
+          {"name": "approved"},
+          {"name": "cancelled"},
+          {"name": "cancel_request"},
+          {"name": "completed"},
+          {"name": "failed"},
+          {"name": "partial_paid"},
+          {"name": "pending"},
+          {"name": "processing"},
+          {"name": "refunded"}
+      ]
+    },
+    "payment_status": {
+      "javaType": "PaymentStatus",
+      "description": "Represents the payment status",
+      "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
+      "enum": [
+        "fully-refunded",
+        "not-paid",
+        "paid",
+        "partial-paid",
+        "partially-refunded"
+      ],
+      "javaEnums": [
+        {"name": "fully_refunded"},
+        {"name": "not_paid"},
+        {"name": "paid"},
+        {"name": "partial_paid"},
+        {"name": "partially_refunded"}
+      ]
     }
   }
 }
