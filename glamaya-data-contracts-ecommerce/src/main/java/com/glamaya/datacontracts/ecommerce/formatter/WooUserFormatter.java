@@ -37,7 +37,8 @@ public class WooUserFormatter implements EcommerceFormatter<User> {
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        var email = formatEmail(user.getBilling().getEmail());
+        // use email from user object only as many times email is not present in the billing address
+        var email = formatEmail(user.getEmail());
         var phone = formatPhoneNumber(Objects.nonNull(user.getBilling()) ?
                 user.getBilling().getPhone() : null, findCountryCode(addressMap));
 
@@ -52,6 +53,7 @@ public class WooUserFormatter implements EcommerceFormatter<User> {
             user.getShipping().setIsPhoneValid(true);
         } else {
             user.getBilling().setIsPhoneValid(false);
+            user.getShipping().setPhone(user.getBilling().getPhone());
             user.getShipping().setIsPhoneValid(false);
         }
 
@@ -61,7 +63,9 @@ public class WooUserFormatter implements EcommerceFormatter<User> {
             user.getShipping().setIsEmailValid(true);
             user.getShipping().setEmail(email);
         } else {
+            user.getBilling().setEmail(user.getEmail());
             user.getBilling().setIsEmailValid(false);
+            user.getShipping().setEmail(user.getEmail());
             user.getShipping().setIsEmailValid(false);
         }
 

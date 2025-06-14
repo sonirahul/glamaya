@@ -52,6 +52,7 @@ public class WooOrderFormatter implements EcommerceFormatter<Order> {
             order.getShipping().setIsPhoneValid(true);
         } else {
             order.getBilling().setIsPhoneValid(false);
+            order.getShipping().setPhone(order.getBilling().getPhone());
             order.getShipping().setIsPhoneValid(false);
         }
 
@@ -62,6 +63,7 @@ public class WooOrderFormatter implements EcommerceFormatter<Order> {
             order.getShipping().setEmail(email);
         } else {
             order.getBilling().setIsEmailValid(false);
+            order.getShipping().setEmail(order.getBilling().getEmail());
             order.getShipping().setIsEmailValid(false);
         }
 
