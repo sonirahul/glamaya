@@ -66,9 +66,10 @@
       "javaType": "OrderStatus",
       "description": "Status of a Order on Woocommerce",
       "javaInterfaces" : ["java.io.Serializable", "Cloneable"],
-      "enum": ["any", "pending", "processing", "on-hold", "partial-paid", "cancel-request", "completed", "cancelled", "refunded", "failed", "trash"],
+      "enum": ["any", "draft","pending", "processing", "on-hold", "partial-paid", "cancel-request", "completed", "cancelled", "refunded", "in-transit", "out-for-delivery","rto-delivered", "rto-in-transit","failed", "trash"],
       "javaEnums": [
           {"name": "any"},
+          {"name": "draft"},
           {"name": "pending"},
           {"name": "processing"},
           {"name": "on_hold"},
@@ -77,6 +78,10 @@
           {"name": "completed"},
           {"name": "cancelled"},
           {"name": "refunded"},
+          {"name": "in_transit"},
+          {"name": "out_for_delivery"},
+          {"name": "rto_delivered"},
+          {"name": "rto_in_transit"},
           {"name": "failed"},
           {"name": "trash"}
         ],
