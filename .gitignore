@@ -35,3 +35,4 @@ build/
 
 # Ignore generated envs for ci-cd/docker
 ci-cd/docker/.env
+.container-data/
