@@ -25,6 +25,7 @@
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <commons-io.version>2.21.0</commons-io.version>
         <libphonenumber.version>9.0.18</libphonenumber.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
 
     <dependencyManagement>
@@ -49,6 +50,24 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsonschema2pojo</groupId>
+                <artifactId>jsonschema2pojo-core</artifactId>
+                <version>${jsonschema2pojo-core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
