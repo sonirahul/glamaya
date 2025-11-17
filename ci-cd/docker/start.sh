@@ -65,6 +65,7 @@ update_env_file() {
   # any provided fallbacks, then common useful entries.
   # initialize empty array (avoid unbound variable with set -u)
   fallback_arr=()
+
   # helper to push unique
   push_unique() {
     local val="$1"
@@ -74,6 +75,7 @@ update_env_file() {
     done
     fallback_arr+=("$val")
   }
+
   # Prior primary (if set and not equal to detected)
   if [ -n "$prev_primary" ] && [ "$prev_primary" != "$detected_ip" ]; then
     push_unique "$prev_primary"
@@ -81,12 +83,12 @@ update_env_file() {
   # previous fallbacks
   if [ -n "$prev_fallbacks" ]; then
     IFS=',' read -ra pf <<< "$prev_fallbacks"
-    for v in "${pf[@]}"; do push_unique "$v"; done
+    for v in "${pf[@]:-}"; do push_unique "$v"; done
   fi
   # provided fallbacks (argument)
   if [ -n "$provided_fallbacks" ]; then
     IFS=',' read -ra pf2 <<< "$provided_fallbacks"
-    for v in "${pf2[@]}"; do push_unique "$v"; done
+    for v in "${pf2[@]:-}"; do push_unique "$v"; done
   fi
   # always useful fallbacks
   push_unique "host.docker.internal"
@@ -150,7 +152,48 @@ compose_ps() {
 }
 
 show_help() {
-  sed -n '1,160p' "$0"
+  cat <<'HELP'
+start.sh - manage the local ci-cd/docker stack and .env
+
+Usage: ./start.sh <command> [arg]
+
+Commands:
+  up [FALLBACK_CSV|--no-env]
+      Update .env (unless --no-env) and start the docker compose stack (docker compose up -d --build).
+      If a second argument is provided and not "--no-env", it is treated as a comma-separated
+      list of fallback addresses to include in KAFKA_ADVERTISED_IP_FALLBACKS.
+
+  down
+      Stop and remove the stack (docker compose down -v).
+
+  restart [FALLBACK_CSV]
+      Update .env (optionally with provided fallbacks), then stop and start the stack.
+
+  logs
+      Follow docker compose logs (docker compose logs -f).
+
+  ps
+      Show docker compose ps output.
+
+  update-env [FALLBACK_CSV]
+      Regenerate the .env file only. Optionally provide a comma-separated fallback list.
+
+  help, -h, --help
+      Show this help text.
+
+Notes:
+  - The script writes ci-cd/docker/.env with KAFKA_ADVERTISED_IP, KAFKA_ADVERTISED_IP_FALLBACKS,
+    and KAFKA_ADVERTISED_HOST. The compose file reads the primary advertised IP/host.
+  - KAFKA_ADVERTISED_IP_FALLBACKS is informational/documentation for clients to try other addresses
+    when the primary IP changes (e.g., previous LAN IP, host.docker.internal, 127.0.0.1).
+  - Use the --no-env flag with "up" if you want to start the stack without modifying .env.
+
+Examples:
+  ./start.sh up
+  ./start.sh up --no-env
+  ./start.sh update-env 192.168.0.35,backup-host.local
+  ./start.sh restart
+HELP
 }
 
 case "${1:-up}" in
