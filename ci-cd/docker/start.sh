@@ -48,6 +48,7 @@ read_env_value() {
 # Build and write .env
 update_env_file() {
   local provided_fallbacks="$1" # comma-separated optional
+  local dry_run="${2:-false}"
   echo "Detecting LAN IP and local hostname..."
   local detected_ip
   detected_ip=$(detect_ip || true)
@@ -130,7 +131,34 @@ KAFKA_VERSION=3.6.1
 SCALA_VERSION=2.13
 EOF
 
+  if [ "$dry_run" = "true" ]; then
+    echo "DRY RUN: would write .env with:"
+    sed -n '1,200p' "$ENV_FILE"
+    # restore previous content (don't overwrite) by removing the file created above
+    rm -f "$ENV_FILE"
+    return 0
+  fi
+
   echo ".env written: KAFKA_ADVERTISED_IP=${primary_ip:-<empty>}, KAFKA_ADVERTISED_IP_FALLBACKS=${fallback_csv:-<empty>}, KAFKA_ADVERTISED_HOSTNAME=${hostname}.local"
+}
+
+# Wait for services to report healthy via docker-compose healthchecks
+wait_for_health() {
+  local timeout_secs=${1:-60}
+  local poll_interval=${2:-3}
+  local elapsed=0
+  echo "Waiting for services to become healthy (timeout ${timeout_secs}s)..."
+  while [ $elapsed -lt $timeout_secs ]; do
+    # use docker compose ps --format to check health if supported, else fall back to docker inspect
+    if docker compose ps --format "{{.Service}} {{.Status}}" 2>/dev/null | grep -q "(healthy)"; then
+      echo "At least one service reports healthy - continuing."
+      return 0
+    fi
+    sleep $poll_interval
+    elapsed=$((elapsed + poll_interval))
+  done
+  echo "Timed out waiting for healthchecks after ${timeout_secs}s." >&2
+  return 1
 }
 
 compose_up() {
@@ -175,8 +203,10 @@ Commands:
   ps
       Show docker compose ps output.
 
-  update-env [FALLBACK_CSV]
+  update-env [FALLBACK_CSV] [--dry-run]
       Regenerate the .env file only. Optionally provide a comma-separated fallback list.
+      If --dry-run is provided as the second arg, the script will print the proposed .env
+      and will NOT write it to disk.
 
   help, -h, --help
       Show this help text.
@@ -192,6 +222,7 @@ Examples:
   ./start.sh up
   ./start.sh up --no-env
   ./start.sh update-env 192.168.0.35,backup-host.local
+  ./start.sh update-env 192.168.0.35 --dry-run
   ./start.sh restart
 HELP
 }
@@ -201,19 +232,23 @@ case "${1:-up}" in
     # support optional flag --no-env
     if [ "${2:-}" = "--no-env" ] || [ "${2:-}" = "-n" ]; then
       compose_up
+      # wait a bit for health (best-effort)
+      wait_for_health 60 3 || true
     else
       # allow passing optional fallback list as second arg when invoking up
-      update_env_file "${2:-}"
+      update_env_file "${2:-}" "false"
       compose_up
+      wait_for_health 60 3 || true
     fi
     ;;
   down|stop)
     compose_down
     ;;
   restart)
-    update_env_file "${2:-}"
+    update_env_file "${2:-}" "false"
     compose_down
     compose_up
+    wait_for_health 60 3 || true
     ;;
   logs)
     compose_logs
@@ -222,7 +257,12 @@ case "${1:-up}" in
     compose_ps
     ;;
   update-env)
-    update_env_file "${2:-}"
+    # support optional --dry-run as the second arg
+    if [ "${2:-}" = "--dry-run" ] || [ "${3:-}" = "--dry-run" ]; then
+      update_env_file "${2:-}" "true"
+    else
+      update_env_file "${2:-}" "false"
+    fi
     ;;
   help|-h|--help)
     show_help

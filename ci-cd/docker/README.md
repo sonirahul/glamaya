@@ -59,9 +59,13 @@ Quick run (single-tool workflow)
 
 # just regenerate .env (optionally provide a comma-separated fallback list)
 ./start.sh update-env 192.168.0.35,backup-host.local
+
+# print what would be written to .env without changing disk
+./start.sh update-env 192.168.0.35 --dry-run
 ```
 
 Notes and configuration details
+- After `up` or `restart`, `start.sh` will wait (best-effort) for services to report healthy via the compose healthchecks. This is helpful in scripts and CI to ensure the stack is up before clients try to connect.
 - We publish two external ports per-broker so clients can connect either by hostname (EXTERNAL_HOST) or by IP (EXTERNAL_IP). If you prefer fewer ports, you can remove the second published port and only advertise the hostname or IP.
 - Ensure your macOS firewall permits incoming connections to the published ports if you want other machines to connect.
 - If your LAN uses mDNS (Bonjour), hostname.local should resolve automatically; otherwise prefer the IP-based addresses.
