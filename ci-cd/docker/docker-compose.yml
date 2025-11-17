@@ -1,0 +1,154 @@
+services:
+  zookeeper1:
+    image: ${ZOOKEEPER_IMAGE}
+    container_name: zookeeper1
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper1:2888:3888;zookeeper2:2888:3888
+    ports:
+      - "22181:2181"
+    volumes:
+      - ../../.container-data/zookeeper1-data:/var/lib/zookeeper/data
+      - ../../.container-data/zookeeper1-logs:/var/lib/zookeeper/log
+    networks:
+      - glamaya-network
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 127.0.0.1 2181 | grep imok || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  zookeeper2:
+    image: ${ZOOKEEPER_IMAGE}
+    container_name: zookeeper2
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper1:2888:3888;zookeeper2:2888:3888
+    ports:
+      - "32181:2181"
+    volumes:
+      - ../../.container-data/zookeeper2-data:/var/lib/zookeeper/data
+      - ../../.container-data/zookeeper2-logs:/var/lib/zookeeper/log
+    networks:
+      - glamaya-network
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc -w 2 127.0.0.1 2181 | grep imok || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  kafka1:
+    image: ${KAFKA_IMAGE}
+    container_name: kafka1
+    restart: unless-stopped
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+    ports:
+      - "29092:29092"
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181
+      # Kafka will listen on multiple listener names inside the container:
+      #   INTERNAL -> 9092 (container-to-container)
+      #   EXTERNAL_HOST -> 29092 (advertises hostname.local)
+      #   EXTERNAL_IP -> 29093 (advertises current LAN IP)
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL_HOST://0.0.0.0:29092,EXTERNAL_IP://0.0.0.0:29093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9092,EXTERNAL_HOST://${KAFKA_ADVERTISED_HOST}:29092,EXTERNAL_IP://${KAFKA_ADVERTISED_IP}:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_HOST:PLAINTEXT,EXTERNAL_IP:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+    volumes:
+      - ../../.container-data/kafka1-data:/var/lib/kafka/data
+    networks:
+      - glamaya-network
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  kafka2:
+    image: ${KAFKA_IMAGE}
+    container_name: kafka2
+    restart: unless-stopped
+    depends_on:
+      - zookeeper1
+      - zookeeper2
+    ports:
+      - "39092:39092"
+      - "39093:39093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper1:2181,zookeeper2:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL_HOST://0.0.0.0:39092,EXTERNAL_IP://0.0.0.0:39093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:9092,EXTERNAL_HOST://${KAFKA_ADVERTISED_HOST}:39092,EXTERNAL_IP://${KAFKA_ADVERTISED_IP}:39093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_HOST:PLAINTEXT,EXTERNAL_IP:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    volumes:
+      - ../../.container-data/kafka2-data:/var/lib/kafka/data
+    networks:
+      - glamaya-network
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  clnui-tools:
+    build:
+      context: clnui-tools
+      args:
+        - KAFKA_VERSION=${KAFKA_VERSION}
+        - SCALA_VERSION=${SCALA_VERSION}
+    image: ${CLNUI_TOOLS_IMAGE}
+    container_name: clnui-tools
+    restart: unless-stopped
+    depends_on:
+      - kafka1
+      - kafka2
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka1:9092,kafka2:9092
+      JVM_OPTS: -Xms32M -Xmx256M
+      SERVER_SERVLET_CONTEXT_PATH: /
+    volumes:
+      - ./clnui-tools/kafka-sample-cmd.md:/etc/clnui-tools/kafka/configs/kafka-sample-cmd.md
+    networks:
+      - glamaya-network
+    env_file:
+      - .env
+
+networks:
+  glamaya-network:
+    driver: bridge

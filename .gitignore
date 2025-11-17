@@ -32,3 +32,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore generated envs for ci-cd/docker
+ci-cd/docker/.env
