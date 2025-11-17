@@ -1,0 +1,1 @@
+# glamaya-wix-sync

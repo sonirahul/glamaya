@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: glamaya-wix-sync
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:127.0.0.1:29092}
+    client-id: ${spring.application.name}
+    security:
+      protocol: ${SPRING_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+    producer:
+      #      transaction-id-prefix: tx-auth-processor-${random.uuid}
+      compression-type: zstd
+      properties:
+        enable.idempotence: true
+        linger.ms: 25
+      batch-size: 32KB
+  data:
+    mongodb:
+      uri: "mongodb-connection-uri"
+
+external:
+  wix:
+    api:
+      url: "enter your url here"
+      key: "enter your key here"
+      account-id: "enter your account id here"
+      site-id: "enter your site id here"
+      account-name: "enter your account name here"
+
+application:
+  webclient:
+    response-timeout-in-millis: 30000
+    max-in-memory-size-in-bytes: 10485760 # 10MB
+  wix:
+    entities:
+      global-fetch-duration-in-millis:
+        init-mode: 500
+      products:
+        query-url: /stores/v1/products/query
+        enable: false
+        fetch-limit: 100
+        reset-on-startup: false
+        fetch-duration-in-millis:
+          active-mode: 500
+          passive-mode: 60000
+      collections:
+        query-url: /stores/v1/collections/query
+        enable: false
+        fetch-limit: 100
+        reset-on-startup: false
+        fetch-duration-in-millis:
+          active-mode: 500
+          passive-mode: 60000
+      orders:
+        query-url: /ecom/v1/orders/search
+        enable: false
+        fetch-limit: 100
+        reset-on-startup: false
+        fetch-duration-in-millis:
+          active-mode: 500
+          passive-mode: 60000
+      contacts:
+        query-url: /contacts/v4/contacts/query
+        enable: false
+        fetch-limit: 100
+        reset-on-startup: false
+        fetch-duration-in-millis:
+          active-mode: 500
+          passive-mode: 60000
+
+  kafka:
+    topic:
+      product-events: wix-product-events
+      collection-events: wix-collection-events
+      order-events: wix-order-events
+      contact-events: wix-contact-events
+      ecom-contact-events: ecommerce-contact-events
+
+logging:
+  level:
+    com.glamaya.glamayawixsync: info
