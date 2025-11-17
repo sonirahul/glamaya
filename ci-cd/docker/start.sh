@@ -118,7 +118,7 @@ update_env_file() {
 KAFKA_ADVERTISED_IP=${primary_ip}
 # Comma-separated fallbacks that clients may try if primary changes (not directly used by compose)
 KAFKA_ADVERTISED_IP_FALLBACKS=${fallback_csv}
-KAFKA_ADVERTISED_HOST=${hostname}.local
+KAFKA_ADVERTISED_HOSTNAME=${hostname}.local
 
 # Zookeeper & Kafka images (pin to specific versions)
 ZOOKEEPER_IMAGE=confluentinc/cp-zookeeper:7.9.4
@@ -130,7 +130,7 @@ KAFKA_VERSION=3.6.1
 SCALA_VERSION=2.13
 EOF
 
-  echo ".env written: KAFKA_ADVERTISED_IP=${primary_ip:-<empty>}, KAFKA_ADVERTISED_IP_FALLBACKS=${fallback_csv:-<empty>}, KAFKA_ADVERTISED_HOST=${hostname}.local"
+  echo ".env written: KAFKA_ADVERTISED_IP=${primary_ip:-<empty>}, KAFKA_ADVERTISED_IP_FALLBACKS=${fallback_csv:-<empty>}, KAFKA_ADVERTISED_HOSTNAME=${hostname}.local"
 }
 
 compose_up() {
