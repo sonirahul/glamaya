@@ -44,6 +44,7 @@ public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
     private final KafkaProducer<Object> producer;
     @Getter
     private final PollerMetadata poller;
+    @Getter
     private final ObjectMapper objectMapper;
     private final ProcessorStatusTrackerRepository repository;
     private final ContactMapperFactory<Order> contactMapperFactory;
@@ -102,7 +103,7 @@ public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
                 updateStatusTracker(statusTracker, response, o -> ((Order) o).getDateModifiedGmt());
                 modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
             }
-            repository.save(statusTracker).block();
+            repository.save(statusTracker).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()).block();
 
             return response == null ? null : MessageBuilder.withPayload(response).build();
         };

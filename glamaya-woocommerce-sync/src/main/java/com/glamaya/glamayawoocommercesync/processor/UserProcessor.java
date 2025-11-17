@@ -45,6 +45,7 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
     private final KafkaProducer<Object> producer;
     @Getter
     private final PollerMetadata poller;
+    @Getter
     private final ObjectMapper objectMapper;
     private final ProcessorStatusTrackerRepository repository;
     private final ContactMapperFactory<User> contactMapperFactory;
@@ -104,7 +105,7 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
                         ? ((User) o).getDateModified() : ((User) o).getDateCreated());
                 modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
             }
-            repository.save(statusTracker).block();
+            repository.save(statusTracker).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()).block();
 
             return response == null ? null : MessageBuilder.withPayload(response).build();
         };

@@ -66,7 +66,7 @@ application:
         page-size: 10
         reset-on-startup: false
         fetch-duration-in-millis:
-          active-mode: 500
+          active-mode: 1000
           passive-mode: 60000
         n8n:
           enable: false
