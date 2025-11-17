@@ -36,3 +36,4 @@ build/
 # Ignore generated envs for ci-cd/docker
 ci-cd/docker/.env
 .container-data/
+**/src/main/resources/application-local**
