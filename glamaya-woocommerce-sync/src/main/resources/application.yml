@@ -12,7 +12,7 @@ spring:
       properties:
         enable.idempotence: true
         linger.ms: 25
-      batch-size: 32KB
+      batch-size: 32768 # fixed from 32KB (must be numeric bytes)
   data:
     mongodb:
       uri: "mongodb-connection-uri"
