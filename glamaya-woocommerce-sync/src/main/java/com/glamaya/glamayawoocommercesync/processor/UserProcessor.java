@@ -26,6 +26,8 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.Map;
@@ -84,30 +86,33 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
                 return null;
             }
 
-            ProcessorStatusTracker statusTracker = getOrCreateStatusTracker(resetOnStartup, pageSize);
-            resetOnStartup = false; // Reset only once on startup
+            Mono<ProcessorStatusTracker> trackerMono = getOrCreateStatusTracker(resetOnStartup, pageSize)
+                    .doOnNext(t -> resetOnStartup = false);
 
-            UserSearchRequest userSearchRequest = buildUserSearchRequest(statusTracker);
-
-            Map<String, String> queryParamMap = objectMapper.convertValue(userSearchRequest, new TypeReference<>() {});
-            String oauthHeader = oAuth1Service.generateOAuth1Header(queryUsersUrl, queryParamMap);
-
-            List<User> response = fetchEntities(woocommerceWebClient, queryUsersUrl, queryParamMap, oauthHeader,
-                    new ParameterizedTypeReference<>() {});
-
-            if (response == null || response.isEmpty()) {
-                log.info("No new woocommerce Users found, resetting status tracker and switching to passive mode");
-                resetStatusTracker(statusTracker);
-                modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
-            } else {
-                log.info("Fetched {} woocommerce Users", statusTracker.getCount() + response.size());
-                updateStatusTracker(statusTracker, response, o -> Objects.nonNull(((User) o).getDateModifiedGmt())
-                        ? ((User) o).getDateModified() : ((User) o).getDateCreated());
-                modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
-            }
-            repository.save(statusTracker).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()).block();
-
-            return response == null ? null : MessageBuilder.withPayload(response).build();
+            return trackerMono.flatMap(statusTracker -> {
+                        UserSearchRequest userSearchRequest = buildUserSearchRequest(statusTracker);
+                        Map<String, String> queryParamMap = objectMapper.convertValue(userSearchRequest, new TypeReference<>() {});
+                        String oauthHeader = oAuth1Service.generateOAuth1Header(queryUsersUrl, queryParamMap);
+                        return fetchEntities(woocommerceWebClient, queryUsersUrl, queryParamMap, oauthHeader, new ParameterizedTypeReference<List<User>>() {})
+                                .defaultIfEmpty(List.of())
+                                .flatMap(users -> {
+                                    if (users.isEmpty()) {
+                                        log.info("No new woocommerce Users found, resetting status tracker and switching to passive mode");
+                                        resetStatusTracker(statusTracker);
+                                        modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
+                                    } else {
+                                        log.info("Fetched {} woocommerce Users", statusTracker.getCount() + users.size());
+                                        updateStatusTracker(statusTracker, users, o -> Objects.nonNull(((User) o).getDateModifiedGmt())
+                                                ? ((User) o).getDateModified() : ((User) o).getDateCreated());
+                                        modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
+                                    }
+                                    return repository.save(statusTracker)
+                                            .subscribeOn(Schedulers.boundedElastic())
+                                            .thenReturn(users);
+                                });
+                    })
+                    .map(users -> users.isEmpty() ? null : MessageBuilder.withPayload(users).build())
+                    .block(); // boundary sync
         };
     }
 

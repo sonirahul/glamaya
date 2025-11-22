@@ -24,6 +24,8 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.Map;
@@ -75,31 +77,33 @@ public class ProductProcessor implements GlamWoocommerceProcessor<List<Product>>
                 return null;
             }
 
-            ProcessorStatusTracker statusTracker = getOrCreateStatusTracker(resetOnStartup, pageSize);
-            resetOnStartup = false; // Reset only once on startup
+            // Build mono chain
+            Mono<ProcessorStatusTracker> trackerMono = getOrCreateStatusTracker(resetOnStartup, pageSize)
+                    .doOnNext(t -> resetOnStartup = false);
 
-            ProductSearchRequest productSearchRequest = buildProductSearchRequest(statusTracker);
-
-            Map<String, String> queryParamMap = objectMapper.convertValue(productSearchRequest, new TypeReference<>() {
-            });
-            String oauthHeader = oAuth1Service.generateOAuth1Header(queryProductsUrl, queryParamMap);
-
-            List<Product> response = fetchEntities(woocommerceWebClient, queryProductsUrl, queryParamMap, oauthHeader,
-                    new ParameterizedTypeReference<>() {
-                    });
-
-            if (response == null || response.isEmpty()) {
-                log.info("No new woocommerce Products found, resetting status tracker and switching to passive mode");
-                resetStatusTracker(statusTracker);
-                modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
-            } else {
-                log.info("Fetched {} woocommerce Products", statusTracker.getCount() + response.size());
-                updateStatusTracker(statusTracker, response, o -> ((Product) o).getDateModifiedGmt());
-                modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
-            }
-            repository.save(statusTracker).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()).block();
-
-            return response == null ? null : MessageBuilder.withPayload(response).build();
+            return trackerMono.flatMap(statusTracker -> {
+                        ProductSearchRequest productSearchRequest = buildProductSearchRequest(statusTracker);
+                        Map<String, String> queryParamMap = objectMapper.convertValue(productSearchRequest, new TypeReference<>() {});
+                        String oauthHeader = oAuth1Service.generateOAuth1Header(queryProductsUrl, queryParamMap);
+                        return fetchEntities(woocommerceWebClient, queryProductsUrl, queryParamMap, oauthHeader, new ParameterizedTypeReference<List<Product>>() {})
+                                .defaultIfEmpty(List.of())
+                                .flatMap(products -> {
+                                    if (products.isEmpty()) {
+                                        log.info("No new woocommerce Products found, resetting status tracker and switching to passive mode");
+                                        resetStatusTracker(statusTracker);
+                                        modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
+                                    } else {
+                                        log.info("Fetched {} woocommerce Products", statusTracker.getCount() + products.size());
+                                        updateStatusTracker(statusTracker, products, o -> ((Product) o).getDateModifiedGmt());
+                                        modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
+                                    }
+                                    return repository.save(statusTracker)
+                                            .subscribeOn(Schedulers.boundedElastic())
+                                            .thenReturn(products);
+                                });
+                    })
+                    .map(products -> products.isEmpty() ? null : MessageBuilder.withPayload(products).build())
+                    .block(); // boundary: Integration MessageSource requires sync return
         };
     }
 

@@ -16,7 +16,6 @@ import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.integration.util.DynamicPeriodicTrigger;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.List;
@@ -40,21 +39,18 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
 
     ProcessorType getProcessorType();
 
-    default ProcessorStatusTracker getOrCreateStatusTracker(boolean resetOnStartup, long pageSize) {
+    default Mono<ProcessorStatusTracker> getOrCreateStatusTracker(boolean resetOnStartup, long pageSize) {
         if (resetOnStartup) {
-            return createStatusTracker(pageSize).subscribeOn(Schedulers.boundedElastic()).block();
+            return createStatusTracker(pageSize);
         }
-
-        var statusTracker = getStatusTrackerRepository().findById(getProcessorType())
+        return getStatusTrackerRepository().findById(getProcessorType())
                 .switchIfEmpty(createStatusTracker(pageSize))
-                .subscribeOn(Schedulers.boundedElastic())
-                .block();
-
-        // Ensure that the status tracker is not null and has the correct page size
-        if (statusTracker != null && statusTracker.getPageSize() != pageSize) {
-            return createStatusTracker(pageSize).subscribeOn(Schedulers.boundedElastic()).block();
-        }
-        return statusTracker;
+                .flatMap(tracker -> {
+                    if (tracker.getPageSize() != pageSize) {
+                        return createStatusTracker(pageSize);
+                    }
+                    return Mono.just(tracker);
+                });
     }
 
     private Mono<ProcessorStatusTracker> createStatusTracker(long pageSize) {
@@ -75,82 +71,72 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
 
     default void updateStatusTracker(ProcessorStatusTracker statusTracker, List<?> response,
                                      Function<Object, String> getDateModified) {
-
+        if (response == null || response.isEmpty()) {
+            return;
+        }
         long newCount = statusTracker.getCount() + response.size();
         statusTracker.setCount(newCount);
         statusTracker.setPage(statusTracker.getPage() + 1);
         String lastDateModified = getDateModified.apply(response.getLast());
-        statusTracker.setLastUpdatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(lastDateModified));
+        if (lastDateModified != null) {
+            statusTracker.setLastUpdatedDate(STRING_DATE_TO_INSTANT_FUNCTION.apply(lastDateModified));
+        }
     }
 
-    default <E> List<E> fetchEntities(WebClient webClient, String queryUrl, Map<String, String> queryParamMap,
-                                      String oauthHeader, ParameterizedTypeReference<List<E>> typeRef) {
+    // Change to reactive fetch
+    default <E> Mono<List<E>> fetchEntities(WebClient webClient, String queryUrl, Map<String, String> queryParamMap,
+                                            String oauthHeader, ParameterizedTypeReference<List<E>> typeRef) {
+        String paramsDesc = (queryParamMap != null && !queryParamMap.isEmpty()) ?
+                queryParamMap.entrySet().stream()
+                        .map(e -> e.getKey() + "=" + (e.getKey().toLowerCase().contains("secret") || e.getKey().toLowerCase().contains("key") ? "***" : e.getValue()))
+                        .reduce((a, b) -> a + "," + b).orElse("") : "";
 
-        // Build a canonical request description for logs (mask common secrets)
-        String paramsDesc;
-        if (queryParamMap != null && !queryParamMap.isEmpty()) {
-            paramsDesc = queryParamMap.entrySet().stream()
-                    .map(e -> e.getKey() + "=" + (e.getKey().toLowerCase().contains("secret") || e.getKey().toLowerCase().contains("key") ? "***" : e.getValue()))
-                    .reduce((a, b) -> a + "," + b).orElse("");
-        } else {
-            paramsDesc = "";
-        }
-
-        try {
-            return webClient.get()
-                    .uri(uriBuilder -> {
-                        uriBuilder.path(queryUrl);
-                        if (queryParamMap != null) {
-                            queryParamMap.forEach(uriBuilder::queryParam);
+        return webClient.get()
+                .uri(uriBuilder -> {
+                    uriBuilder.path(queryUrl);
+                    if (queryParamMap != null) {
+                        queryParamMap.forEach(uriBuilder::queryParam);
+                    }
+                    return uriBuilder.build();
+                })
+                .header(HttpHeaders.AUTHORIZATION, oauthHeader == null ? "" : oauthHeader)
+                .retrieve()
+                .bodyToFlux(Map.class) // deserialize as generic map list first if unknown; will re-map via ObjectMapper
+                .collectList()
+                .flatMap(rawList -> {
+                    try {
+                        // Re-serialize rawList then deserialize into target type list for consistency
+                        String json = getObjectMapper().writeValueAsString(rawList);
+                        JavaType javaType = getObjectMapper().getTypeFactory().constructType(typeRef.getType());
+                        List<E> result = getObjectMapper().readValue(json, javaType);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Fetched {} items for {}?{}", result.size(), queryUrl, paramsDesc);
                         }
-                        return uriBuilder.build();
-                    })
-                    .header(HttpHeaders.AUTHORIZATION, oauthHeader == null ? "" : oauthHeader)
-                    .exchangeToMono(response -> response.bodyToMono(String.class)
-                            .flatMap(body -> {
-                                // Log debug of response size
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("Received response (len={}) for {}?{}", body == null ? 0 : body.length(), queryUrl, paramsDesc);
-                                }
-                                if (!response.statusCode().is2xxSuccessful()) {
-                                    LOG.error("Non-success response for request {}?{} status={} body={}",
-                                            queryUrl, paramsDesc, response.statusCode().value(), body == null ? "<empty>" : body.substring(0, Math.min(body.length(), 2000)));
-                                    return Mono.error(new RuntimeException("Non-success response: " + response.statusCode()));
-                                }
-
-                                try {
-                                    JavaType javaType = getObjectMapper().getTypeFactory().constructType(typeRef.getType());
-                                    List<E> result = getObjectMapper().readValue(body, javaType);
-                                    return Mono.just(result);
-                                } catch (Exception ex) {
-                                    // Log detailed diagnostic to help debug mapping issues
-                                    LOG.error("Failed to deserialize response for request {}?{}. HTTP status={}. Response body (first 2000 chars): {}",
-                                            queryUrl, paramsDesc, response.statusCode().value(), body, ex);
-                                    return Mono.error(new RuntimeException("Failed to deserialize Woocommerce response: see logs for body", ex));
-                                }
-                            }))
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .block();
-        } catch (Exception e) {
-            // Provide a helpful wrapper if anything else goes wrong
-            LOG.error("Error fetching entities from {}?{}. Exception: {}", queryUrl, paramsDesc, e, e);
-            throw e;
-        }
+                        return Mono.just(result);
+                    } catch (Exception ex) {
+                        LOG.error("Failed to deserialize response for {}?{}", queryUrl, paramsDesc, ex);
+                        return Mono.error(ex);
+                    }
+                })
+                .onErrorResume(e -> {
+                    LOG.error("Error fetching entities from {}?{}: {}", queryUrl, paramsDesc, e.toString());
+                    return Mono.empty();
+                });
     }
 
+    // Make asynchronous fire-and-forget publish (no blocking)
     default void publishData(WebClient webClient, String queryUrl, Object data, boolean n8nEnable) {
-
         if (!n8nEnable) {
             return;
         }
-
         webClient.post()
                 .uri(queryUrl)
                 .bodyValue(data)
                 .retrieve()
                 .bodyToMono(Void.class)
-                .subscribeOn(Schedulers.boundedElastic())
-                .block();
+                .doOnError(e -> LOG.error("n8n publish failed url={} error={}", queryUrl, e.toString()))
+                .onErrorResume(e -> Mono.empty())
+                .subscribe(); // fire and forget
     }
 
     default Consumer<SourcePollingChannelAdapterSpec> poll() {

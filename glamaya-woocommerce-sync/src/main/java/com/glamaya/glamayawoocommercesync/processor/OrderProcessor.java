@@ -26,6 +26,8 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.Map;
@@ -83,29 +85,32 @@ public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
                 return null;
             }
 
-            ProcessorStatusTracker statusTracker = getOrCreateStatusTracker(resetOnStartup, pageSize);
-            resetOnStartup = false; // Reset only once on startup
+            Mono<ProcessorStatusTracker> trackerMono = getOrCreateStatusTracker(resetOnStartup, pageSize)
+                    .doOnNext(t -> resetOnStartup = false);
 
-            OrderSearchRequest orderSearchRequest = buildOrderSearchRequest(statusTracker);
-
-            Map<String, String> queryParamMap = objectMapper.convertValue(orderSearchRequest, new TypeReference<>() {});
-            String oauthHeader = oAuth1Service.generateOAuth1Header(queryOrdersUrl, queryParamMap);
-
-            List<Order> response = fetchEntities(woocommerceWebClient, queryOrdersUrl, queryParamMap, oauthHeader,
-                    new ParameterizedTypeReference<>() {});
-
-            if (response == null || response.isEmpty()) {
-                log.info("No new woocommerce Orders found, resetting status tracker and switching to passive mode");
-                resetStatusTracker(statusTracker);
-                modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
-            } else {
-                log.info("Fetched {} woocommerce Orders", statusTracker.getCount() + response.size());
-                updateStatusTracker(statusTracker, response, o -> ((Order) o).getDateModifiedGmt());
-                modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
-            }
-            repository.save(statusTracker).subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic()).block();
-
-            return response == null ? null : MessageBuilder.withPayload(response).build();
+            return trackerMono.flatMap(statusTracker -> {
+                        OrderSearchRequest orderSearchRequest = buildOrderSearchRequest(statusTracker);
+                        Map<String, String> queryParamMap = objectMapper.convertValue(orderSearchRequest, new TypeReference<>() {});
+                        String oauthHeader = oAuth1Service.generateOAuth1Header(queryOrdersUrl, queryParamMap);
+                        return fetchEntities(woocommerceWebClient, queryOrdersUrl, queryParamMap, oauthHeader, new ParameterizedTypeReference<List<Order>>() {})
+                                .defaultIfEmpty(List.of())
+                                .flatMap(orders -> {
+                                    if (orders.isEmpty()) {
+                                        log.info("No new woocommerce Orders found, resetting status tracker and switching to passive mode");
+                                        resetStatusTracker(statusTracker);
+                                        modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
+                                    } else {
+                                        log.info("Fetched {} woocommerce Orders", statusTracker.getCount() + orders.size());
+                                        updateStatusTracker(statusTracker, orders, o -> ((Order) o).getDateModifiedGmt());
+                                        modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
+                                    }
+                                    return repository.save(statusTracker)
+                                            .subscribeOn(Schedulers.boundedElastic())
+                                            .thenReturn(orders);
+                                });
+                    })
+                    .map(orders -> orders.isEmpty() ? null : MessageBuilder.withPayload(orders).build())
+                    .block(); // boundary sync
         };
     }
 
