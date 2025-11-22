@@ -42,9 +42,15 @@ public class OAuth1Service {
         oauthParams.put("oauth_timestamp", String.valueOf(timestamp));
         oauthParams.put("oauth_version", "1.0");
 
-        // Merge OAuth parameters and query parameters
+        // Filter null/blank query params BEFORE merging
+        Map<String, String> filteredQueryParams = queryParams == null ? Map.of() :
+                queryParams.entrySet().stream()
+                        .filter(e -> e.getValue() != null && !e.getValue().isBlank())
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // Merge OAuth parameters and filtered query parameters
         Map<String, String> allParams = new HashMap<>(oauthParams);
-        allParams.putAll(queryParams);
+        allParams.putAll(filteredQueryParams);
 
         // Generate the base string including query parameters
         String baseString = generateBaseString(url, method, allParams);
