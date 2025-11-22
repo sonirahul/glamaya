@@ -29,6 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -151,11 +152,17 @@ public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
                 producer.send(orderEventsTopic, order.getId().toString(), order);
                 var contact = contactMapperFactory.toGlamayaContact(order, sourceAccountName);
                 producer.send(contactEventsTopic, contact.getId(), contact);
-                // Publish to n8n webhook
-                publishData(n8nWebClient, n8nWebhookUrl, order, n8nEnable);
+                Map<String,Object> ctx = new HashMap<>();
+                ctx.put("entity","order");
+                ctx.put("id", order.getId());
+                publishData(n8nWebClient, n8nWebhookUrl, order, n8nEnable, ctx);
             } catch (Exception e) {
+                Map<String,Object> errCtx = new HashMap<>();
+                errCtx.put("entity","order");
+                errCtx.put("id", order.getId());
+                errCtx.put("error", e.getMessage());
                 log.error("Error processing order: {}", order.getId(), e);
-                publishData(n8nWebClient, n8nErrorWebhookUrl, "Error processing order: " + order.getId() + ", exception: " + e.getMessage(), n8nEnable);
+                publishData(n8nWebClient, n8nErrorWebhookUrl, "Error processing order: " + order.getId() + ", exception: " + e.getMessage(), n8nEnable, errCtx);
             }
         });
         return null;

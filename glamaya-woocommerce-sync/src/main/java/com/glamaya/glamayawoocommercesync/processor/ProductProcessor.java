@@ -27,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -140,11 +141,18 @@ public class ProductProcessor implements GlamWoocommerceProcessor<List<Product>>
     public Object handle(List<Product> payload, MessageHeaders headers) {
         payload.forEach(product -> {
             try {
-                publishData(n8nWebClient, n8nWebhookUrl, product, n8nEnable);
+                Map<String,Object> ctx = new HashMap<>();
+                ctx.put("entity","product");
+                ctx.put("id", product.getId());
+                publishData(n8nWebClient, n8nWebhookUrl, product, n8nEnable, ctx);
                 producer.send(productEventsTopic, product.getId().toString(), product);
             } catch (Exception e) {
+                Map<String,Object> errCtx = new HashMap<>();
+                errCtx.put("entity","product");
+                errCtx.put("id", product.getId());
+                errCtx.put("error", e.getMessage());
                 log.error("Error processing product: {}", product.getId(), e);
-                publishData(n8nWebClient, n8nErrorWebhookUrl, e.getMessage(), n8nEnable);
+                publishData(n8nWebClient, n8nErrorWebhookUrl, e.getMessage(), n8nEnable, errCtx);
             }
         });
         return null;

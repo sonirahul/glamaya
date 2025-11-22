@@ -29,6 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -153,11 +154,17 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
                 producer.send(userEventsTopic, user.getId(), user);
                 var contact = contactMapperFactory.toGlamayaContact(user, sourceAccountName);
                 producer.send(contactEventsTopic, contact.getId(), contact);
-                // Publish to n8n webhook
-                publishData(n8nWebClient, n8nWebhookUrl, user, n8nEnable);
+                Map<String,Object> ctx = new HashMap<>();
+                ctx.put("entity","user");
+                ctx.put("id", user.getId());
+                publishData(n8nWebClient, n8nWebhookUrl, user, n8nEnable, ctx);
             } catch (Exception e) {
+                Map<String,Object> errCtx = new HashMap<>();
+                errCtx.put("entity","user");
+                errCtx.put("id", user.getId());
+                errCtx.put("error", e.getMessage());
                 log.error("Error processing user: {}", user.getId(), e);
-                publishData(n8nWebClient, n8nErrorWebhookUrl, e.getMessage(), n8nEnable);
+                publishData(n8nWebClient, n8nErrorWebhookUrl, e.getMessage(), n8nEnable, errCtx);
             }
         });
         return null;

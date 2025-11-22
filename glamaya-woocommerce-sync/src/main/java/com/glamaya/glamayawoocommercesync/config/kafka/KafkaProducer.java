@@ -19,6 +19,18 @@ public class KafkaProducer<T> {
     private final String sourceAccountName;
     private final KafkaTemplate<String, T> kafkaTemplate;
 
+    @Value("${application.kafka.dlq.enable:false}")
+    private boolean dlqEnable;
+
+    @Value("${application.kafka.topic.product-events-dlq:woo-product-events-dlq}")
+    private String productEventsDlq;
+    @Value("${application.kafka.topic.user-events-dlq:woo-user-events-dlq}")
+    private String userEventsDlq;
+    @Value("${application.kafka.topic.order-events-dlq:woo-order-events-dlq}")
+    private String orderEventsDlq;
+    @Value("${application.kafka.topic.contact-events-dlq:ecommerce-contact-events-dlq}")
+    private String contactEventsDlq;
+
     public CompletableFuture<SendResult<String, T>> send(String topicName, String key, T message) {
 
         var producerRecord = new ProducerRecord<>(topicName, key, message);
@@ -29,17 +41,38 @@ public class KafkaProducer<T> {
         // Add callback to log the delivery information
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.debug("Message sent successfully to topic: {}, key: {}, partition: {}, offset: {}",
-                        result.getRecordMetadata().topic(),
-                        key,
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
+                log.debug("kafka_send success topic={} key={} partition={} offset={}",
+                        result.getRecordMetadata().topic(), key,
+                        result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
             } else {
-                log.error("Failed to send message to topic: {}, key: {}", topicName, key, ex);
+                log.error("kafka_send failure topic={} key={} error={}", topicName, key, ex.toString());
+                if (dlqEnable) {
+                    String dlqTopic = resolveDlq(topicName);
+                    if (dlqTopic != null) {
+                        log.warn("Routing failed message to DLQ dlqTopic={} originalTopic={} key={}", dlqTopic, topicName, key);
+                        kafkaTemplate.send(dlqTopic, key, message).whenComplete((dlqResult, dlqEx) -> {
+                            if (dlqEx == null) {
+                                log.info("DLQ send success dlqTopic={} key={} partition={} offset={}", dlqResult.getRecordMetadata().topic(), key, dlqResult.getRecordMetadata().partition(), dlqResult.getRecordMetadata().offset());
+                            } else {
+                                log.error("DLQ send failure dlqTopic={} key={} error={}", dlqTopic, key, dlqEx.toString());
+                            }
+                        });
+                    }
+                }
             }
         });
 
         return future;
+    }
+
+    private String resolveDlq(String topicName) {
+        if (topicName.equals(productEventsDlq.replace("-dlq", ""))) return productEventsDlq; // prevent double-dlq
+        if (topicName.equals(userEventsDlq.replace("-dlq", ""))) return userEventsDlq;
+        if (topicName.equals(orderEventsDlq.replace("-dlq", ""))) return orderEventsDlq;
+        if (topicName.equals(contactEventsDlq.replace("-dlq", ""))) return contactEventsDlq;
+        // fallback heuristic
+        if (!topicName.endsWith("-dlq")) return topicName + "-dlq"; // generic suffix
+        return null;
     }
 
     public void flush() {

@@ -8,6 +8,7 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.integration.core.GenericHandler;
 import org.springframework.integration.core.MessageSource;
@@ -91,6 +92,14 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
                         .map(e -> e.getKey() + "=" + (e.getKey().toLowerCase().contains("secret") || e.getKey().toLowerCase().contains("key") ? "***" : e.getValue()))
                         .reduce((a, b) -> a + "," + b).orElse("") : "";
 
+        // Attempt to derive element class for direct mapping
+        Class<?> elementClass = Object.class;
+        try {
+            ResolvableType rt = ResolvableType.forType(typeRef.getType());
+            elementClass = rt.getGeneric(0).toClass();
+        } catch (Exception ignored) {}
+        Class<E> castClass = (Class<E>) elementClass;
+
         return webClient.get()
                 .uri(uriBuilder -> {
                     uriBuilder.path(queryUrl);
@@ -101,21 +110,12 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
                 })
                 .header(HttpHeaders.AUTHORIZATION, oauthHeader == null ? "" : oauthHeader)
                 .retrieve()
-                .bodyToFlux(Map.class) // deserialize as generic map list first if unknown; will re-map via ObjectMapper
+                .bodyToFlux(castClass)
+                .cast((Class<E>) castClass)
                 .collectList()
-                .flatMap(rawList -> {
-                    try {
-                        // Re-serialize rawList then deserialize into target type list for consistency
-                        String json = getObjectMapper().writeValueAsString(rawList);
-                        JavaType javaType = getObjectMapper().getTypeFactory().constructType(typeRef.getType());
-                        List<E> result = getObjectMapper().readValue(json, javaType);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Fetched {} items for {}?{}", result.size(), queryUrl, paramsDesc);
-                        }
-                        return Mono.just(result);
-                    } catch (Exception ex) {
-                        LOG.error("Failed to deserialize response for {}?{}", queryUrl, paramsDesc, ex);
-                        return Mono.error(ex);
+                .doOnNext(list -> {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Fetched {} items for {}?{}", list.size(), queryUrl, paramsDesc);
                     }
                 })
                 .onErrorResume(e -> {
@@ -124,8 +124,8 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
                 });
     }
 
-    // Make asynchronous fire-and-forget publish (no blocking)
-    default void publishData(WebClient webClient, String queryUrl, Object data, boolean n8nEnable) {
+    // Make asynchronous fire-and-forget publish (no blocking) with context logging
+    default void publishData(WebClient webClient, String queryUrl, Object data, boolean n8nEnable, Map<String, Object> context) {
         if (!n8nEnable) {
             return;
         }
@@ -133,8 +133,15 @@ public interface GlamWoocommerceProcessor<T> extends GenericHandler<T> {
                 .uri(queryUrl)
                 .bodyValue(data)
                 .retrieve()
-                .bodyToMono(Void.class)
-                .doOnError(e -> LOG.error("n8n publish failed url={} error={}", queryUrl, e.toString()))
+                .toEntity(Void.class)
+                .doOnSuccess(resp -> {
+                    if (resp != null && resp.getStatusCode().is2xxSuccessful()) {
+                        LOG.debug("n8n publish success url={} status={} ctx={}", queryUrl, resp.getStatusCode().value(), context);
+                    } else if (resp != null) {
+                        LOG.error("n8n publish non-2xx url={} status={} ctx={}", queryUrl, resp.getStatusCode().value(), context);
+                    }
+                })
+                .doOnError(e -> LOG.error("n8n publish failed url={} error={} ctx={}", queryUrl, e.toString(), context))
                 .onErrorResume(e -> Mono.empty())
                 .subscribe(); // fire and forget
     }

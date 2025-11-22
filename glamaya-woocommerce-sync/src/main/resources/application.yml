@@ -7,11 +7,14 @@ spring:
     security:
       protocol: ${SPRING_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
     producer:
-      #      transaction-id-prefix: tx-auth-service-${random.uuid}
       compression-type: zstd
       properties:
         enable.idempotence: true
         linger.ms: 25
+        acks: all            # ensure strongest delivery guarantees
+        retries: 10          # retry transient failures
+        delivery.timeout.ms: 120000 # overall delivery timeout
+        request.timeout.ms: 30000   # request timeout for produces
       batch-size: 32768 # fixed from 32KB (must be numeric bytes)
   data:
     mongodb:
@@ -79,3 +82,9 @@ application:
       user-events: woo-user-events
       order-events: woo-order-events
       contact-events: ecommerce-contact-events
+      product-events-dlq: woo-product-events-dlq
+      user-events-dlq: woo-user-events-dlq
+      order-events-dlq: woo-order-events-dlq
+      contact-events-dlq: ecommerce-contact-events-dlq
+    dlq:
+      enable: true
