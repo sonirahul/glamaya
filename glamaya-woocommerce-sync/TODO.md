@@ -25,8 +25,8 @@ _Status Legend:_
    - To do: unify fallback strategy across all entities.
 7. ~~Avoid Double Memory Usage on Fetch~~ (DONE)
    - Switched to streaming `bodyToFlux(elementClass).collectList()`.
-8. Polling Rate Control (Prevent Throttling) (TODO)
-   - Adaptive backoff not yet implemented.
+8. ~~Polling Rate Control (Prevent Throttling)~~ (DONE)
+   - Implemented exponential backoff based on consecutive empty pages (caps at passive delay, resets on data).
 
 ---
 ## P2 – Observability, Resilience & Consistency
@@ -63,6 +63,7 @@ _Status Legend:_
 - [x] Stream HTTP deserialization (remove body-to-String).
 - [x] Wrap `publishData` with robust error handling & contextual logging.
 - [ ] Introduce standardized structured log format keys (page, pageSize, entity, account, items, status, durationMs).
+- [x] Adaptive polling backoff (empty page exponential).
 
 ---
 ## Phase Plan
@@ -74,7 +75,7 @@ Phase 3: abstract processor, deduplication cache, Mac caching, request builder r
 
 Phase 4: fully reactive polling (remove boundary `.block()`), advanced DLQ + retry operator, coordinated emission.
 
-Phase 5: schema evolution, outbox, multi-tenant, adaptive rate strategy.
+Phase 5: schema evolution, outbox, multi-tenant, adaptive rate strategy improvements (token bucket).
 
 ---
 ## Implementation Sketches

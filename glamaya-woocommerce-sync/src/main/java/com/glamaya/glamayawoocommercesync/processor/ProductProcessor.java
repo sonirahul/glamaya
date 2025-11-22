@@ -30,6 +30,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -48,6 +49,7 @@ public class ProductProcessor implements GlamWoocommerceProcessor<List<Product>>
     @Getter
     private final ObjectMapper objectMapper;
     private final ProcessorStatusTrackerRepository repository;
+    private final AtomicInteger consecutiveEmptyPages = new AtomicInteger(0);
 
     @Value("${application.woocommerce.entities.products.query-url}")
     private final String queryProductsUrl;
@@ -90,11 +92,14 @@ public class ProductProcessor implements GlamWoocommerceProcessor<List<Product>>
                                 .defaultIfEmpty(List.of())
                                 .flatMap(products -> {
                                     if (products.isEmpty()) {
-                                        log.info("No new woocommerce Products found, resetting status tracker and switching to passive mode");
+                                        int emptyCount = consecutiveEmptyPages.incrementAndGet();
+                                        long backoff = Math.min((long) (fetchDurationInMillisActiveMode * Math.pow(2, emptyCount)), fetchDurationInMillisPassiveMode);
+                                        log.info("No new Products (emptyCount={}), applying backoff delay {} ms (cap {})", emptyCount, backoff, fetchDurationInMillisPassiveMode);
                                         resetStatusTracker(statusTracker);
-                                        modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
+                                        modifyPollerDuration(poller, (int) backoff);
                                     } else {
-                                        log.info("Fetched {} woocommerce Products", statusTracker.getCount() + products.size());
+                                        consecutiveEmptyPages.set(0);
+                                        log.info("Fetched {} woocommerce Products (reset backoff)", statusTracker.getCount() + products.size());
                                         updateStatusTracker(statusTracker, products, o -> ((Product) o).getDateModifiedGmt());
                                         modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
                                     }

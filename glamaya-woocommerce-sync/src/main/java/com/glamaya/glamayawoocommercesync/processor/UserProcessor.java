@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -53,6 +54,7 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
     private final ProcessorStatusTrackerRepository repository;
     private final ContactMapperFactory<User> contactMapperFactory;
     private final WooUserFormatter wooUserFormatter;
+    private final AtomicInteger consecutiveEmptyPages = new AtomicInteger(0);
 
     @Value("${application.woocommerce.entities.users.query-url}")
     private final String queryUsersUrl;
@@ -98,11 +100,14 @@ public class UserProcessor implements GlamWoocommerceProcessor<List<User>> {
                                 .defaultIfEmpty(List.of())
                                 .flatMap(users -> {
                                     if (users.isEmpty()) {
-                                        log.info("No new woocommerce Users found, resetting status tracker and switching to passive mode");
+                                        int emptyCount = consecutiveEmptyPages.incrementAndGet();
+                                        long backoff = Math.min((long) (fetchDurationInMillisActiveMode * Math.pow(2, emptyCount)), fetchDurationInMillisPassiveMode);
+                                        log.info("No new Users (emptyCount={}), applying backoff delay {} ms (cap {})", emptyCount, backoff, fetchDurationInMillisPassiveMode);
                                         resetStatusTracker(statusTracker);
-                                        modifyPollerDuration(poller, fetchDurationInMillisPassiveMode);
+                                        modifyPollerDuration(poller, (int) backoff);
                                     } else {
-                                        log.info("Fetched {} woocommerce Users", statusTracker.getCount() + users.size());
+                                        consecutiveEmptyPages.set(0);
+                                        log.info("Fetched {} woocommerce Users (reset backoff)", statusTracker.getCount() + users.size());
                                         updateStatusTracker(statusTracker, users, o -> Objects.nonNull(((User) o).getDateModifiedGmt())
                                                 ? ((User) o).getDateModified() : ((User) o).getDateCreated());
                                         modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
