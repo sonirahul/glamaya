@@ -86,7 +86,11 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
         if (tracker.isUseLastUpdatedDateInQuery() && tracker.getLastUpdatedDate() != null) {
             b.withModifiedAfter(tracker.getLastUpdatedDate());
         }
-        return b.build();
+        var request = b.build();
+        if (log.isDebugEnabled()) {
+            log.debug("Built order search request: page={} perPage={} lastUpdatedDate={} useLastUpdatedFlag={}", tracker.getPage(), pageSize, tracker.getLastUpdatedDate(), tracker.isUseLastUpdatedDateInQuery());
+        }
+        return request;
     }
 
     @Override
@@ -106,17 +110,20 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
 
     @Override
     protected void publishPrimaryEvent(Order formatted) {
+        log.debug("Publishing primary order event orderId={}", formatted.getId());
         eventPublisher.send(orderConfig.getKafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void publishSecondaryEvent(Order formatted) {
+        log.debug("Publishing secondary order event orderId={}", formatted.getId());
         var contact = contactMapperFactory.toGlamayaContact(formatted, orderConfig.getSourceAccountName());
         eventPublisher.send(orderConfig.getContactKafkaTopic(), contact.getId(), contact);
     }
 
     @Override
     protected void notifySuccess(Order formatted, Map<String, Object> ctx) {
+        log.debug("Order processed successfully orderId={}", formatted.getId());
         if (orderConfig.getN8n().isEnable()) {
             n8nNotificationService.success(true, orderConfig.getN8n().getWebhookUrl(), formatted, ctx);
         }
@@ -124,6 +131,7 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
 
     @Override
     protected void notifyError(Order original, Exception e, Map<String, Object> ctx) {
+        log.error("Order processing failed orderId={} errorMsg={}", original.getId(), e.getMessage(), e);
         if (orderConfig.getN8n().isEnable()) {
             n8nNotificationService.error(true, orderConfig.getN8n().getErrorWebhookUrl(),
                     "Error processing order: " + original.getId() + ", exception: " + e.getMessage(), ctx);

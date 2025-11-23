@@ -73,7 +73,11 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
         if (tracker.isUseLastUpdatedDateInQuery() && tracker.getLastUpdatedDate() != null) {
             b.withModifiedAfter(tracker.getLastUpdatedDate());
         }
-        return b.build();
+        var request = b.build();
+        if (log.isDebugEnabled()) {
+            log.debug("Built product search request: page={} perPage={} lastUpdatedDate={} useLastUpdatedFlag={}", tracker.getPage(), pageSize, tracker.getLastUpdatedDate(), tracker.isUseLastUpdatedDateInQuery());
+        }
+        return request;
     }
 
     @Override
@@ -88,19 +92,20 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
 
     @Override
     protected void publishPrimaryEvent(Product formatted) {
+        log.debug("Publishing primary product event productId={}", formatted.getId());
         eventPublisher.send(productConfig.getKafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void notifySuccess(Product formatted, Map<String, Object> ctx) {
-        if (productConfig.getN8n().isEnable())
-            n8nNotificationService.success(true, productConfig.getN8n().getWebhookUrl(), formatted, ctx);
+        log.debug("Product processed successfully productId={}", formatted.getId());
+        if (productConfig.getN8n().isEnable()) n8nNotificationService.success(true, productConfig.getN8n().getWebhookUrl(), formatted, ctx);
     }
 
     @Override
     protected void notifyError(Product original, Exception e, Map<String, Object> ctx) {
-        if (productConfig.getN8n().isEnable())
-            n8nNotificationService.error(true, productConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
+        log.error("Product processing failed productId={} errorMsg={}", original.getId(), e.getMessage(), e);
+        if (productConfig.getN8n().isEnable()) n8nNotificationService.error(true, productConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
     }
 
     @Override

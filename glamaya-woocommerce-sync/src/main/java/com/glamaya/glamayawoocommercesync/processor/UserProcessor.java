@@ -81,7 +81,11 @@ public class UserProcessor extends AbstractWooProcessor<User> {
         if (tracker.isUseLastUpdatedDateInQuery() && tracker.getLastUpdatedDate() != null) {
             b.withModifiedAfter(tracker.getLastUpdatedDate());
         }
-        return b.build();
+        var request = b.build();
+        if (log.isDebugEnabled()) {
+            log.debug("Built user search request: page={} perPage={} lastUpdatedDate={} useLastUpdatedFlag={}", tracker.getPage(), pageSize, tracker.getLastUpdatedDate(), tracker.isUseLastUpdatedDateInQuery());
+        }
+        return request;
     }
 
     @Override
@@ -96,25 +100,27 @@ public class UserProcessor extends AbstractWooProcessor<User> {
 
     @Override
     protected void publishPrimaryEvent(User formatted) {
+        log.debug("Publishing primary user event userId={}", formatted.getId());
         eventPublisher.send(userConfig.getKafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void publishSecondaryEvent(User formatted) {
+        log.debug("Publishing secondary user event userId={}", formatted.getId());
         var contact = contactMapperFactory.toGlamayaContact(formatted, userConfig.getSourceAccountName());
         eventPublisher.send(userConfig.getContactKafkaTopic(), contact.getId(), contact);
     }
 
     @Override
     protected void notifySuccess(User formatted, Map<String, Object> ctx) {
-        if (userConfig.getN8n().isEnable())
-            n8nNotificationService.success(true, userConfig.getN8n().getWebhookUrl(), formatted, ctx);
+        log.debug("User processed successfully userId={}", formatted.getId());
+        if (userConfig.getN8n().isEnable()) n8nNotificationService.success(true, userConfig.getN8n().getWebhookUrl(), formatted, ctx);
     }
 
     @Override
     protected void notifyError(User original, Exception e, Map<String, Object> ctx) {
-        if (userConfig.getN8n().isEnable())
-            n8nNotificationService.error(true, userConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
+        log.error("User processing failed userId={} errorMsg={}", original.getId(), e.getMessage(), e);
+        if (userConfig.getN8n().isEnable()) n8nNotificationService.error(true, userConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
     }
 
     @Override

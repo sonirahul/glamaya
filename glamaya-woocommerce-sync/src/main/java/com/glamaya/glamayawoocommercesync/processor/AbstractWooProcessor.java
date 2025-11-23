@@ -300,7 +300,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
     private List<E> drainReadyBatch() {
         List<E> ready = resultsQueue.poll();
         if (ready != null && !ready.isEmpty()) {
-            log.debug("{} delivering batch size={}", getProcessorType(), ready.size());
+            log.debug("deliver_batch processor={} batchSize={}", getProcessorType(), ready.size());
             return ready;
         }
         return null;
@@ -336,7 +336,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
         Object searchRequest = buildSearchRequest(tracker);
         Map<String, String> queryParams = buildFilteredQueryParams(searchRequest);
         String oauthHeader = getOAuthHeader(queryUrl, queryParams);
-        log.info("{} fetch started with params={}", getProcessorType(), queryParams);
+        log.info("fetch_start processor={} params={}", getProcessorType(), queryParams);
 
         return webClient.get()
                 .uri(uriBuilder -> {
@@ -352,7 +352,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
                 .collectList()
                 .onErrorResume(e -> {
                     long elapsed = System.nanoTime() - startNanos;
-                    log.error("{} fetch error: {}", getProcessorType(), e.toString());
+                    log.error("fetch_error processor={} error={}", getProcessorType(), e.toString());
                     eventPublisher.publishEvent(new FetchCycleEvent(getProcessorType(), 0, true, true, elapsed));
                     return Mono.just(List.of());
                 })
@@ -371,7 +371,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
         try {
             return objectMapper.convertValue(fragment, getEntityClass());
         } catch (IllegalArgumentException ex) {
-            log.error("Conversion failure {} fragment={}", getProcessorType(), fragment);
+            log.error("conversion_failure processor={} fragment={}", getProcessorType(), fragment);
             return null;
         }
     }
@@ -390,7 +390,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
         if (empty) {
             int emptyCount = consecutiveEmptyPages.incrementAndGet();
             long backoff = Math.min((long) (activeMillis * Math.pow(2, emptyCount)), passiveMillis);
-            log.info("No new {} (emptyCount={}), backoff={}ms", getProcessorType(), emptyCount, backoff);
+            log.info("no_new_entities processor={} emptyCount={} backoffMs={} page={} lastUpdatedDate={}", getProcessorType(), emptyCount, backoff, tracker.getPage(), tracker.getLastUpdatedDate());
             resetStatusTracker(tracker);
             modifyPollerDuration(poller, (int) backoff);
         } else {
@@ -460,7 +460,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
             ctx.put("entity", getProcessorType().name().toLowerCase());
             ctx.put("id", idForLog);
             ctx.put("error", ex.getMessage());
-            log.error("{} processing error id={}", getProcessorType(), idForLog, ex);
+            log.error("entity_processing_error processor={} id={} errorMsg={}", getProcessorType(), idForLog, ex.getMessage(), ex);
             notifyError(entity, ex, ctx);
         }
     }
