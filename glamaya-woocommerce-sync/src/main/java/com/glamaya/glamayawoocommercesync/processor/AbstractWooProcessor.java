@@ -41,13 +41,13 @@ import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_T
  * Base Woo processor implementing polling, incremental fetching, adaptive backoff and templated per-entity processing.
  * Subclasses supply: search request construction, entity type, formatting, id extraction and publishing hooks.
  * Common concerns (tracker persistence, OAuth header, date extraction) are handled here.
- *
+ * <p>
  * Responsibilities:
- *  - Manage polling cadence (active vs passive) & disabled adaptive backoff.
- *  - Build and execute WooCommerce queries with OAuth1 signing.
- *  - Maintain and persist {@link ProcessorStatusTracker} state (page, lastUpdatedDate, count).
- *  - Convert raw response fragments to typed entities and hand them to the generic reactive handle pipeline.
- *  - Emit fetch cycle monitoring events.
+ * - Manage polling cadence (active vs passive) & disabled adaptive backoff.
+ * - Build and execute WooCommerce queries with OAuth1 signing.
+ * - Maintain and persist {@link ProcessorStatusTracker} state (page, lastUpdatedDate, count).
+ * - Convert raw response fragments to typed entities and hand them to the generic reactive handle pipeline.
+ * - Emit fetch cycle monitoring events.
  */
 @Slf4j
 public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcessor<List<E>> {
@@ -111,6 +111,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Build search request POJO representing query parameter state for current page / lastUpdatedDate.
+     *
      * @param tracker current persisted tracker.
      * @return search request object convertible to a Map via ObjectMapper.
      */
@@ -118,6 +119,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Extract modified date string from an entity. Uses marker interface first then reflective fallbacks.
+     *
      * @return function mapping arbitrary entity (Object) to a best-effort modified date string or null.
      */
     public Function<Object, String> dateExtractorFunction() {
@@ -160,6 +162,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Persist tracker asynchronously.
+     *
      * @param tracker tracker instance with updated state.
      * @return mono completing with persisted tracker.
      */
@@ -169,8 +172,9 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Retrieve or initialize tracker for this processor.
+     *
      * @param resetOnStartup whether reset is requested for first poll.
-     * @param pageSize configured page size.
+     * @param pageSize       configured page size.
      * @return mono of existing or new tracker.
      */
     protected Mono<ProcessorStatusTracker> getOrCreateTracker(boolean resetOnStartup, long pageSize) {
@@ -179,7 +183,8 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Build OAuth1 header value for the request.
-     * @param queryUrl endpoint path.
+     *
+     * @param queryUrl    endpoint path.
      * @param queryParams already-filtered (non-null/non-blank) query params.
      * @return authorization header string.
      */
@@ -194,6 +199,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Optional entity formatting/transformation hook. Defaults to identity.
+     *
      * @param entity raw entity.
      * @return formatted entity.
      */
@@ -203,6 +209,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Extract stable identifier used for logging and Kafka key selection.
+     *
      * @param entity entity instance.
      * @return identifier object (String/Long/etc).
      */
@@ -210,33 +217,38 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Publish the primary domain event for the formatted entity.
+     *
      * @param formatted entity after formatting.
      */
     protected abstract void publishPrimaryEvent(E formatted);
 
     /**
      * Publish optional secondary derived event (e.g., Contact). No-op by default.
+     *
      * @param formatted entity.
      */
     protected void publishSecondaryEvent(E formatted) { /* optional */ }
 
     /**
      * Notification hook executed after successful processing of an entity.
+     *
      * @param formatted entity.
-     * @param ctx context map (id, entity type, etc.).
+     * @param ctx       context map (id, entity type, etc.).
      */
     protected void notifySuccess(E formatted, Map<String, Object> ctx) { /* optional */ }
 
     /**
      * Notification hook executed on processing error.
+     *
      * @param original original entity.
-     * @param e thrown exception.
-     * @param ctx context map (id, entity type, error message).
+     * @param e        thrown exception.
+     * @param ctx      context map (id, entity type, error message).
      */
     protected void notifyError(E original, Exception e, Map<String, Object> ctx) { /* optional */ }
 
     /**
      * Exposes a message source adapting internal polling logic to Spring Integration.
+     *
      * @return message source delivering batches of entities when available.
      */
     @Override
@@ -246,6 +258,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Single poll attempt invoked by the framework. Handles disabled backoff, batch draining and async fetch kickoff.
+     *
      * @return Message with payload list or null if nothing ready.
      */
     private Message<List<E>> pollOnce() {
@@ -281,6 +294,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Drain one completed batch from the internal queue if present.
+     *
      * @return list of entities or null.
      */
     private List<E> drainReadyBatch() {
@@ -313,7 +327,8 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Execute the remote fetch, update tracker, publish monitoring event and return list of entities.
-     * @param tracker current tracker state.
+     *
+     * @param tracker    current tracker state.
      * @param startNanos start time for latency measurement.
      * @return mono with fetched list (possibly empty).
      */
@@ -346,6 +361,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Convert a raw response fragment to the target entity type using ObjectMapper, logging failures.
+     *
      * @param fragment raw fragment.
      * @return typed entity or null if conversion fails.
      */
@@ -362,8 +378,9 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Handle result list: adaptive backoff on empty, tracker update on non-empty, monitoring event, persistence.
-     * @param tracker status tracker.
-     * @param list fetched entities.
+     *
+     * @param tracker    status tracker.
+     * @param list       fetched entities.
      * @param startNanos start time.
      * @return mono with same list after tracker persistence.
      */
@@ -387,6 +404,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Convert search request object -> filtered query string map (remove null/blank values).
+     *
      * @param searchRequest built POJO.
      * @return map of query params.
      */
@@ -401,6 +419,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Generic reactive handle implementation processing each entity concurrently using {@link #processingConcurrency}.
+     *
      * @param payload batch of entities.
      * @param headers message headers (unused currently).
      * @return null (fire-and-forget processing).
@@ -416,6 +435,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Internal per-entity processing chain: format, publish events, notifications, error handling.
+     *
      * @param entity raw entity.
      */
     private void processEntityInternal(E entity) {
@@ -447,6 +467,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Reset tracker to first page and enable lastUpdatedDate usage after an empty response.
+     *
      * @param statusTracker tracker.
      */
     private void resetStatusTracker(ProcessorStatusTracker statusTracker) {
@@ -456,8 +477,9 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Advance tracker state given non-empty response list.
-     * @param statusTracker tracker.
-     * @param response entities.
+     *
+     * @param statusTracker   tracker.
+     * @param response        entities.
      * @param getDateModified date extractor function.
      */
     private void updateStatusTracker(ProcessorStatusTracker statusTracker, List<?> response,
@@ -483,8 +505,9 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     /**
      * Dynamically update poller trigger duration (used for adaptive backoff).
+     *
      * @param pollerMetadata poller metadata.
-     * @param millis new duration in milliseconds.
+     * @param millis         new duration in milliseconds.
      */
     private void modifyPollerDuration(PollerMetadata pollerMetadata, int millis) {
         DynamicPeriodicTrigger trigger = (DynamicPeriodicTrigger) pollerMetadata.getTrigger();

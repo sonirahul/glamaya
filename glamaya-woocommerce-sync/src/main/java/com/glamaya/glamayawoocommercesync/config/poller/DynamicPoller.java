@@ -12,14 +12,14 @@ import java.time.Duration;
 @Configuration
 public class DynamicPoller {
 
-    @Value("${application.woocommerce.entities.global-fetch-duration-in-millis.init-mode}")
-    private int globalFetchDurationInMillisInitMode;
+    @Value("${application.processing.default-fetch-duration-ms:1000}")
+    private int defaultFetchDurationMs;
 
     @Bean()
     @Scope("prototype")
     public PollerMetadata poller() {
         DynamicPeriodicTrigger trigger = new DynamicPeriodicTrigger(
-                Duration.ofMillis(globalFetchDurationInMillisInitMode)); // Initial delay
+                Duration.ofMillis(defaultFetchDurationMs)); // Initial delay
         trigger.setFixedRate(true);
         PollerMetadata pollerMetadata = new PollerMetadata();
         pollerMetadata.setTrigger(trigger);

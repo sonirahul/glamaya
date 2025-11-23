@@ -7,6 +7,7 @@ import com.glamaya.datacontracts.woocommerce.SortOrder;
 import com.glamaya.datacontracts.woocommerce.User;
 import com.glamaya.datacontracts.woocommerce.UserOrderBy;
 import com.glamaya.datacontracts.woocommerce.UserSearchRequest;
+import com.glamaya.glamayawoocommercesync.config.ApplicationProperties;
 import com.glamaya.glamayawoocommercesync.port.EventPublisher;
 import com.glamaya.glamayawoocommercesync.port.StatusTrackerStore;
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTracker;
@@ -14,7 +15,6 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import com.glamaya.glamayawoocommercesync.service.N8nNotificationService;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.stereotype.Service;
@@ -25,47 +25,44 @@ import java.util.Map;
 @Slf4j
 @Service
 public class UserProcessor extends AbstractWooProcessor<User> {
-
     private final EventPublisher eventPublisher;
     private final ContactMapperFactory<User> contactMapperFactory;
     private final WooUserFormatter wooUserFormatter;
     private final N8nNotificationService n8nNotificationService;
+    private final ApplicationProperties.ProcessorConfig userConfig;
 
-    @Value("${application.kafka.topic.user-events}")
-    private String userEventsTopic;
-    @Value("${application.kafka.topic.contact-events}")
-    private String contactEventsTopic;
-    @Value("${application.woocommerce.entities.users.n8n.webhook-url}")
-    private String n8nWebhookUrl;
-    @Value("${application.woocommerce.entities.users.n8n.error-webhook-url}")
-    private String n8nErrorWebhookUrl;
-    @Value("${application.woocommerce.entities.users.n8n.enable}")
-    private boolean n8nEnable;
-    @Value("${external.woocommerce.api.account-name}")
-    private String sourceAccountName;
-
-    public UserProcessor(WebClient woocommerceWebClient,
-                         ObjectMapper objectMapper,
-                         PollerMetadata poller,
-                         @Value("${application.woocommerce.entities.users.page-size}") long pageSize,
-                         @Value("${application.woocommerce.entities.users.reset-on-startup: false}") boolean resetOnStartup,
-                         @Value("${application.woocommerce.entities.users.fetch-duration-in-millis.active-mode}") int active,
-                         @Value("${application.woocommerce.entities.users.fetch-duration-in-millis.passive-mode}") int passive,
-                         @Value("${application.woocommerce.entities.users.query-url}") String queryUrl,
-                         @Value("${application.woocommerce.entities.users.enable}") boolean enable,
-                         @Value("${application.processing.concurrency:4}") int processingConcurrency,
-                         OAuth1Service oAuth1Service,
-                         StatusTrackerStore statusTrackerStore,
-                         EventPublisher eventPublisher,
-                         ContactMapperFactory<User> contactMapperFactory,
-                         WooUserFormatter wooUserFormatter,
-                         N8nNotificationService n8nNotificationService,
-                         ApplicationEventPublisher eventPublisherPublisher) {
-        super(woocommerceWebClient, objectMapper, poller, pageSize, resetOnStartup, active, passive, queryUrl, enable, processingConcurrency, oAuth1Service, statusTrackerStore, eventPublisherPublisher);
+    public UserProcessor(
+            WebClient woocommerceWebClient,
+            ObjectMapper objectMapper,
+            PollerMetadata poller,
+            OAuth1Service oAuth1Service,
+            StatusTrackerStore statusTrackerStore,
+            EventPublisher eventPublisher,
+            ContactMapperFactory<User> contactMapperFactory,
+            WooUserFormatter wooUserFormatter,
+            N8nNotificationService n8nNotificationService,
+            ApplicationEventPublisher eventPublisherPublisher,
+            ApplicationProperties applicationProperties) {
+        super(
+                woocommerceWebClient,
+                objectMapper,
+                poller,
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getPageSize(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).isResetOnStartup(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getFetchDurationMs().getActive(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getFetchDurationMs().getPassive(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getQueryUrl(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).isEnable(),
+                applicationProperties.getProcessing().getConcurrency(),
+                oAuth1Service,
+                statusTrackerStore,
+                eventPublisherPublisher
+        );
         this.eventPublisher = eventPublisher;
         this.contactMapperFactory = contactMapperFactory;
         this.wooUserFormatter = wooUserFormatter;
         this.n8nNotificationService = n8nNotificationService;
+        this.userConfig = applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER);
     }
 
     @Override
@@ -79,15 +76,14 @@ public class UserProcessor extends AbstractWooProcessor<User> {
                 .withFetchLatest(null)
                 .withOrderby(UserOrderBy.id)
                 .withOrder(SortOrder.asc)
-                .withPage(Long.valueOf(tracker.getPage()))
-                .withPerPage(Long.valueOf(pageSize));
+                .withPage((long) tracker.getPage())
+                .withPerPage(pageSize);
         if (tracker.isUseLastUpdatedDateInQuery() && tracker.getLastUpdatedDate() != null) {
             b.withModifiedAfter(tracker.getLastUpdatedDate());
         }
         return b.build();
     }
 
-    // Hook implementations
     @Override
     protected User doFormat(User entity) {
         return wooUserFormatter.format(entity);
@@ -100,23 +96,25 @@ public class UserProcessor extends AbstractWooProcessor<User> {
 
     @Override
     protected void publishPrimaryEvent(User formatted) {
-        eventPublisher.send(userEventsTopic, formatted.getId(), formatted);
+        eventPublisher.send(userConfig.getKafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void publishSecondaryEvent(User formatted) {
-        var contact = contactMapperFactory.toGlamayaContact(formatted, sourceAccountName);
-        eventPublisher.send(contactEventsTopic, contact.getId(), contact);
+        var contact = contactMapperFactory.toGlamayaContact(formatted, userConfig.getSourceAccountName());
+        eventPublisher.send(userConfig.getContactKafkaTopic(), contact.getId(), contact);
     }
 
     @Override
     protected void notifySuccess(User formatted, Map<String, Object> ctx) {
-        if (n8nEnable) n8nNotificationService.success(true, n8nWebhookUrl, formatted, ctx);
+        if (userConfig.getN8n().isEnable())
+            n8nNotificationService.success(true, userConfig.getN8n().getWebhookUrl(), formatted, ctx);
     }
 
     @Override
     protected void notifyError(User original, Exception e, Map<String, Object> ctx) {
-        if (n8nEnable) n8nNotificationService.error(true, n8nErrorWebhookUrl, e.getMessage(), ctx);
+        if (userConfig.getN8n().isEnable())
+            n8nNotificationService.error(true, userConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
     }
 
     @Override

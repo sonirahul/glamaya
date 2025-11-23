@@ -34,6 +34,7 @@ external:
 application:
   processing:
     concurrency: 4
+    default-fetch-duration-ms: 1000
     backpressure:
       buffer-size: 100
       overflow-strategy: drop
@@ -48,49 +49,52 @@ application:
       product-events-dlq: woo-product-events-dlq
       user-events-dlq: woo-user-events-dlq
       order-events-dlq: woo-order-events-dlq
-      contact-events-dlq: ecommerce-contact-events-dlq
-    dlq:
-      enable: true
+  processors:
+    woo_product:
+      enable: false
+      reset-on-startup: false
+      page-size: 10
+      fetch-duration-ms:
+        active: 500
+        passive: 60000
+      query-url: /wp-json/wc/v3/products
+      kafka-topic: woo-product-events
+      contact-kafka-topic: ecommerce-contact-events
+      n8n:
+        enable: false
+        webhook-url: "enter your n8n webhook URL here"
+        error-webhook-url: "enter your n8n error webhook URL here"
+      source-account-name: Glamaya
+    woo_user:
+      enable: false
+      reset-on-startup: false
+      page-size: 20
+      fetch-duration-ms:
+        active: 500
+        passive: 60000
+      query-url: /wp-json/wc/v3/customers
+      kafka-topic: woo-user-events
+      contact-kafka-topic: ecommerce-contact-events
+      n8n:
+        enable: false
+        webhook-url: "enter your n8n webhook URL here"
+        error-webhook-url: "enter your n8n error webhook URL here"
+      source-account-name: Glamaya
+    woo_order:
+      enable: false
+      reset-on-startup: false
+      page-size: 10
+      fetch-duration-ms:
+        active: 1000
+        passive: 60000
+      query-url: /wp-json/wc/v3/orders
+      kafka-topic: woo-order-events
+      contact-kafka-topic: ecommerce-contact-events
+      n8n:
+        enable: false
+        webhook-url: "enter your n8n webhook URL here"
+        error-webhook-url: "enter your n8n error webhook URL here"
+      source-account-name: Glamaya
   webclient:
     response-timeout-in-millis: 30000
     max-in-memory-size-in-bytes: 10485760 # 10MB
-  woocommerce:
-    entities:
-      global-fetch-duration-in-millis:
-        init-mode: 500
-      products:
-        query-url: /wp-json/wc/v3/products
-        enable: false
-        page-size: 10
-        reset-on-startup: false
-        fetch-duration-in-millis:
-          active-mode: 500
-          passive-mode: 60000
-        n8n:
-          enable: false
-          webhook-url: "enter your n8n webhook URL here"
-          error-webhook-url: "enter your n8n error webhook URL here"
-      users:
-        query-url: /wp-json/wc/v3/customers
-        enable: false
-        page-size: 20
-        reset-on-startup: false
-        fetch-duration-in-millis:
-          active-mode: 500
-          passive-mode: 60000
-        n8n:
-          enable: false
-          webhook-url: "enter your n8n webhook URL here"
-          error-webhook-url: "enter your n8n error webhook URL here"
-      orders:
-        query-url: /wp-json/wc/v3/orders
-        enable: false
-        page-size: 10
-        reset-on-startup: false
-        fetch-duration-in-millis:
-          active-mode: 1000
-          passive-mode: 60000
-        n8n:
-          enable: false
-          webhook-url: "enter your n8n webhook URL here"
-          error-webhook-url: "enter your n8n error webhook URL here"
