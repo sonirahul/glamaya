@@ -14,6 +14,7 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTrack
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import com.glamaya.glamayawoocommercesync.service.N8nNotificationService;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.integration.scheduling.PollerMetadata;
@@ -47,21 +48,24 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
             WooOrderFormatter wooOrderFormatter,
             N8nNotificationService n8nNotificationService,
             ApplicationEventPublisher eventPublisherPublisher,
-            ApplicationProperties applicationProperties) {
+            ApplicationProperties applicationProperties,
+            MeterRegistry meterRegistry) {
         super(
                 woocommerceWebClient,
                 objectMapper,
                 poller,
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).getPageSize(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).isResetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).getFetchDurationMs().getActive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).getFetchDurationMs().getPassive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).getQueryUrl(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).isEnable(),
-                applicationProperties.getProcessing().getConcurrency(),
+                (long) applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).pageSize(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).resetOnStartup(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).fetchDurationMs().active(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).fetchDurationMs().passive(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).queryUrl(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).enable(),
+                applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
-                eventPublisherPublisher
+                eventPublisherPublisher,
+                applicationProperties,
+                meterRegistry
         );
         this.eventPublisher = eventPublisher;
         this.contactMapperFactory = contactMapperFactory;
@@ -111,29 +115,29 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
     @Override
     protected void publishPrimaryEvent(Order formatted) {
         log.debug("Publishing primary order event orderId={}", formatted.getId());
-        eventPublisher.send(orderConfig.getKafkaTopic(), formatted.getId(), formatted);
+        eventPublisher.send(orderConfig.kafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void publishSecondaryEvent(Order formatted) {
         log.debug("Publishing secondary order event orderId={}", formatted.getId());
-        var contact = contactMapperFactory.toGlamayaContact(formatted, orderConfig.getSourceAccountName());
-        eventPublisher.send(orderConfig.getContactKafkaTopic(), contact.getId(), contact);
+        var contact = contactMapperFactory.toGlamayaContact(formatted, orderConfig.sourceAccountName());
+        eventPublisher.send(orderConfig.contactKafkaTopic(), contact.getId(), contact);
     }
 
     @Override
     protected void notifySuccess(Order formatted, Map<String, Object> ctx) {
         log.debug("Order processed successfully orderId={}", formatted.getId());
-        if (orderConfig.getN8n().isEnable()) {
-            n8nNotificationService.success(true, orderConfig.getN8n().getWebhookUrl(), formatted, ctx);
+        if (orderConfig.n8n().enable()) {
+            n8nNotificationService.success(true, orderConfig.n8n().webhookUrl(), formatted, ctx);
         }
     }
 
     @Override
     protected void notifyError(Order original, Exception e, Map<String, Object> ctx) {
         log.error("Order processing failed orderId={} errorMsg={}", original.getId(), e.getMessage(), e);
-        if (orderConfig.getN8n().isEnable()) {
-            n8nNotificationService.error(true, orderConfig.getN8n().getErrorWebhookUrl(),
+        if (orderConfig.n8n().enable()) {
+            n8nNotificationService.error(true, orderConfig.n8n().errorWebhookUrl(),
                     "Error processing order: " + original.getId() + ", exception: " + e.getMessage(), ctx);
         }
     }

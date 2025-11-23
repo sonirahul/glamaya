@@ -1,6 +1,7 @@
 package com.glamaya.glamayawoocommercesync.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.glamaya.glamayawoocommercesync.config.ApplicationProperties;
 import com.glamaya.glamayawoocommercesync.monitoring.FetchCycleEvent;
 import com.glamaya.glamayawoocommercesync.port.StatusTrackerStore;
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTracker;
@@ -8,6 +9,8 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
 import com.glamaya.glamayawoocommercesync.util.ModifiedDateResolver;
 import com.glamaya.glamayawoocommercesync.woocommerce.WooEntityWithDates;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -19,16 +22,20 @@ import org.springframework.integration.util.DynamicPeriodicTrigger;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -64,6 +71,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
     protected final AtomicInteger consecutiveEmptyPages = new AtomicInteger(0);
     private int disabledPollCount = 0;
     private static final int DISABLED_BASE_DELAY_MS = 1000;
+    private static final int DEFAULT_FETCH_TIMEOUT_MS = 30000; // safety timeout
     protected final int processingConcurrency;
 
     private final ApplicationEventPublisher eventPublisher;
@@ -72,6 +80,14 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
 
     protected final StatusTrackerStore statusTrackerStore; // new
     protected final OAuth1Service oAuth1Service; // new
+    private final ApplicationProperties applicationProperties;
+    private final MeterRegistry meterRegistry;
+    private final Timer fetchTimer;
+    private final io.micrometer.core.instrument.Counter retryCounter;
+
+    // Simple circuit breaker state
+    private int recentFailures = 0;
+    private long circuitOpenedAt = -1L;
 
     /**
      * Constructor wiring core collaborators required for polling & processing.
@@ -88,7 +104,9 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
                                    int processingConcurrency,
                                    OAuth1Service oAuth1Service,
                                    StatusTrackerStore statusTrackerStore,
-                                   ApplicationEventPublisher eventPublisher) {
+                                   ApplicationEventPublisher eventPublisher,
+                                   ApplicationProperties applicationProperties,
+                                   MeterRegistry meterRegistry) {
         this.webClient = webClient;
         this.objectMapper = objectMapper;
         this.poller = poller;
@@ -102,6 +120,10 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
         this.oAuth1Service = oAuth1Service;
         this.statusTrackerStore = statusTrackerStore;
         this.eventPublisher = eventPublisher;
+        this.applicationProperties = applicationProperties;
+        this.meterRegistry = meterRegistry;
+        this.fetchTimer = meterRegistry != null ? meterRegistry.timer("woocommerce.fetch.timer", "processor", getProcessorType().name()) : null;
+        this.retryCounter = meterRegistry != null ? meterRegistry.counter("woocommerce.fetch.retries", "processor", getProcessorType().name()) : null;
     }
 
     /**
@@ -310,19 +332,18 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
      * Initiate asynchronous fetch sequence if not already in progress.
      */
     private void startAsyncFetchIfNeeded() {
-        if (!fetchInProgress.compareAndSet(false, true)) {
-            return; // already fetching
+        if (!fetchInProgress.compareAndSet(false, true)) return;
+        if (circuitOpen()) {
+            log.warn("circuit_open processor={} skipping fetch", getProcessorType());
+            fetchInProgress.set(false);
+            return;
         }
         long startNanos = System.nanoTime();
         getOrCreateTracker(resetOnStartup, pageSize)
                 .doOnNext(t -> resetOnStartup = false)
                 .flatMap(tracker -> executeFetch(tracker, startNanos))
-                .subscribe(list -> {
-                    if (!list.isEmpty()) {
-                        resultsQueue.offer(list);
-                    }
-                    fetchInProgress.set(false);
-                }, err -> fetchInProgress.set(false));
+                .doFinally(sig -> fetchInProgress.set(false))
+                .subscribe(list -> { if (!list.isEmpty()) resultsQueue.offer(list); });
     }
 
     /**
@@ -346,13 +367,29 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
                 })
                 .header(HttpHeaders.AUTHORIZATION, oauthHeader == null ? "" : oauthHeader)
                 .retrieve()
+                .onStatus(status -> status.is5xxServerError() || status.value() == 429,
+                        resp -> resp.bodyToMono(String.class)
+                                .defaultIfEmpty("<empty>")
+                                .flatMap(body -> Mono.error(new RuntimeException("Remote HTTP " + resp.statusCode().value() + ": " + body))))
                 .bodyToFlux(Object.class)
+                .timeout(Duration.ofMillis(DEFAULT_FETCH_TIMEOUT_MS))
                 .map(this::convertFragmentSafely)
                 .filter(Objects::nonNull)
                 .collectList()
+                .retryWhen(Retry.backoff(applicationProperties.getProcessing().retry().maxAttempts(),
+                                        Duration.ofMillis(applicationProperties.getProcessing().retry().initialDelayMs()))
+                        .filter(this::isTransientError)
+                        .maxBackoff(Duration.ofMillis(applicationProperties.getProcessing().retry().maxBackoffMs()))
+                        .doBeforeRetry(rs -> { if (retryCounter != null) retryCounter.increment(); }))
                 .onErrorResume(e -> {
                     long elapsed = System.nanoTime() - startNanos;
-                    log.error("fetch_error processor={} error={}", getProcessorType(), e.toString());
+                    recentFailures++;
+                    int threshold = applicationProperties.getProcessing().retry().circuitBreakerFailureThreshold();
+                    if (applicationProperties.getProcessing().retry().enableCircuitBreaker() && recentFailures >= threshold) {
+                        circuitOpenedAt = System.currentTimeMillis();
+                        log.warn("circuit_opened processor={} failures={} threshold={}", getProcessorType(), recentFailures, threshold);
+                    }
+                    log.error("fetch_error processor={} error={} class={}", getProcessorType(), e.getMessage(), e.getClass().getSimpleName(), e);
                     eventPublisher.publishEvent(new FetchCycleEvent(getProcessorType(), 0, true, true, elapsed));
                     return Mono.just(List.of());
                 })
@@ -395,9 +432,11 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
             modifyPollerDuration(poller, (int) backoff);
         } else {
             consecutiveEmptyPages.set(0);
+            recentFailures = 0; // reset circuit breaker failure count on success
             updateStatusTracker(tracker, list, dateExtractorFunction());
             modifyPollerDuration(poller, activeMillis);
         }
+        if (fetchTimer != null) fetchTimer.record(Duration.ofNanos(elapsed));
         eventPublisher.publishEvent(new FetchCycleEvent(getProcessorType(), list.size(), empty, false, elapsed));
         return saveTracker(tracker).subscribeOn(Schedulers.boundedElastic()).thenReturn(list);
     }
@@ -428,6 +467,7 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
     public Object handle(List<E> payload, MessageHeaders headers) {
         if (payload == null || payload.isEmpty()) return null;
         Flux.fromIterable(payload)
+                .limitRate(applicationProperties.getProcessing().bulkhead().limitRate())
                 .flatMap(e -> Mono.fromRunnable(() -> processEntityInternal(e)), processingConcurrency)
                 .subscribe();
         return null;
@@ -521,5 +561,23 @@ public abstract class AbstractWooProcessor<E> implements GlamWoocommerceProcesso
     public PollerMetadata getPoller() {
         return this.poller;
     }
-}
 
+    private boolean isTransientError(Throwable t) {
+        if (t instanceof TimeoutException) return true;
+        if (t instanceof IOException) return true;
+        if (t instanceof WebClientResponseException wcre) {
+            int code = wcre.getStatusCode().value();
+            return code == 429 || (code >= 500 && code < 600);
+        }
+        return false;
+    }
+
+    private boolean circuitOpen() {
+        if (!applicationProperties.getProcessing().retry().enableCircuitBreaker()) return false;
+        long resetMs = applicationProperties.getProcessing().retry().circuitBreakerResetMs();
+        if (System.currentTimeMillis() - circuitOpenedAt > resetMs) {
+            circuitOpenedAt = -1L; recentFailures = 0; return false;
+        }
+        return true;
+    }
+}

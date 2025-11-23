@@ -34,10 +34,19 @@ external:
 application:
   processing:
     concurrency: 4
-    default-fetch-duration-ms: 1000
     backpressure:
       buffer-size: 100
       overflow-strategy: drop
+    retry:
+      max-attempts: 3
+      initial-delay-ms: 500
+      max-backoff-ms: 5000
+      enable-circuit-breaker: true
+      circuit-breaker-failure-threshold: 5
+      circuit-breaker-reset-ms: 60000
+    bulkhead:
+      limit-rate: 500
+      max-in-flight: 1
   kafka:
     producer:
       slow-send-threshold-ms: 2000

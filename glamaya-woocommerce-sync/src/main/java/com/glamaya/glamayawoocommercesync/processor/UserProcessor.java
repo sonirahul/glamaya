@@ -14,6 +14,7 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTrack
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import com.glamaya.glamayawoocommercesync.service.N8nNotificationService;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.integration.scheduling.PollerMetadata;
@@ -42,21 +43,24 @@ public class UserProcessor extends AbstractWooProcessor<User> {
             WooUserFormatter wooUserFormatter,
             N8nNotificationService n8nNotificationService,
             ApplicationEventPublisher eventPublisherPublisher,
-            ApplicationProperties applicationProperties) {
+            ApplicationProperties applicationProperties,
+            MeterRegistry meterRegistry) {
         super(
                 woocommerceWebClient,
                 objectMapper,
                 poller,
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getPageSize(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).isResetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getFetchDurationMs().getActive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getFetchDurationMs().getPassive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).getQueryUrl(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).isEnable(),
-                applicationProperties.getProcessing().getConcurrency(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).pageSize(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).resetOnStartup(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).fetchDurationMs().active(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).fetchDurationMs().passive(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).queryUrl(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).enable(),
+                applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
-                eventPublisherPublisher
+                eventPublisherPublisher,
+                applicationProperties,
+                meterRegistry
         );
         this.eventPublisher = eventPublisher;
         this.contactMapperFactory = contactMapperFactory;
@@ -101,26 +105,26 @@ public class UserProcessor extends AbstractWooProcessor<User> {
     @Override
     protected void publishPrimaryEvent(User formatted) {
         log.debug("Publishing primary user event userId={}", formatted.getId());
-        eventPublisher.send(userConfig.getKafkaTopic(), formatted.getId(), formatted);
+        eventPublisher.send(userConfig.kafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void publishSecondaryEvent(User formatted) {
         log.debug("Publishing secondary user event userId={}", formatted.getId());
-        var contact = contactMapperFactory.toGlamayaContact(formatted, userConfig.getSourceAccountName());
-        eventPublisher.send(userConfig.getContactKafkaTopic(), contact.getId(), contact);
+        var contact = contactMapperFactory.toGlamayaContact(formatted, userConfig.sourceAccountName());
+        eventPublisher.send(userConfig.contactKafkaTopic(), contact.getId(), contact);
     }
 
     @Override
     protected void notifySuccess(User formatted, Map<String, Object> ctx) {
         log.debug("User processed successfully userId={}", formatted.getId());
-        if (userConfig.getN8n().isEnable()) n8nNotificationService.success(true, userConfig.getN8n().getWebhookUrl(), formatted, ctx);
+        if (userConfig.n8n().enable()) n8nNotificationService.success(true, userConfig.n8n().webhookUrl(), formatted, ctx);
     }
 
     @Override
     protected void notifyError(User original, Exception e, Map<String, Object> ctx) {
         log.error("User processing failed userId={} errorMsg={}", original.getId(), e.getMessage(), e);
-        if (userConfig.getN8n().isEnable()) n8nNotificationService.error(true, userConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
+        if (userConfig.n8n().enable()) n8nNotificationService.error(true, userConfig.n8n().errorWebhookUrl(), e.getMessage(), ctx);
     }
 
     @Override

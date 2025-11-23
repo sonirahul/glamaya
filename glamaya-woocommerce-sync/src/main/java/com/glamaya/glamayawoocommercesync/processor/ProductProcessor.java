@@ -12,6 +12,7 @@ import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTrack
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
 import com.glamaya.glamayawoocommercesync.service.N8nNotificationService;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.integration.scheduling.PollerMetadata;
@@ -36,21 +37,24 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
             EventPublisher eventPublisher,
             N8nNotificationService n8nNotificationService,
             ApplicationEventPublisher eventPublisherPublisher,
-            ApplicationProperties applicationProperties) {
+            ApplicationProperties applicationProperties,
+            MeterRegistry meterRegistry) {
         super(
                 woocommerceWebClient,
                 objectMapper,
                 poller,
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).getPageSize(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).isResetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).getFetchDurationMs().getActive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).getFetchDurationMs().getPassive(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).getQueryUrl(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).isEnable(),
-                applicationProperties.getProcessing().getConcurrency(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).pageSize(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).resetOnStartup(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).fetchDurationMs().active(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).fetchDurationMs().passive(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).queryUrl(),
+                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).enable(),
+                applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
-                eventPublisherPublisher
+                eventPublisherPublisher,
+                applicationProperties,
+                meterRegistry
         );
         this.eventPublisher = eventPublisher;
         this.n8nNotificationService = n8nNotificationService;
@@ -93,19 +97,19 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
     @Override
     protected void publishPrimaryEvent(Product formatted) {
         log.debug("Publishing primary product event productId={}", formatted.getId());
-        eventPublisher.send(productConfig.getKafkaTopic(), formatted.getId(), formatted);
+        eventPublisher.send(productConfig.kafkaTopic(), formatted.getId(), formatted);
     }
 
     @Override
     protected void notifySuccess(Product formatted, Map<String, Object> ctx) {
         log.debug("Product processed successfully productId={}", formatted.getId());
-        if (productConfig.getN8n().isEnable()) n8nNotificationService.success(true, productConfig.getN8n().getWebhookUrl(), formatted, ctx);
+        if (productConfig.n8n().enable()) n8nNotificationService.success(true, productConfig.n8n().webhookUrl(), formatted, ctx);
     }
 
     @Override
     protected void notifyError(Product original, Exception e, Map<String, Object> ctx) {
         log.error("Product processing failed productId={} errorMsg={}", original.getId(), e.getMessage(), e);
-        if (productConfig.getN8n().isEnable()) n8nNotificationService.error(true, productConfig.getN8n().getErrorWebhookUrl(), e.getMessage(), ctx);
+        if (productConfig.n8n().enable()) n8nNotificationService.error(true, productConfig.n8n().errorWebhookUrl(), e.getMessage(), ctx);
     }
 
     @Override
