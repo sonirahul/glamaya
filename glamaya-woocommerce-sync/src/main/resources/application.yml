@@ -32,6 +32,25 @@ external:
       url: "enter your n8n URL here"
 
 application:
+  processing:
+    concurrency: 4
+    backpressure:
+      buffer-size: 100
+      overflow-strategy: drop
+  kafka:
+    producer:
+      slow-send-threshold-ms: 2000
+    topic:
+      product-events: woo-product-events
+      user-events: woo-user-events
+      order-events: woo-order-events
+      contact-events: ecommerce-contact-events
+      product-events-dlq: woo-product-events-dlq
+      user-events-dlq: woo-user-events-dlq
+      order-events-dlq: woo-order-events-dlq
+      contact-events-dlq: ecommerce-contact-events-dlq
+    dlq:
+      enable: true
   webclient:
     response-timeout-in-millis: 30000
     max-in-memory-size-in-bytes: 10485760 # 10MB
@@ -75,16 +94,3 @@ application:
           enable: false
           webhook-url: "enter your n8n webhook URL here"
           error-webhook-url: "enter your n8n error webhook URL here"
-
-  kafka:
-    topic:
-      product-events: woo-product-events
-      user-events: woo-user-events
-      order-events: woo-order-events
-      contact-events: ecommerce-contact-events
-      product-events-dlq: woo-product-events-dlq
-      user-events-dlq: woo-user-events-dlq
-      order-events-dlq: woo-order-events-dlq
-      contact-events-dlq: ecommerce-contact-events-dlq
-    dlq:
-      enable: true

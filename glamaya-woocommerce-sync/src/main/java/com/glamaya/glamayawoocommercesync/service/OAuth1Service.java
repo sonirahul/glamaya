@@ -1,6 +1,5 @@
 package com.glamaya.glamayawoocommercesync.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,23 +16,40 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class OAuth1Service {
 
     @Value("${external.woocommerce.api.url}")
-    private final String baseUrl;
+    private String baseUrl;
     @Value("${external.woocommerce.api.wc-client-key}")
-    private final String clientKey;
+    private String clientKey;
     @Value("${external.woocommerce.api.wc-client-secret}")
-    private final String clientSecret;
+    private String clientSecret;
+
+    private volatile SecretKeySpec cachedKeySpec;
+    private final ThreadLocal<Mac> macThreadLocal = ThreadLocal.withInitial(() -> {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            ensureKeySpec();
+            mac.init(cachedKeySpec);
+            return mac;
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to init HmacSHA1 Mac", e);
+        }
+    });
+
+    private void ensureKeySpec() {
+        if (cachedKeySpec == null && clientSecret != null) {
+            cachedKeySpec = new SecretKeySpec((clientSecret + "&").getBytes(StandardCharsets.UTF_8), "HmacSHA1");
+        }
+    }
 
     public String generateOAuth1Header(String url, Map<String, String> queryParams) {
+        ensureKeySpec();
         String method = HttpMethod.GET.name();
         url = baseUrl.concat(url);
         long timestamp = System.currentTimeMillis() / 1000;
         String nonce = UUID.randomUUID().toString().replace("-", "");
 
-        // Add OAuth parameters
         Map<String, String> oauthParams = new HashMap<>();
         oauthParams.put("oauth_consumer_key", clientKey);
         oauthParams.put("oauth_nonce", nonce);
@@ -42,24 +57,20 @@ public class OAuth1Service {
         oauthParams.put("oauth_timestamp", String.valueOf(timestamp));
         oauthParams.put("oauth_version", "1.0");
 
-        // Filter null/blank query params BEFORE merging
-        Map<String, String> filteredQueryParams = queryParams == null ? Map.of() :
+        // Robust filtering: treat any value via String.valueOf, then check blank
+        Map<String, String> filteredQueryParams = (queryParams == null ? Map.<String, String>of() :
                 queryParams.entrySet().stream()
-                        .filter(e -> e.getValue() != null && !e.getValue().isBlank())
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                        .filter(e -> e.getValue() != null && !String.valueOf(e.getValue()).isBlank())
+                        .map(e -> Map.entry(e.getKey(), String.valueOf(e.getValue())))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
-        // Merge OAuth parameters and filtered query parameters
         Map<String, String> allParams = new HashMap<>(oauthParams);
         allParams.putAll(filteredQueryParams);
 
-        // Generate the base string including query parameters
         String baseString = generateBaseString(url, method, allParams);
         String signature = generateSignature(baseString, clientSecret);
-
-        // Add the signature to the OAuth parameters
         oauthParams.put("oauth_signature", signature);
 
-        // Build the OAuth header
         return "OAuth " + oauthParams.entrySet().stream()
                 .map(entry -> String.format("%s=\"%s\"", entry.getKey(), urlEncode(entry.getValue())))
                 .collect(Collectors.joining(", "));
@@ -76,12 +87,17 @@ public class OAuth1Service {
 
     private String generateSignature(String baseString, String consumerSecret) {
         try {
-            Mac mac = Mac.getInstance("HmacSHA1");
-            SecretKeySpec secretKeySpec = new SecretKeySpec((consumerSecret + "&").getBytes(StandardCharsets.UTF_8), "HmacSHA1");
-            mac.init(secretKeySpec);
+            ensureKeySpec();
+            Mac mac = macThreadLocal.get();
+            if (consumerSecret != null && !consumerSecret.equals(clientSecret)) {
+                mac.init(new SecretKeySpec((consumerSecret + "&").getBytes(StandardCharsets.UTF_8), "HmacSHA1"));
+            } else if (cachedKeySpec != null) {
+                mac.init(cachedKeySpec);
+            }
+            mac.reset();
             byte[] signatureBytes = mac.doFinal(baseString.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(signatureBytes);
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (InvalidKeyException e) {
             throw new RuntimeException("Failed to generate OAuth signature", e);
         }
     }

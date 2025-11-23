@@ -27,6 +27,7 @@ public class WebClientConfig {
     private final int maxInMemorySize;
 
     @Bean(name = "woocommerceWebClient")
+    @WebhookTarget
     public WebClient woocommerceWebClient() {
         return WebClient.builder()
                 .baseUrl(woocommerceApiUrl)
@@ -38,6 +39,7 @@ public class WebClientConfig {
     }
 
     @Bean(name = "n8nWebhookWebClient")
+    @WebhookTarget
     public WebClient n8nWebhookWebClient() {
         return WebClient.builder()
                 .baseUrl(n8nApiUrl)

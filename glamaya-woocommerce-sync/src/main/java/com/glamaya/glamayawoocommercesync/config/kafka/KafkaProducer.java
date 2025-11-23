@@ -31,8 +31,12 @@ public class KafkaProducer<T> {
     @Value("${application.kafka.topic.contact-events-dlq:ecommerce-contact-events-dlq}")
     private String contactEventsDlq;
 
+    @Value("${application.kafka.producer.slow-send-threshold-ms:2000}")
+    private long slowSendThresholdMs;
+
     public CompletableFuture<SendResult<String, T>> send(String topicName, String key, T message) {
 
+        long start = System.currentTimeMillis();
         var producerRecord = new ProducerRecord<>(topicName, key, message);
         producerRecord.headers().add("__SourceAccountName__", sourceAccountName.getBytes());
 
@@ -40,10 +44,15 @@ public class KafkaProducer<T> {
 
         // Add callback to log the delivery information
         future.whenComplete((result, ex) -> {
+            long duration = System.currentTimeMillis() - start;
             if (ex == null) {
-                log.debug("kafka_send success topic={} key={} partition={} offset={}",
-                        result.getRecordMetadata().topic(), key,
-                        result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+                if (duration > slowSendThresholdMs) {
+                    log.warn("kafka_send slow topic={} key={} durationMs={}", topicName, key, duration);
+                } else {
+                    log.debug("kafka_send success topic={} key={} partition={} offset={} durationMs={}",
+                            result.getRecordMetadata().topic(), key,
+                            result.getRecordMetadata().partition(), result.getRecordMetadata().offset(), duration);
+                }
             } else {
                 log.error("kafka_send failure topic={} key={} error={}", topicName, key, ex.toString());
                 if (dlqEnable) {

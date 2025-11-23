@@ -1,6 +1,5 @@
 package com.glamaya.glamayawoocommercesync.processor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glamaya.datacontracts.ecommerce.formatter.WooOrderFormatter;
 import com.glamaya.datacontracts.ecommerce.mapper.ContactMapperFactory;
@@ -8,135 +7,65 @@ import com.glamaya.datacontracts.woocommerce.Order;
 import com.glamaya.datacontracts.woocommerce.OrderOrderBy;
 import com.glamaya.datacontracts.woocommerce.OrderSearchRequest;
 import com.glamaya.datacontracts.woocommerce.SortOrder;
-import com.glamaya.glamayawoocommercesync.config.kafka.KafkaProducer;
-import com.glamaya.glamayawoocommercesync.repository.ProcessorStatusTrackerRepository;
+import com.glamaya.glamayawoocommercesync.port.EventPublisher;
+import com.glamaya.glamayawoocommercesync.port.StatusTrackerStore;
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorStatusTracker;
 import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
+import com.glamaya.glamayawoocommercesync.service.N8nNotificationService;
 import com.glamaya.glamayawoocommercesync.service.OAuth1Service;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.integration.core.MessageSource;
-import org.springframework.integration.dsl.SourcePollingChannelAdapterSpec;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.integration.scheduling.PollerMetadata;
-import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
+public class OrderProcessor extends AbstractWooProcessor<Order> {
 
-    @Qualifier("woocommerceWebClient")
-    private final WebClient woocommerceWebClient;
-    @Qualifier("n8nWebhookWebClient")
-    private final WebClient n8nWebClient;
-    private final OAuth1Service oAuth1Service;
-    private final KafkaProducer<Object> producer;
-    @Getter
-    private final PollerMetadata poller;
-    @Getter
-    private final ObjectMapper objectMapper;
-    private final ProcessorStatusTrackerRepository repository;
+    private final EventPublisher eventPublisher;
     private final ContactMapperFactory<Order> contactMapperFactory;
     private final WooOrderFormatter wooOrderFormatter;
-    private final AtomicInteger consecutiveEmptyPages = new AtomicInteger(0);
+    private final N8nNotificationService n8nNotificationService;
 
-    @Value("${application.woocommerce.entities.orders.query-url}")
-    private final String queryOrdersUrl;
-    @Value("${application.woocommerce.entities.orders.n8n.webhook-url}")
-    private final String n8nWebhookUrl;
-    @Value("${application.woocommerce.entities.orders.n8n.error-webhook-url}")
-    private final String n8nErrorWebhookUrl;
-    @Value("${application.woocommerce.entities.orders.n8n.enable}")
-    private final boolean n8nEnable;
-    @Value("${application.woocommerce.entities.orders.enable}")
-    private final boolean enable;
-    @Value("${application.woocommerce.entities.orders.page-size}")
-    private final long pageSize;
-    @Value("${application.woocommerce.entities.orders.reset-on-startup}")
-    private boolean resetOnStartup;
-    @Value("${external.woocommerce.api.account-name}")
-    private final String sourceAccountName;
     @Value("${application.kafka.topic.order-events}")
-    private final String orderEventsTopic;
+    private String orderEventsTopic;
     @Value("${application.kafka.topic.contact-events}")
-    private final String contactEventsTopic;
-    @Value("${application.woocommerce.entities.orders.fetch-duration-in-millis.active-mode}")
-    private int fetchDurationInMillisActiveMode;
-    @Value("${application.woocommerce.entities.orders.fetch-duration-in-millis.passive-mode}")
-    private int fetchDurationInMillisPassiveMode;
+    private String contactEventsTopic;
+    @Value("${application.woocommerce.entities.orders.n8n.webhook-url}")
+    private String n8nWebhookUrl;
+    @Value("${application.woocommerce.entities.orders.n8n.error-webhook-url}")
+    private String n8nErrorWebhookUrl;
+    @Value("${application.woocommerce.entities.orders.n8n.enable}")
+    private boolean n8nEnable;
+    @Value("${external.woocommerce.api.account-name}")
+    private String sourceAccountName;
 
-    public MessageSource<List<Order>> receive() {
-        return () -> {
-            if (!enable) {
-                log.info("Order sync is disabled");
-                modifyPollerDuration(poller, fetchDurationInMillisPassiveMode * 60);
-                return null;
-            }
-
-            Mono<ProcessorStatusTracker> trackerMono = getOrCreateStatusTracker(resetOnStartup, pageSize)
-                    .doOnNext(t -> resetOnStartup = false);
-
-            return trackerMono.flatMap(statusTracker -> {
-                        OrderSearchRequest orderSearchRequest = buildOrderSearchRequest(statusTracker);
-                        Map<String, String> queryParamMap = objectMapper.convertValue(orderSearchRequest, new TypeReference<>() {});
-                        String oauthHeader = oAuth1Service.generateOAuth1Header(queryOrdersUrl, queryParamMap);
-                        return fetchEntities(woocommerceWebClient, queryOrdersUrl, queryParamMap, oauthHeader, new ParameterizedTypeReference<List<Order>>() {})
-                                .defaultIfEmpty(List.of())
-                                .flatMap(orders -> {
-                                    if (orders.isEmpty()) {
-                                        int emptyCount = consecutiveEmptyPages.incrementAndGet();
-                                        long backoff = Math.min((long) (fetchDurationInMillisActiveMode * Math.pow(2, emptyCount)), fetchDurationInMillisPassiveMode);
-                                        log.info("No new Orders (emptyCount={}), applying backoff delay {} ms (cap {})", emptyCount, backoff, fetchDurationInMillisPassiveMode);
-                                        resetStatusTracker(statusTracker);
-                                        modifyPollerDuration(poller, (int) backoff);
-                                    } else {
-                                        consecutiveEmptyPages.set(0);
-                                        log.info("Fetched {} woocommerce Orders (reset backoff)", statusTracker.getCount() + orders.size());
-                                        updateStatusTracker(statusTracker, orders, o -> ((Order) o).getDateModifiedGmt());
-                                        modifyPollerDuration(poller, fetchDurationInMillisActiveMode);
-                                    }
-                                    return repository.save(statusTracker)
-                                            .subscribeOn(Schedulers.boundedElastic())
-                                            .thenReturn(orders);
-                                });
-                    })
-                    .map(orders -> orders.isEmpty() ? null : MessageBuilder.withPayload(orders).build())
-                    .block(); // boundary sync
-        };
-    }
-
-    private OrderSearchRequest buildOrderSearchRequest(ProcessorStatusTracker statusTracker) {
-        var builder = OrderSearchRequest.builder()
-                .withFetchLatest(null)
-                .withOrderby(OrderOrderBy.date_modified)
-                .withOrder(SortOrder.asc)
-                .withPage(statusTracker.getPage())
-                .withPerPage(pageSize);
-
-        if (statusTracker.isUseLastUpdatedDateInQuery() && statusTracker.getLastUpdatedDate() != null) {
-            builder.withModifiedAfter(statusTracker.getLastUpdatedDate());
-        }
-        return builder.build();
-    }
-
-    @Override
-    public ProcessorStatusTrackerRepository getStatusTrackerRepository() {
-        return repository;
+    public OrderProcessor(WebClient woocommerceWebClient,
+                          ObjectMapper objectMapper,
+                          PollerMetadata poller,
+                          @Value("${application.woocommerce.entities.orders.page-size}") long pageSize,
+                          @Value("${application.woocommerce.entities.orders.reset-on-startup}") boolean resetOnStartup,
+                          @Value("${application.woocommerce.entities.orders.fetch-duration-in-millis.active-mode}") int active,
+                          @Value("${application.woocommerce.entities.orders.fetch-duration-in-millis.passive-mode}") int passive,
+                          @Value("${application.woocommerce.entities.orders.query-url}") String queryUrl,
+                          @Value("${application.woocommerce.entities.orders.enable}") boolean enable,
+                          @Value("${application.processing.concurrency:4}") int processingConcurrency,
+                          OAuth1Service oAuth1Service,
+                          StatusTrackerStore statusTrackerStore,
+                          EventPublisher eventPublisher,
+                          ContactMapperFactory<Order> contactMapperFactory,
+                          WooOrderFormatter wooOrderFormatter,
+                          N8nNotificationService n8nNotificationService,
+                          ApplicationEventPublisher eventPublisherPublisher) {
+        super(woocommerceWebClient, objectMapper, poller, pageSize, resetOnStartup, active, passive, queryUrl, enable, processingConcurrency, oAuth1Service, statusTrackerStore, eventPublisherPublisher);
+        this.eventPublisher = eventPublisher;
+        this.contactMapperFactory = contactMapperFactory;
+        this.wooOrderFormatter = wooOrderFormatter;
+        this.n8nNotificationService = n8nNotificationService;
     }
 
     @Override
@@ -145,31 +74,54 @@ public class OrderProcessor implements GlamWoocommerceProcessor<List<Order>> {
     }
 
     @Override
-    public Consumer<SourcePollingChannelAdapterSpec> poll() {
-        return e -> e.poller(getPoller());
+    protected Object buildSearchRequest(ProcessorStatusTracker tracker) {
+        var b = OrderSearchRequest.builder()
+                .withFetchLatest(null)
+                .withOrderby(OrderOrderBy.date_modified)
+                .withOrder(SortOrder.asc)
+                .withPage(Long.valueOf(tracker.getPage()))
+                .withPerPage(Long.valueOf(pageSize));
+        if (tracker.isUseLastUpdatedDateInQuery() && tracker.getLastUpdatedDate() != null) {
+            b.withModifiedAfter(tracker.getLastUpdatedDate());
+        }
+        return b.build();
     }
 
     @Override
-    public Object handle(List<Order> payload, MessageHeaders headers) {
-        payload.forEach(order -> {
-            try {
-                order = wooOrderFormatter.format(order);
-                producer.send(orderEventsTopic, order.getId().toString(), order);
-                var contact = contactMapperFactory.toGlamayaContact(order, sourceAccountName);
-                producer.send(contactEventsTopic, contact.getId(), contact);
-                Map<String,Object> ctx = new HashMap<>();
-                ctx.put("entity","order");
-                ctx.put("id", order.getId());
-                publishData(n8nWebClient, n8nWebhookUrl, order, n8nEnable, ctx);
-            } catch (Exception e) {
-                Map<String,Object> errCtx = new HashMap<>();
-                errCtx.put("entity","order");
-                errCtx.put("id", order.getId());
-                errCtx.put("error", e.getMessage());
-                log.error("Error processing order: {}", order.getId(), e);
-                publishData(n8nWebClient, n8nErrorWebhookUrl, "Error processing order: " + order.getId() + ", exception: " + e.getMessage(), n8nEnable, errCtx);
-            }
-        });
-        return null;
+    protected Class<Order> getEntityClass() {
+        return Order.class;
+    }
+
+    // New hook implementations
+    @Override
+    protected Order doFormat(Order entity) {
+        return wooOrderFormatter.format(entity);
+    }
+
+    @Override
+    protected Object getEntityId(Order entity) {
+        return entity.getId();
+    }
+
+    @Override
+    protected void publishPrimaryEvent(Order formatted) {
+        eventPublisher.send(orderEventsTopic, formatted.getId(), formatted);
+    }
+
+    @Override
+    protected void publishSecondaryEvent(Order formatted) {
+        var contact = contactMapperFactory.toGlamayaContact(formatted, sourceAccountName);
+        eventPublisher.send(contactEventsTopic, contact.getId(), contact);
+    }
+
+    @Override
+    protected void notifySuccess(Order formatted, Map<String, Object> ctx) {
+        if (n8nEnable) n8nNotificationService.success(true, n8nWebhookUrl, formatted, ctx);
+    }
+
+    @Override
+    protected void notifyError(Order original, Exception e, Map<String, Object> ctx) {
+        if (n8nEnable)
+            n8nNotificationService.error(true, n8nErrorWebhookUrl, "Error processing order: " + original.getId() + ", exception: " + e.getMessage(), ctx);
     }
 }
