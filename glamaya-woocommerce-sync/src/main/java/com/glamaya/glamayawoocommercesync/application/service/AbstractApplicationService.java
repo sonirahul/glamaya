@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.MessageHeaders;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public abstract class AbstractApplicationService<E> implements org.springframewo
     protected final long pageSize;
     protected boolean resetOnStartup;
     protected final String queryUrl;
-    protected final boolean enable;
+    protected final boolean enable; // Keep enable here for fetchAndProcess logic
     protected final int processingConcurrency;
 
     private final ApplicationEventPublisher eventPublisher;
@@ -90,19 +91,23 @@ public abstract class AbstractApplicationService<E> implements org.springframewo
     protected abstract Object getEntityId(E entity);
     protected abstract void publishPrimaryEvent(E formatted);
 
-    public Mono<List<E>> fetchAndProcess() {
-        if (!enable) {
-            return Mono.empty();
-        }
+    /**
+     * Executes the core fetch and process logic. This method is called by the Polling Adapter.
+     *
+     * @return A Mono<Boolean> indicating if the fetch resulted in an empty list (true for empty, false for non-empty or error).
+     */
+    public Mono<Boolean> fetchAndProcess() {
         if (isCircuitBreakerOpen()) {
             log.warn("Circuit breaker is open for processor={}. Skipping fetch.", getProcessorType());
-            return Mono.just(List.of());
+            return Mono.just(true); // Treat as empty to allow backoff
         }
 
         long startNanos = System.nanoTime();
         return getOrCreateTracker(this.resetOnStartup, this.pageSize)
                 .doOnNext(t -> this.resetOnStartup = false)
-                .flatMap(tracker -> executeFetch(tracker, startNanos));
+                .flatMap(tracker -> executeFetch(tracker, startNanos))
+                .map(List::isEmpty) // Return true if list is empty
+                .onErrorResume(error -> handleFetchError(error, startNanos).thenReturn(true)); // Treat error as empty
     }
 
     private Mono<List<E>> executeFetch(ProcessorStatus tracker, long startNanos) {
@@ -117,8 +122,7 @@ public abstract class AbstractApplicationService<E> implements org.springframewo
                 .collectList()
                 .timeout(Duration.ofMillis(DEFAULT_FETCH_TIMEOUT_MS))
                 .retryWhen(configureRetryPolicy())
-                .flatMap(entities -> handleFetchResult(tracker, entities, startNanos))
-                .onErrorResume(error -> handleFetchError(error, startNanos));
+                .flatMap(entities -> handleFetchResult(tracker, entities, startNanos));
     }
 
     private E deserializeEntity(Object fragment) {

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class WooCommercePollingAdapter<E> implements MessageSource<List<E>> {
@@ -20,17 +21,20 @@ public class WooCommercePollingAdapter<E> implements MessageSource<List<E>> {
     private final AbstractApplicationService<E> applicationService;
     private final PollerMetadata poller;
     private final boolean enable;
+    private final int activeMillis; // New field
     private final int passiveMillis;
     private final ConcurrentLinkedQueue<List<E>> resultsQueue = new ConcurrentLinkedQueue<>();
     private final AtomicBoolean fetchInProgress = new AtomicBoolean(false);
+    private final AtomicInteger consecutiveEmptyFetches = new AtomicInteger(0); // Renamed and moved
     private int disabledPollCount = 0;
 
     private static final int DISABLED_BASE_DELAY_MS = 1000;
 
-    public WooCommercePollingAdapter(AbstractApplicationService<E> applicationService, PollerMetadata poller, boolean enable, int passiveMillis) {
+    public WooCommercePollingAdapter(AbstractApplicationService<E> applicationService, PollerMetadata poller, boolean enable, int activeMillis, int passiveMillis) {
         this.applicationService = applicationService;
         this.poller = poller;
         this.enable = enable;
+        this.activeMillis = activeMillis;
         this.passiveMillis = passiveMillis;
     }
 
@@ -55,14 +59,28 @@ public class WooCommercePollingAdapter<E> implements MessageSource<List<E>> {
             applicationService.fetchAndProcess()
                     .doFinally(sig -> fetchInProgress.set(false))
                     .subscribe(
-                            processedList -> {
-                                if (!processedList.isEmpty()) {
-                                    resultsQueue.offer(processedList);
+                            isEmptyFetch -> {
+                                if (isEmptyFetch) {
+                                    handleEmptyFetchResult();
+                                } else {
+                                    handleSuccessfulFetchResult();
                                 }
                             },
                             error -> log.error("Error in polling adapter for processor={}", applicationService.getProcessorType(), error)
                     );
         }
+    }
+
+    private void handleEmptyFetchResult() {
+        int emptyCount = consecutiveEmptyFetches.incrementAndGet();
+        long backoff = Math.min((long) (activeMillis * Math.pow(2, emptyCount)), passiveMillis);
+        log.info("No new entities found for processor={}. Empty fetches in a row: {}. Backing off for {}ms.", applicationService.getProcessorType(), emptyCount, backoff);
+        modifyPollerDuration(poller, (int) backoff);
+    }
+
+    private void handleSuccessfulFetchResult() {
+        consecutiveEmptyFetches.set(0);
+        modifyPollerDuration(poller, activeMillis);
     }
 
     private boolean isProcessorEnabled() {

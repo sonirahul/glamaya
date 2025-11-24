@@ -22,10 +22,11 @@ public class GlamWoocommerceIntegrationFlow {
                 productProcessor,
                 poller,
                 applicationProperties.getProcessorConfigOrThrow(productProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(productProcessor.getProcessorType()).fetchDurationMs().active(), // Pass activeMillis
                 applicationProperties.getProcessorConfigOrThrow(productProcessor.getProcessorType()).fetchDurationMs().passive()
         );
         return IntegrationFlow.from(adapter, e -> e.poller(poller))
-                .handle(productProcessor) // Corrected: Handle the processor, not the adapter
+                .handle(productProcessor)
                 .get();
     }
 
@@ -35,10 +36,11 @@ public class GlamWoocommerceIntegrationFlow {
                 userProcessor,
                 poller,
                 applicationProperties.getProcessorConfigOrThrow(userProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(userProcessor.getProcessorType()).fetchDurationMs().active(), // Pass activeMillis
                 applicationProperties.getProcessorConfigOrThrow(userProcessor.getProcessorType()).fetchDurationMs().passive()
         );
         return IntegrationFlow.from(adapter, e -> e.poller(poller))
-                .handle(userProcessor) // Corrected: Handle the processor, not the adapter
+                .handle(userProcessor)
                 .get();
     }
 
@@ -48,10 +50,11 @@ public class GlamWoocommerceIntegrationFlow {
                 orderProcessor,
                 poller,
                 applicationProperties.getProcessorConfigOrThrow(orderProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(orderProcessor.getProcessorType()).fetchDurationMs().active(), // Pass activeMillis
                 applicationProperties.getProcessorConfigOrThrow(orderProcessor.getProcessorType()).fetchDurationMs().passive()
         );
         return IntegrationFlow.from(adapter, e -> e.poller(poller))
-                .handle(orderProcessor) // Corrected: Handle the processor, not the adapter
+                .handle(orderProcessor)
                 .get();
     }
 }
