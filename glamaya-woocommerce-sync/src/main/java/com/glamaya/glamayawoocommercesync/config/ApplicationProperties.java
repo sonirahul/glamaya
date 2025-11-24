@@ -1,6 +1,6 @@
 package com.glamaya.glamayawoocommercesync.config;
 
-import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
+import com.glamaya.glamayawoocommercesync.domain.ProcessorType; // Updated import
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,15 @@ public class ApplicationProperties {
     private Processing processing;
     private Kafka kafka;
     private Map<String, ProcessorConfig> processors;
+
+    // Manually added getters due to Lombok processing issues
+    public Map<String, ProcessorConfig> getProcessors() {
+        return processors;
+    }
+
+    public Processing getProcessing() {
+        return processing;
+    }
 
     public record Processing(int concurrency,
                              Backpressure backpressure,
@@ -106,7 +115,6 @@ public class ApplicationProperties {
             if (cfg.pageSize() <= 0) throw new IllegalStateException("processor " + name + " page-size must be > 0");
             if (cfg.fetchDurationMs() == null) throw new IllegalStateException("processor " + name + " fetch-duration-ms missing");
             if (cfg.fetchDurationMs().active() <= 0) throw new IllegalStateException("processor " + name + " fetch-duration-ms.active must be > 0");
-            if (cfg.fetchDurationMs().passive() <= 0) throw new IllegalStateException("processor " + name + " fetch-duration-ms.passive must be > 0");
             if (!StringUtils.hasText(cfg.queryUrl())) throw new IllegalStateException("processor " + name + " query-url must be set");
             if (!StringUtils.hasText(cfg.kafkaTopic())) throw new IllegalStateException("processor " + name + " kafka-topic must be set");
             if (!StringUtils.hasText(cfg.contactKafkaTopic())) throw new IllegalStateException("processor " + name + " contact-kafka-topic must be set");

@@ -1,6 +1,6 @@
 package com.glamaya.glamayawoocommercesync.monitoring;
 
-import com.glamaya.glamayawoocommercesync.repository.entity.ProcessorType;
+import com.glamaya.glamayawoocommercesync.domain.ProcessorType; // Updated import
 
 public record FetchCycleEvent(ProcessorType processorType,
                               int itemCount,
