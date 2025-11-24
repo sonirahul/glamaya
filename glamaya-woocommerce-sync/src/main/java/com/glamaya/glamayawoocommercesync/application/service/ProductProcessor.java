@@ -16,14 +16,13 @@ import com.glamaya.glamayawoocommercesync.port.out.WooCommerceApiClientPort;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Slf4j
 @Service
-public class ProductProcessor extends AbstractWooProcessor<Product> {
+public class ProductProcessor extends AbstractApplicationService<Product> {
 
     private final EventPublisher eventPublisher;
     private final N8nApplicationService n8nApplicationService;
@@ -31,11 +30,10 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
 
     public ProductProcessor(
             ObjectMapper objectMapper,
-            PollerMetadata poller,
             OAuthSignerPort oAuth1Service,
             StatusTrackerStore statusTrackerStore,
             ProcessorStatusService processorStatusService,
-            WooCommerceApiClientPort wooCommerceApiClient, // New parameter
+            WooCommerceApiClientPort wooCommerceApiClient,
             EventPublisher eventPublisher,
             N8nApplicationService n8nApplicationService,
             ApplicationEventPublisher eventPublisherPublisher,
@@ -43,18 +41,15 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
             MeterRegistry meterRegistry) {
         super(
                 objectMapper,
-                poller,
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).pageSize(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).resetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).fetchDurationMs().active(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).fetchDurationMs().passive(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).queryUrl(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_PRODUCT).enable(),
                 applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
                 processorStatusService,
-                wooCommerceApiClient, // Pass to super
+                wooCommerceApiClient,
                 eventPublisherPublisher,
                 applicationProperties,
                 meterRegistry
@@ -88,8 +83,8 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
     }
 
     @Override
-    protected Product doFormat(Product entity) {
-        return entity;
+    protected Class<Product> getEntityClass() {
+        return Product.class;
     }
 
     @Override
@@ -103,20 +98,13 @@ public class ProductProcessor extends AbstractWooProcessor<Product> {
         eventPublisher.send(productConfig.kafkaTopic(), formatted.getId(), formatted);
     }
 
-    @Override
     protected void notifySuccess(Product formatted, Map<String, Object> ctx) {
         log.debug("Product processed successfully productId={}", formatted.getId());
         if (productConfig.n8n().enable()) n8nApplicationService.success(true, productConfig.n8n().webhookUrl(), formatted, ctx);
     }
 
-    @Override
     protected void notifyError(Product original, Exception e, Map<String, Object> ctx) {
         log.error("Product processing failed productId={} errorMsg={}", original.getId(), e.getMessage(), e);
         if (productConfig.n8n().enable()) n8nApplicationService.error(true, productConfig.n8n().errorWebhookUrl(), e.getMessage(), ctx);
-    }
-
-    @Override
-    protected Class<Product> getEntityClass() {
-        return Product.class;
     }
 }

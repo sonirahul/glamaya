@@ -3,41 +3,55 @@ package com.glamaya.glamayawoocommercesync.adapter.in;
 import com.glamaya.glamayawoocommercesync.application.service.OrderProcessor;
 import com.glamaya.glamayawoocommercesync.application.service.ProductProcessor;
 import com.glamaya.glamayawoocommercesync.application.service.UserProcessor;
+import com.glamaya.glamayawoocommercesync.config.ApplicationProperties;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.scheduling.PollerMetadata;
 
-@Slf4j
 @Configuration
 @AllArgsConstructor
 public class GlamWoocommerceIntegrationFlow {
 
+    private final ApplicationProperties applicationProperties;
+
     @Bean
-    public IntegrationFlow productFlow(ProductProcessor productProcessor) {
-        return IntegrationFlow.from(
-                        productProcessor.receive(),
-                        productProcessor.poll())
-                .handle(productProcessor)
+    public IntegrationFlow productFlow(ProductProcessor productProcessor, PollerMetadata poller) {
+        var adapter = new WooCommercePollingAdapter<>(
+                productProcessor,
+                poller,
+                applicationProperties.getProcessorConfigOrThrow(productProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(productProcessor.getProcessorType()).fetchDurationMs().passive()
+        );
+        return IntegrationFlow.from(adapter, e -> e.poller(poller))
+                .handle(productProcessor) // Corrected: Handle the processor, not the adapter
                 .get();
     }
 
     @Bean
-    public IntegrationFlow userFlow(UserProcessor userProcessor) {
-        return IntegrationFlow.from(
-                        userProcessor.receive(),
-                        userProcessor.poll())
-                .handle(userProcessor)
+    public IntegrationFlow userFlow(UserProcessor userProcessor, PollerMetadata poller) {
+        var adapter = new WooCommercePollingAdapter<>(
+                userProcessor,
+                poller,
+                applicationProperties.getProcessorConfigOrThrow(userProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(userProcessor.getProcessorType()).fetchDurationMs().passive()
+        );
+        return IntegrationFlow.from(adapter, e -> e.poller(poller))
+                .handle(userProcessor) // Corrected: Handle the processor, not the adapter
                 .get();
     }
 
     @Bean
-    public IntegrationFlow orderFlow(OrderProcessor orderProcessor) {
-        return IntegrationFlow.from(
-                        orderProcessor.receive(),
-                        orderProcessor.poll())
-                .handle(orderProcessor)
+    public IntegrationFlow orderFlow(OrderProcessor orderProcessor, PollerMetadata poller) {
+        var adapter = new WooCommercePollingAdapter<>(
+                orderProcessor,
+                poller,
+                applicationProperties.getProcessorConfigOrThrow(orderProcessor.getProcessorType()).enable(),
+                applicationProperties.getProcessorConfigOrThrow(orderProcessor.getProcessorType()).fetchDurationMs().passive()
+        );
+        return IntegrationFlow.from(adapter, e -> e.poller(poller))
+                .handle(orderProcessor) // Corrected: Handle the processor, not the adapter
                 .get();
     }
 }

@@ -18,14 +18,13 @@ import com.glamaya.glamayawoocommercesync.port.out.WooCommerceApiClientPort;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Slf4j
 @Service
-public class UserProcessor extends AbstractWooProcessor<User> {
+public class UserProcessor extends AbstractApplicationService<User> {
 
     private final EventPublisher eventPublisher;
     private final ContactMapperFactory<User> contactMapperFactory;
@@ -35,11 +34,10 @@ public class UserProcessor extends AbstractWooProcessor<User> {
 
     public UserProcessor(
             ObjectMapper objectMapper,
-            PollerMetadata poller,
             OAuthSignerPort oAuth1Service,
             StatusTrackerStore statusTrackerStore,
             ProcessorStatusService processorStatusService,
-            WooCommerceApiClientPort wooCommerceApiClient, // New parameter
+            WooCommerceApiClientPort wooCommerceApiClient,
             EventPublisher eventPublisher,
             ContactMapperFactory<User> contactMapperFactory,
             WooUserFormatter wooUserFormatter,
@@ -49,18 +47,15 @@ public class UserProcessor extends AbstractWooProcessor<User> {
             MeterRegistry meterRegistry) {
         super(
                 objectMapper,
-                poller,
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).pageSize(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).resetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).fetchDurationMs().active(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).fetchDurationMs().passive(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).queryUrl(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_USER).enable(),
                 applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
                 processorStatusService,
-                wooCommerceApiClient, // Pass to super
+                wooCommerceApiClient,
                 eventPublisherPublisher,
                 applicationProperties,
                 meterRegistry
@@ -96,8 +91,8 @@ public class UserProcessor extends AbstractWooProcessor<User> {
     }
 
     @Override
-    protected User doFormat(User entity) {
-        return wooUserFormatter.format(entity);
+    protected Class<User> getEntityClass() {
+        return User.class;
     }
 
     @Override
@@ -118,20 +113,13 @@ public class UserProcessor extends AbstractWooProcessor<User> {
         eventPublisher.send(userConfig.contactKafkaTopic(), contact.getId(), contact);
     }
 
-    @Override
     protected void notifySuccess(User formatted, Map<String, Object> ctx) {
         log.debug("User processed successfully userId={}", formatted.getId());
         if (userConfig.n8n().enable()) n8nApplicationService.success(true, userConfig.n8n().webhookUrl(), formatted, ctx);
     }
 
-    @Override
     protected void notifyError(User original, Exception e, Map<String, Object> ctx) {
         log.error("User processing failed userId={} errorMsg={}", original.getId(), e.getMessage(), e);
         if (userConfig.n8n().enable()) n8nApplicationService.error(true, userConfig.n8n().errorWebhookUrl(), e.getMessage(), ctx);
-    }
-
-    @Override
-    protected Class<User> getEntityClass() {
-        return User.class;
     }
 }

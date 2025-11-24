@@ -18,14 +18,13 @@ import com.glamaya.glamayawoocommercesync.port.out.WooCommerceApiClientPort;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.integration.scheduling.PollerMetadata;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Slf4j
 @Service
-public class OrderProcessor extends AbstractWooProcessor<Order> {
+public class OrderProcessor extends AbstractApplicationService<Order> {
 
     private final EventPublisher eventPublisher;
     private final ContactMapperFactory<Order> contactMapperFactory;
@@ -35,11 +34,10 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
 
     public OrderProcessor(
             ObjectMapper objectMapper,
-            PollerMetadata poller,
             OAuthSignerPort oAuth1Service,
             StatusTrackerStore statusTrackerStore,
             ProcessorStatusService processorStatusService,
-            WooCommerceApiClientPort wooCommerceApiClient, // New parameter
+            WooCommerceApiClientPort wooCommerceApiClient,
             EventPublisher eventPublisher,
             ContactMapperFactory<Order> contactMapperFactory,
             WooOrderFormatter wooOrderFormatter,
@@ -49,18 +47,15 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
             MeterRegistry meterRegistry) {
         super(
                 objectMapper,
-                poller,
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).pageSize(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).resetOnStartup(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).fetchDurationMs().active(),
-                applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).fetchDurationMs().passive(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).queryUrl(),
                 applicationProperties.getProcessorConfigOrThrow(ProcessorType.WOO_ORDER).enable(),
                 applicationProperties.getProcessing().concurrency(),
                 oAuth1Service,
                 statusTrackerStore,
                 processorStatusService,
-                wooCommerceApiClient, // Pass to super
+                wooCommerceApiClient,
                 eventPublisherPublisher,
                 applicationProperties,
                 meterRegistry
@@ -123,7 +118,6 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
         eventPublisher.send(orderConfig.contactKafkaTopic(), contact.getId(), contact);
     }
 
-    @Override
     protected void notifySuccess(Order formatted, Map<String, Object> ctx) {
         log.debug("Order processed successfully orderId={}", formatted.getId());
         if (orderConfig.n8n().enable()) {
@@ -131,7 +125,6 @@ public class OrderProcessor extends AbstractWooProcessor<Order> {
         }
     }
 
-    @Override
     protected void notifyError(Order original, Exception e, Map<String, Object> ctx) {
         log.error("Order processing failed orderId={} errorMsg={}", original.getId(), e.getMessage(), e);
         if (orderConfig.n8n().enable()) {
