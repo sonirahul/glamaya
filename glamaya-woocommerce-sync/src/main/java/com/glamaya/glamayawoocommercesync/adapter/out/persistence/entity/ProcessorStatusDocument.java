@@ -1,16 +1,20 @@
 package com.glamaya.glamayawoocommercesync.adapter.out.persistence.entity;
 
 import com.glamaya.glamayawoocommercesync.domain.ProcessorType;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 
+/**
+ * Represents the persistence-specific entity for storing {@link com.glamaya.glamayawoocommercesync.domain.ProcessorStatus}
+ * in a MongoDB database. This class includes MongoDB-specific annotations.
+ * It acts as a data transfer object between the persistence adapter and the database.
+ */
 @Data
 @Document(collection = "processor_status_tracker")
-public class ProcessorStatusDocument { // Renamed class
+public class ProcessorStatusDocument {
     @Id
     private ProcessorType processorType;
     private int page;
@@ -19,7 +23,16 @@ public class ProcessorStatusDocument { // Renamed class
     private boolean useLastUpdatedDateInQuery;
     private Instant lastUpdatedDate;
 
-    // Manually added constructor for builder
+    /**
+     * Constructs a new {@code ProcessorStatusDocument}.
+     *
+     * @param processorType             The type of the processor.
+     * @param page                      The current page number.
+     * @param pageSize                  The configured page size.
+     * @param count                     The total count of items processed.
+     * @param useLastUpdatedDateInQuery Whether to use the last updated date in the query.
+     * @param lastUpdatedDate           The timestamp of the last updated item.
+     */
     public ProcessorStatusDocument(ProcessorType processorType, int page, long pageSize, long count, boolean useLastUpdatedDateInQuery, Instant lastUpdatedDate) {
         this.processorType = processorType;
         this.page = page;
@@ -29,12 +42,8 @@ public class ProcessorStatusDocument { // Renamed class
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    // Manually added builder method
-    public static ProcessorStatusDocumentBuilder builder() {
-        return new ProcessorStatusDocumentBuilder();
-    }
+    // --- Getters and Setters (Manually added due to Lombok processing issues) ---
 
-    // Manually added getters and setters (Lombok @Data replacement)
     public ProcessorType getProcessorType() {
         return processorType;
     }
@@ -83,7 +92,20 @@ public class ProcessorStatusDocument { // Renamed class
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    // Manually added Builder class (Lombok @Builder replacement)
+    // --- Builder Pattern (Manual Implementation) ---
+
+    /**
+     * Creates a new builder for {@link ProcessorStatusDocument}.
+     *
+     * @return A {@link ProcessorStatusDocumentBuilder} instance.
+     */
+    public static ProcessorStatusDocumentBuilder builder() {
+        return new ProcessorStatusDocumentBuilder();
+    }
+
+    /**
+     * Builder class for {@link ProcessorStatusDocument}.
+     */
     public static class ProcessorStatusDocumentBuilder {
         private ProcessorType processorType;
         private int page;
@@ -125,10 +147,16 @@ public class ProcessorStatusDocument { // Renamed class
             return this;
         }
 
+        /**
+         * Builds a {@link ProcessorStatusDocument} instance from the builder's properties.
+         *
+         * @return A new {@link ProcessorStatusDocument} object.
+         */
         public ProcessorStatusDocument build() {
             return new ProcessorStatusDocument(processorType, page, pageSize, count, useLastUpdatedDateInQuery, lastUpdatedDate);
         }
 
+        @Override
         public String toString() {
             return "ProcessorStatusDocument.ProcessorStatusDocumentBuilder(processorType=" + this.processorType + ", page=" + this.page + ", pageSize=" + this.pageSize + ", count=" + this.count + ", useLastUpdatedDateInQuery=" + this.useLastUpdatedDateInQuery + ", lastUpdatedDate=" + this.lastUpdatedDate + ")";
         }

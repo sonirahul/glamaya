@@ -10,15 +10,34 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
+/**
+ * An outbound adapter that implements the {@link WooCommerceApiClientPort} using Spring's {@link WebClient}.
+ * This class is responsible for making actual HTTP calls to the WooCommerce API,
+ * handling request building, OAuth authorization, and basic error handling.
+ */
 @Component
 public class WooCommerceApiWebClientAdapter implements WooCommerceApiClientPort {
 
     private final WebClient webClient;
 
+    /**
+     * Constructs a new {@code WooCommerceApiWebClientAdapter}.
+     *
+     * @param webClient The {@link WebClient} instance specifically configured for WooCommerce API calls.
+     */
     public WooCommerceApiWebClientAdapter(@Qualifier("woocommerceWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 
+    /**
+     * Fetches data from a specified WooCommerce API endpoint using {@link WebClient}.
+     * It includes the OAuth1 authorization header and handles common HTTP error statuses.
+     *
+     * @param url         The relative URL of the WooCommerce API endpoint.
+     * @param queryParams A map of query parameters to include in the request.
+     * @param oauthHeader The OAuth1 authorization header string.
+     * @return A {@link Flux} emitting raw objects from the API response.
+     */
     @Override
     public Flux<Object> fetch(String url, Map<String, String> queryParams, String oauthHeader) {
         return webClient.get()

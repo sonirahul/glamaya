@@ -2,6 +2,11 @@ package com.glamaya.glamayawoocommercesync.domain;
 
 import java.time.Instant;
 
+/**
+ * Represents the current status of a WooCommerce processor within the domain.
+ * This is a pure domain entity, free from any persistence-specific annotations or framework dependencies.
+ * It holds the essential state required for tracking the progress of data synchronization.
+ */
 public class ProcessorStatus {
     private ProcessorType processorType;
     private int page;
@@ -10,7 +15,16 @@ public class ProcessorStatus {
     private boolean useLastUpdatedDateInQuery;
     private Instant lastUpdatedDate;
 
-    // Constructor
+    /**
+     * Constructs a new {@code ProcessorStatus}.
+     *
+     * @param processorType             The type of the processor.
+     * @param page                      The current page number being processed.
+     * @param pageSize                  The number of items per page.
+     * @param count                     The total count of items processed so far.
+     * @param useLastUpdatedDateInQuery Whether to use the last updated date in the next query.
+     * @param lastUpdatedDate           The timestamp of the last updated item.
+     */
     public ProcessorStatus(ProcessorType processorType, int page, long pageSize, long count, boolean useLastUpdatedDateInQuery, Instant lastUpdatedDate) {
         this.processorType = processorType;
         this.page = page;
@@ -20,7 +34,8 @@ public class ProcessorStatus {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    // Getters
+    // --- Getters ---
+
     public ProcessorType getProcessorType() {
         return processorType;
     }
@@ -45,7 +60,8 @@ public class ProcessorStatus {
         return lastUpdatedDate;
     }
 
-    // Setters
+    // --- Setters ---
+
     public void setProcessorType(ProcessorType processorType) {
         this.processorType = processorType;
     }
@@ -70,11 +86,20 @@ public class ProcessorStatus {
         this.lastUpdatedDate = lastUpdatedDate;
     }
 
-    // Builder pattern (manual implementation as Lombok is problematic)
+    // --- Builder Pattern (Manual Implementation) ---
+
+    /**
+     * Creates a new builder for {@link ProcessorStatus}.
+     *
+     * @return A {@link ProcessorStatusBuilder} instance.
+     */
     public static ProcessorStatusBuilder builder() {
         return new ProcessorStatusBuilder();
     }
 
+    /**
+     * Builder class for {@link ProcessorStatus}.
+     */
     public static class ProcessorStatusBuilder {
         private ProcessorType processorType;
         private int page;
@@ -83,7 +108,8 @@ public class ProcessorStatus {
         private boolean useLastUpdatedDateInQuery;
         private Instant lastUpdatedDate;
 
-        ProcessorStatusBuilder() {}
+        ProcessorStatusBuilder() {
+        }
 
         public ProcessorStatusBuilder processorType(ProcessorType processorType) {
             this.processorType = processorType;
@@ -115,8 +141,18 @@ public class ProcessorStatus {
             return this;
         }
 
+        /**
+         * Builds a {@link ProcessorStatus} instance from the builder's properties.
+         *
+         * @return A new {@link ProcessorStatus} object.
+         */
         public ProcessorStatus build() {
             return new ProcessorStatus(processorType, page, pageSize, count, useLastUpdatedDateInQuery, lastUpdatedDate);
+        }
+
+        @Override
+        public String toString() {
+            return "ProcessorStatus.ProcessorStatusBuilder(processorType=" + this.processorType + ", page=" + this.page + ", pageSize=" + this.pageSize + ", count=" + this.count + ", useLastUpdatedDateInQuery=" + this.useLastUpdatedDateInQuery + ", lastUpdatedDate=" + this.lastUpdatedDate + ")";
         }
     }
 }
