@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order",
+  "type": "object",
+  "description": "Unified ecommerce order combining fields from multiple platforms",
+  "properties": {
+    "id": { "type": ["string", "null"] },
+    "platformType": { "type": "string" },
+    "originalPlatformId": { "type": ["string", "null"] },
+    "originalPlatformNumber": { "type": ["string", "null"] },
+    "status": { "type": ["string", "null"] },
+    "financialStatus": { "type": ["string", "null"] },
+    "fulfillmentStatus": { "type": ["string", "null"] },
+    "createdAt": { "type": ["string", "null"], "format": "date-time" },
+    "updatedAt": { "type": ["string", "null"], "format": "date-time" },
+    "closedAt": { "type": ["string", "null"], "format": "date-time" },
+    "currency": { "type": ["string", "null"], "maxLength": 6 },
+    "subtotalPrice": { "type": ["number", "null"] },
+    "shippingTotal": { "type": ["number", "null"] },
+    "taxTotal": { "type": ["number", "null"] },
+    "discountTotal": { "type": ["number", "null"] },
+    "totalPrice": { "type": ["number", "null"] },
+    "totalQuantity": { "type": ["integer", "null"] },
+    "customer": {
+      "type": ["object", "null"],
+      "properties": {
+        "id": { "type": ["string", "null"] },
+        "email": { "type": ["string", "null"] },
+        "firstName": { "type": ["string", "null"] },
+        "lastName": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "billingAddress": {
+      "type": ["object", "null"],
+      "properties": {
+        "firstName": { "type": ["string", "null"] },
+        "lastName": { "type": ["string", "null"] },
+        "company": { "type": ["string", "null"] },
+        "address1": { "type": ["string", "null"] },
+        "address2": { "type": ["string", "null"] },
+        "city": { "type": ["string", "null"] },
+        "state": { "type": ["string", "null"] },
+        "postalCode": { "type": ["string", "null"] },
+        "countryCode": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "shippingAddress": {
+      "type": ["object", "null"],
+      "properties": {
+        "firstName": { "type": ["string", "null"] },
+        "lastName": { "type": ["string", "null"] },
+        "company": { "type": ["string", "null"] },
+        "address1": { "type": ["string", "null"] },
+        "address2": { "type": ["string", "null"] },
+        "city": { "type": ["string", "null"] },
+        "state": { "type": ["string", "null"] },
+        "postalCode": { "type": ["string", "null"] },
+        "countryCode": { "type": ["string", "null"] },
+        "phone": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "lineItems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lineId": { "type": ["string", "null"] },
+          "productId": { "type": ["string", "null"] },
+          "variantId": { "type": ["string", "null"] },
+          "sku": { "type": ["string", "null"] },
+          "name": { "type": ["string", "null"] },
+          "quantity": { "type": ["integer", "null"] },
+          "unitPrice": { "type": ["number", "null"] },
+          "totalPrice": { "type": ["number", "null"] },
+          "taxAmount": { "type": ["number", "null"] },
+          "discountAmount": { "type": ["number", "null"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "payment": {
+      "type": ["object", "null"],
+      "properties": {
+        "method": { "type": ["string", "null"] },
+        "transactionId": { "type": ["string", "null"] },
+        "status": { "type": ["string", "null"] },
+        "paidAt": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": true
+    },
+    "fulfillment": {
+      "type": ["object", "null"],
+      "properties": {
+        "status": { "type": ["string", "null"] },
+        "trackingNumber": { "type": ["string", "null"] },
+        "carrier": { "type": ["string", "null"] },
+        "shippedAt": { "type": ["string", "null"], "format": "date-time" },
+        "deliveredAt": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": true
+    },
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "notes": { "type": ["string", "null"] },
+    "platformMetadata": { "type": "object", "additionalProperties": true }
+  },
+  "required": ["platformType"],
+  "additionalProperties": true
+}
+
