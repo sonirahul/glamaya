@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: glamaya-sync-runner
+  data:
+    mongodb:
+      database: glamaya-sync-db
+      host: localhost
+      port: 27017
+
+glamaya:
+  sync:
+    scheduler:
+      fixedDelay: 300000 # 5 minutes in milliseconds
+    woocommerce:
+      api:
+        baseUrl: http://localhost:80/wp-json/wc/v3 # Placeholder, should be overridden in profile
+        consumerKey: ck_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # Placeholder
+        consumerSecret: cs_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # Placeholder
+  notifications:
+    kafka:
+      enabled: false # Enable Kafka in specific profiles if needed
+      topic: glamaya-sync-events # Default topic
+
+logging:
+  level:
+    com.glamaya.sync: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    reactor.netty: DEBUG
