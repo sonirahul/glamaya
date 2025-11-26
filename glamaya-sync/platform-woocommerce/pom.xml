@@ -15,6 +15,9 @@
 
     <name>Platform Adapter - WooCommerce</name>
     <description>The adapter module for integrating with the WooCommerce platform.</description>
+    <properties>
+        <glamaya-data-contracts-ecommerce.version>1.0-SNAPSHOT</glamaya-data-contracts-ecommerce.version>
+    </properties>
 
     <dependencies>
         <!-- Internal dependency on the core module -->
@@ -22,6 +25,13 @@
             <groupId>com.glamaya.sync</groupId>
             <artifactId>core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-ecommerce</artifactId>
+            <version>${glamaya-data-contracts-ecommerce.version}</version>
+        </dependency>
+
 
         <!-- Spring WebFlux for reactive WebClient -->
         <dependency>
@@ -43,7 +53,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

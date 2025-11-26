@@ -16,6 +16,7 @@
         <java.version>17</java.version>
         <spring-boot.version>3.1.5</spring-boot.version> <!-- Use a recent Spring Boot 3 version -->
         <resilience4j.version>2.1.0</resilience4j.version>
+        <lombok.version>1.18.30</lombok.version> <!-- Added Lombok version -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
