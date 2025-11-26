@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class WixOrderToEcommerceOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.wix.Order> {
+public class WixOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.wix.Order> {
 
     @Override
     public Order toGlamayaOrder(com.glamaya.datacontracts.wix.Order source) {

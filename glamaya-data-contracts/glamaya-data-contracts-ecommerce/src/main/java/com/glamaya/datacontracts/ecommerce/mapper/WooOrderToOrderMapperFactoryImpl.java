@@ -16,7 +16,7 @@ import java.util.List;
 import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_TO_INSTANT_FUNCTION;
 
 @Service
-public class WooOrderToEcommerceOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.woocommerce.Order> {
+public class WooOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.woocommerce.Order> {
 
     @Override
     public Order toGlamayaOrder(com.glamaya.datacontracts.woocommerce.Order source) {
