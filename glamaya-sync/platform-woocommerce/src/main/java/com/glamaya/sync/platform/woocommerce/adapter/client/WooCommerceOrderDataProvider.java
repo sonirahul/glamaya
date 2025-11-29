@@ -3,10 +3,10 @@ package com.glamaya.sync.platform.woocommerce.adapter.client;
 import com.glamaya.datacontracts.woocommerce.Order;
 import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.DataProvider;
+import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -27,25 +27,28 @@ import java.util.Optional;
 public class WooCommerceOrderDataProvider implements DataProvider<Order> {
 
     private static final Logger log = LoggerFactory.getLogger(WooCommerceOrderDataProvider.class);
-    public static final int PAGE_SIZE = 100;
     private final WebClient webClient;
     private final OAuthSignerPort oAuthSigner;
-    private final String relativeUrl;
+    private final APIConfig apiConfig;
 
-    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner,
-                                        @Value("${glamaya.sync.woocommerce.api.orders.path}") String relativeUrl) {
+    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner, APIConfig apiConfig) {
         this.webClient = webClient;
         this.oAuthSigner = oAuthSigner;
-        this.relativeUrl = relativeUrl;
+        this.apiConfig = apiConfig;
     }
 
     @Override
     public List<Order> fetchData(SyncContext context) {
+        String relativeUrl = apiConfig.getQueryUrl();
+        if (relativeUrl == null || relativeUrl.isBlank()) {
+            throw new IllegalStateException("Missing required WooCommerce orders query URL in APIConfig (glamaya.sync.woocommerce.api.orders-config.query-url)");
+        }
+
         int page = context.status().getCurrentPage();
 
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("page", String.valueOf(page));
-        queryParams.put("per_page", String.valueOf(PAGE_SIZE));
+        queryParams.put("per_page", apiConfig.getPageSize());
         queryParams.put("orderby", "modified");
         queryParams.put("order", "asc");
         queryParams.put("status", "any");

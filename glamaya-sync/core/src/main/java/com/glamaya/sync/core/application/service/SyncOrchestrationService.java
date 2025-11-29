@@ -7,12 +7,12 @@ import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.StatusStorePort;
 import com.glamaya.sync.core.domain.port.out.SyncProcessor;
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,12 +25,12 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
 
     private final StatusStorePort statusStorePort;
     private final NotificationPort<Object> notificationPort;
-    private final Map<ProcessorType, SyncProcessor<?, ?>> syncProcessors;
+    private final Map<ProcessorType, SyncProcessor<?, ?, ?>> syncProcessors;
 
     public SyncOrchestrationService(
             StatusStorePort statusStorePort,
             NotificationPort<Object> notificationPort,
-            List<SyncProcessor<?, ?>> syncProcessors) {
+            List<SyncProcessor<?, ?, ?>> syncProcessors) {
         this.statusStorePort = statusStorePort;
         this.notificationPort = notificationPort;
         this.syncProcessors = syncProcessors.stream()
@@ -41,7 +41,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
     public void sync(ProcessorType processorType) {
         log.info("Starting synchronization for processor type: {}", processorType);
 
-        SyncProcessor<?, ?> processor = syncProcessors.get(processorType);
+        SyncProcessor<?, ?, ?> processor = syncProcessors.get(processorType);
         if (processor == null) {
             log.error("No SyncProcessor found for processor type: {}", processorType);
             return;
@@ -50,16 +50,15 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
         executeSync(processor);
     }
 
-    private <P, C> void executeSync(SyncProcessor<P, C> processor) {
+    private <P, C, T> void executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
         ProcessorStatus currentStatus = statusStorePort.findStatus(processorType)
                 .orElseGet(() -> new ProcessorStatus(processorType));
 
-        Map<String, Object> configuration = Collections.emptyMap();
+        ProcessorConfiguration<T> configuration = processor.getConfiguration();
         boolean hasMoreData = true;
         int totalItemsProcessed = 0;
 
-        // Start from page 1 if not specified, otherwise continue from where we left off.
         int currentPage = currentStatus.getCurrentPage() > 0 ? currentStatus.getCurrentPage() : 1;
 
         try {
@@ -81,7 +80,6 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                         totalItemsProcessed++;
                     }
 
-                    // If the number of items returned is less than the page size, this was the last page.
                     if (rawData.size() < 100) { // Assuming a fixed page size of 100
                         hasMoreData = false;
                     } else {
@@ -90,15 +88,13 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                 }
             }
 
-            // Sync completed successfully. Update status for the next run.
             currentStatus.setLastSuccessfulRun(Instant.now());
-            currentStatus.setCurrentPage(1); // Reset to page 1 for the next sync cycle.
+            currentStatus.setCurrentPage(1); // Reset for the next sync cycle.
             statusStorePort.saveStatus(currentStatus);
             log.info("Synchronization completed successfully for processor type: {}. Processed {} items in total.", processorType, totalItemsProcessed);
 
         } catch (Exception e) {
             log.error("Error during synchronization for processor type {} on page {}: {}", processorType, currentPage, e.getMessage(), e);
-            // Save the current page to resume from this point on the next run.
             currentStatus.setCurrentPage(currentPage);
             statusStorePort.saveStatus(currentStatus);
         }

@@ -4,13 +4,14 @@ import com.glamaya.sync.core.domain.model.ProcessorType;
 
 /**
  * A port that represents a self-contained processing unit for a specific data type.
- * It encapsulates the data fetching and mapping logic, preserving the generic type link
- * between the platform model and the canonical model.
+ * It encapsulates the data fetching, mapping, and configuration logic, preserving the
+ * generic type link between the platform model and the canonical model.
  *
  * @param <P> The Platform-specific model type.
  * @param <C> The Canonical core model type.
+ * @param <T> The typed configuration object type.
  */
-public interface SyncProcessor<P, C> {
+public interface SyncProcessor<P, C, T> {
 
     /**
      * Returns the data provider for the platform-specific model.
@@ -32,4 +33,7 @@ public interface SyncProcessor<P, C> {
      * @return The ProcessorType enum.
      */
     ProcessorType getProcessorType();
+
+    /** Returns typed processor configuration wrapper. */
+    ProcessorConfiguration<T> getConfiguration();
 }

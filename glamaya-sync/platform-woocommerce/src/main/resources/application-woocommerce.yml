@@ -12,6 +12,11 @@ glamaya:
         max-in-memory-size: 10485760 # 10MB
         # Timeout for waiting for a response from the server (in milliseconds).
         response-timeout-in-millis: 30000 # 30 seconds
-        # Path segment for orders endpoint, without base URL.
-        orders:
-          path: "/wp-json/wc/v3/orders"
+        orders-config:
+          enable: false
+          reset-on-startup: false
+          page-size: 10
+          fetch-duration-ms:
+            active: 1000
+            passive: 60000
+          query-url: "/wp-json/wc/v3/orders"
