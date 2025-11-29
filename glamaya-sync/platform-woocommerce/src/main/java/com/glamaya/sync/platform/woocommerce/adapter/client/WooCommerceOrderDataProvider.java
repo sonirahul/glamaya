@@ -29,16 +29,16 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
     private static final Logger log = LoggerFactory.getLogger(WooCommerceOrderDataProvider.class);
     private final WebClient webClient;
     private final OAuthSignerPort oAuthSigner;
-    private final APIConfig apiConfig;
 
-    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner, APIConfig apiConfig) {
+    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner) {
         this.webClient = webClient;
         this.oAuthSigner = oAuthSigner;
-        this.apiConfig = apiConfig;
     }
 
     @Override
     public List<Order> fetchData(SyncContext context) {
+        APIConfig apiConfig = (APIConfig) context.configuration().get();
+
         String relativeUrl = apiConfig.getQueryUrl();
         if (relativeUrl == null || relativeUrl.isBlank()) {
             throw new IllegalStateException("Missing required WooCommerce orders query URL in APIConfig (glamaya.sync.woocommerce.api.orders-config.query-url)");
@@ -48,7 +48,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
 
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("page", String.valueOf(page));
-        queryParams.put("per_page", apiConfig.getPageSize());
+        queryParams.put("per_page", String.valueOf(apiConfig.getPageSize()));
         queryParams.put("orderby", "modified");
         queryParams.put("order", "asc");
         queryParams.put("status", "any");

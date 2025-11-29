@@ -17,6 +17,8 @@ public class ProcessorStatus {
     private Instant lastSuccessfulRun;
     private String cursor; // For cursor-based pagination
     private int currentPage; // For page-based pagination
+    private int pageSize;
+    private int totalItemsSynced;
 
     public ProcessorStatus(ProcessorType processorType) {
         this.processorType = processorType;
