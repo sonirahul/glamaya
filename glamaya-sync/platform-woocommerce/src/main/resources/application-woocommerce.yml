@@ -1,0 +1,17 @@
+# Default properties for the WooCommerce module
+glamaya:
+  sync:
+    woocommerce:
+      api:
+        # --- IMPORTANT ---
+        # These are environment-specific secrets and should be defined here or in a profile.
+        baseUrl: http://your-woocommerce-store.com
+        consumerKey: ck_your_consumer_key
+        consumerSecret: cs_your_consumer_secret
+        # Max response size to buffer in memory (in bytes).
+        max-in-memory-size: 10485760 # 10MB
+        # Timeout for waiting for a response from the server (in milliseconds).
+        response-timeout-in-millis: 30000 # 30 seconds
+        # Path segment for orders endpoint, without base URL.
+        orders:
+          path: "/wp-json/wc/v3/orders"

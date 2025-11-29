@@ -1,10 +1,13 @@
 spring:
   application:
     name: glamaya-sync-runner
+  # Import module-specific configurations
+  config:
+    import:
+      - "optional:classpath:application-woocommerce.yml"
   # Kafka Configuration
   kafka:
     bootstrap-servers: localhost:9092 # Default Kafka broker location
-    # Add other Kafka properties like consumer/producer settings if needed
   # MongoDB Configuration
   data:
     mongodb:
@@ -17,18 +20,6 @@ glamaya:
     scheduler:
       # How often the sync job runs. Default is 5 minutes.
       fixedDelay: 300000
-    woocommerce:
-      api:
-        # --- IMPORTANT ---
-        # Replace these placeholders with your actual WooCommerce store details.
-        # For production, use environment variables or a secrets manager.
-        baseUrl: http://your-woocommerce-store.com/wp-json/wc/v3
-        consumerKey: ck_your_consumer_key
-        consumerSecret: cs_your_consumer_secret
-        # Max response size to buffer in memory (in bytes). Default is 256KB.
-        max-in-memory-size: 10485760 # 10MB
-        # Timeout for waiting for a response from the server (in milliseconds).
-        response-timeout-in-millis: 30000 # 30 seconds
   notifications:
     kafka:
       # Set to 'true' to enable sending notifications to Kafka.
@@ -38,9 +29,6 @@ glamaya:
 # --- LOGGING ---
 logging:
   level:
-    # Set to DEBUG for detailed application logs
     com.glamaya.sync: INFO
-    # Set to DEBUG to see WebClient request/response details
     org.springframework.web.reactive.function.client: INFO
-    # Set to DEBUG for low-level network logging
     reactor.netty: INFO

@@ -6,6 +6,7 @@ import com.glamaya.sync.core.domain.port.out.DataProvider;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -29,15 +30,17 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
     public static final int PAGE_SIZE = 100;
     private final WebClient webClient;
     private final OAuthSignerPort oAuthSigner;
+    private final String relativeUrl;
 
-    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner) {
+    public WooCommerceOrderDataProvider(WebClient webClient, OAuthSignerPort oAuthSigner,
+                                        @Value("${glamaya.sync.woocommerce.api.orders.path}") String relativeUrl) {
         this.webClient = webClient;
         this.oAuthSigner = oAuthSigner;
+        this.relativeUrl = relativeUrl;
     }
 
     @Override
     public List<Order> fetchData(SyncContext context) {
-        String relativeUrl = "/orders";
         int page = context.status().getCurrentPage();
 
         Map<String, String> queryParams = new HashMap<>();
@@ -45,6 +48,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
         queryParams.put("per_page", String.valueOf(PAGE_SIZE));
         queryParams.put("orderby", "modified");
         queryParams.put("order", "asc");
+        queryParams.put("status", "any");
 
         Optional.ofNullable(context.status().getLastSuccessfulRun())
                 .ifPresent(lastRun -> {
