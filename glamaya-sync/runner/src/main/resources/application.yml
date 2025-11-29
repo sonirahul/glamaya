@@ -1,6 +1,11 @@
 spring:
   application:
     name: glamaya-sync-runner
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092 # Default Kafka broker location
+    # Add other Kafka properties like consumer/producer settings if needed
+  # MongoDB Configuration
   data:
     mongodb:
       database: glamaya-sync-db
@@ -10,19 +15,32 @@ spring:
 glamaya:
   sync:
     scheduler:
-      fixedDelay: 300000 # 5 minutes in milliseconds
+      # How often the sync job runs. Default is 5 minutes.
+      fixedDelay: 300000
     woocommerce:
       api:
-        baseUrl: http://localhost:80/wp-json/wc/v3 # Placeholder, should be overridden in profile
-        consumerKey: ck_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # Placeholder
-        consumerSecret: cs_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # Placeholder
+        # --- IMPORTANT ---
+        # Replace these placeholders with your actual WooCommerce store details.
+        # For production, use environment variables or a secrets manager.
+        baseUrl: http://your-woocommerce-store.com/wp-json/wc/v3
+        consumerKey: ck_your_consumer_key
+        consumerSecret: cs_your_consumer_secret
+        # Max response size to buffer in memory (in bytes). Default is 256KB.
+        max-in-memory-size: 10485760 # 10MB
+        # Timeout for waiting for a response from the server (in milliseconds).
+        response-timeout-in-millis: 30000 # 30 seconds
   notifications:
     kafka:
-      enabled: false # Enable Kafka in specific profiles if needed
-      topic: glamaya-sync-events # Default topic
+      # Set to 'true' to enable sending notifications to Kafka.
+      enabled: false
+      topic: glamaya-sync-events # The Kafka topic to publish events to.
 
+# --- LOGGING ---
 logging:
   level:
-    com.glamaya.sync: DEBUG
-    org.springframework.web.reactive.function.client: DEBUG
-    reactor.netty: DEBUG
+    # Set to DEBUG for detailed application logs
+    com.glamaya.sync: INFO
+    # Set to DEBUG to see WebClient request/response details
+    org.springframework.web.reactive.function.client: INFO
+    # Set to DEBUG for low-level network logging
+    reactor.netty: INFO

@@ -30,7 +30,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
     public SyncOrchestrationService(
             StatusStorePort statusStorePort,
             NotificationPort<Object> notificationPort,
-            List<SyncProcessor<?, ?>> syncProcessors) { // Inject list of all SyncProcessors
+            List<SyncProcessor<?, ?>> syncProcessors) {
         this.statusStorePort = statusStorePort;
         this.notificationPort = notificationPort;
         this.syncProcessors = syncProcessors.stream()
@@ -47,57 +47,60 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
             return;
         }
 
-        // Use a private helper method to handle generics safely
         executeSync(processor);
     }
 
-    /**
-     * Private helper method to execute the synchronization for a specific SyncProcessor,
-     * preserving type safety.
-     *
-     * @param processor The SyncProcessor to execute.
-     * @param <P> The platform-specific model type.
-     * @param <C> The canonical core model type.
-     */
     private <P, C> void executeSync(SyncProcessor<P, C> processor) {
         ProcessorType processorType = processor.getProcessorType();
-
-        // 1. Retrieve current status
         ProcessorStatus currentStatus = statusStorePort.findStatus(processorType)
                 .orElseGet(() -> new ProcessorStatus(processorType));
 
-        // For now, let's assume configuration is empty or comes from elsewhere
-        Map<String, Object> configuration = Collections.emptyMap(); // Placeholder
+        Map<String, Object> configuration = Collections.emptyMap();
+        boolean hasMoreData = true;
+        int totalItemsProcessed = 0;
 
-        SyncContext syncContext = new SyncContext(currentStatus, configuration);
+        // Start from page 1 if not specified, otherwise continue from where we left off.
+        int currentPage = currentStatus.getCurrentPage() > 0 ? currentStatus.getCurrentPage() : 1;
 
         try {
-            // 2. Fetch raw data using the DataProvider from the SyncProcessor
-            List<P> rawData = processor.getDataProvider().fetchData(syncContext);
-            log.debug("Fetched {} raw items for processor type: {}", rawData.size(), processorType);
+            while (hasMoreData) {
+                currentStatus.setCurrentPage(currentPage);
+                SyncContext syncContext = new SyncContext(currentStatus, configuration);
 
-            if (rawData.isEmpty()) {
-                log.info("No new data to sync for processor type: {}", processorType);
-                currentStatus.setLastSuccessfulRun(Instant.now());
-                statusStorePort.saveStatus(currentStatus);
-                return;
+                log.info("Fetching page {} for processor type: {}", currentPage, processorType);
+                List<P> rawData = processor.getDataProvider().fetchData(syncContext);
+
+                if (rawData == null || rawData.isEmpty()) {
+                    log.info("No more data found for processor type: {}. Concluding sync.", processorType);
+                    hasMoreData = false;
+                } else {
+                    log.debug("Fetched {} raw items on page {}.", rawData.size(), currentPage);
+                    for (P rawItem : rawData) {
+                        C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
+                        notificationPort.notify(canonicalModel);
+                        totalItemsProcessed++;
+                    }
+
+                    // If the number of items returned is less than the page size, this was the last page.
+                    if (rawData.size() < 100) { // Assuming a fixed page size of 100
+                        hasMoreData = false;
+                    } else {
+                        currentPage++;
+                    }
+                }
             }
 
-            // 3. Map to canonical models and notify using the DataMapper from the SyncProcessor
-            for (P rawItem : rawData) {
-                C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                notificationPort.notify(canonicalModel);
-            }
-
-            // 4. Update and save status
+            // Sync completed successfully. Update status for the next run.
             currentStatus.setLastSuccessfulRun(Instant.now());
-            // TODO: Update cursor/page based on the last successfully processed item if applicable
+            currentStatus.setCurrentPage(1); // Reset to page 1 for the next sync cycle.
             statusStorePort.saveStatus(currentStatus);
-            log.info("Synchronization completed successfully for processor type: {}", processorType);
+            log.info("Synchronization completed successfully for processor type: {}. Processed {} items in total.", processorType, totalItemsProcessed);
 
         } catch (Exception e) {
-            log.error("Error during synchronization for processor type {}: {}", processorType, e.getMessage(), e);
-            // Depending on policy, might save status with error or not update lastSuccessfulRun
+            log.error("Error during synchronization for processor type {} on page {}: {}", processorType, currentPage, e.getMessage(), e);
+            // Save the current page to resume from this point on the next run.
+            currentStatus.setCurrentPage(currentPage);
+            statusStorePort.saveStatus(currentStatus);
         }
     }
 }
