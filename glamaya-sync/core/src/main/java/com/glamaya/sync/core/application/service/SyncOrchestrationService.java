@@ -52,10 +52,11 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
 
     private <P, C, T> void executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
+        ProcessorConfiguration<T> configuration = processor.getConfiguration();
+
         ProcessorStatus currentStatus = statusStorePort.findStatus(processorType)
                 .orElseGet(() -> new ProcessorStatus(processorType));
 
-        ProcessorConfiguration<T> configuration = processor.getConfiguration();
         boolean hasMoreData = true;
         int totalItemsProcessed = 0;
 

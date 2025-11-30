@@ -9,6 +9,8 @@ import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * Concrete implementation of SyncProcessor for WooCommerce Orders.
  * This class groups the DataProvider, DataMapper, and configuration for WooCommerce Orders,
@@ -24,10 +26,14 @@ public class WooCommerceOrderProcessor implements SyncProcessor<com.glamaya.data
     public WooCommerceOrderProcessor(
             WooCommerceOrderDataProvider dataProvider,
             WooCommerceOrderDataMapper dataMapper,
-            @Qualifier("wooOrdersProcessorConfig") ProcessorConfiguration<APIConfig> processorConfiguration) {
+            @Qualifier("wooEndpointConfigurations") Map<ProcessorType, ProcessorConfiguration<APIConfig>> endpointConfigs) {
         this.dataProvider = dataProvider;
         this.dataMapper = dataMapper;
-        this.configuration = processorConfiguration;
+        ProcessorConfiguration<APIConfig> cfg = endpointConfigs.get(ProcessorType.WOOCOMMERCE_ORDER);
+        if (cfg == null) {
+            throw new IllegalStateException("Missing configuration for processor type: WOOCOMMERCE_ORDER in endpoint-configs");
+        }
+        this.configuration = cfg;
     }
 
     @Override
