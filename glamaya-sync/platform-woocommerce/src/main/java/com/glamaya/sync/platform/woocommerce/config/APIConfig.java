@@ -1,5 +1,6 @@
 package com.glamaya.sync.platform.woocommerce.config;
 
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class APIConfig {
+public class APIConfig implements ProcessorConfiguration<APIConfig> {
 
     private boolean enable;
     private boolean resetOnStartup;
@@ -24,5 +25,15 @@ public class APIConfig {
     public static class FetchDurationMs {
         private long active;
         private long passive;
+    }
+
+    @Override
+    public APIConfig get() {
+        return this;
+    }
+
+    @Override
+    public int getCurrentPage() {
+        return 0; // core uses ProcessorStatus for pagination
     }
 }

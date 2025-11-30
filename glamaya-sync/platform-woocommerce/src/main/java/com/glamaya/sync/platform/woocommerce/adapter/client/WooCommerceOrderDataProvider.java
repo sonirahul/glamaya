@@ -41,7 +41,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
 
         String relativeUrl = apiConfig.getQueryUrl();
         if (relativeUrl == null || relativeUrl.isBlank()) {
-            throw new IllegalStateException("Missing required WooCommerce orders query URL in APIConfig (glamaya.sync.woocommerce.api.orders-config.query-url)");
+            throw new IllegalStateException("Missing required WooCommerce orders query URL in configuration (glamaya.sync.woocommerce.api.orders-config.query-url)");
         }
 
         int page = context.status().getCurrentPage();

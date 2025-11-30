@@ -64,7 +64,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
         try {
             while (hasMoreData) {
                 currentStatus.setCurrentPage(currentPage);
-                SyncContext syncContext = new SyncContext(currentStatus, configuration);
+                SyncContext<T> syncContext = new SyncContext<>(currentStatus, configuration);
 
                 log.info("Fetching page {} for processor type: {}", currentPage, processorType);
                 List<P> rawData = processor.getDataProvider().fetchData(syncContext);
