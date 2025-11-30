@@ -2,7 +2,10 @@ package com.glamaya.sync.platform.woocommerce.adapter;
 
 import com.glamaya.datacontracts.ecommerce.Order;
 import com.glamaya.sync.core.domain.model.ProcessorType;
-import com.glamaya.sync.core.domain.port.out.*;
+import com.glamaya.sync.core.domain.port.out.DataMapper;
+import com.glamaya.sync.core.domain.port.out.DataProvider;
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
+import com.glamaya.sync.core.domain.port.out.SyncProcessor;
 import com.glamaya.sync.platform.woocommerce.adapter.client.WooCommerceOrderDataProvider;
 import com.glamaya.sync.platform.woocommerce.adapter.mapper.WooCommerceOrderDataMapper;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;

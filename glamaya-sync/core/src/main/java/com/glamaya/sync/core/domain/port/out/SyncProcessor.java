@@ -34,6 +34,8 @@ public interface SyncProcessor<P, C, T> {
      */
     ProcessorType getProcessorType();
 
-    /** Returns typed processor configuration wrapper. */
+    /**
+     * Returns typed processor configuration wrapper.
+     */
     ProcessorConfiguration<T> getConfiguration();
 }

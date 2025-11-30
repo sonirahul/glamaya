@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,29 +37,22 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
     }
 
     @Override
-    public void notify(Object payload) {
+    public Mono<Void> notify(Object payload) {
         log.debug("CompositeNotificationAdapter dispatching payload to {} notifiers.", notifiers.size());
-        for (NotificationPort<Object> notifier : notifiers) {
-            if (notifier.supports(payload)) {
-                try {
-                    notifier.notify(payload);
-                    log.debug("Payload dispatched by notifier: {}", notifier.getClass().getSimpleName());
-                } catch (Exception e) {
-                    log.error("Error dispatching payload via notifier {}: {}", notifier.getClass().getSimpleName(), e.getMessage(), e);
-                    // Continue to next notifier even if one fails
-                }
-            } else {
-                log.debug("Notifier {} does not support payload type {}. Skipping.",
-                        notifier.getClass().getSimpleName(), payload.getClass().getSimpleName());
-            }
-        }
+        return Flux.fromIterable(notifiers)
+                .filter(notifier -> notifier.supports(payload))
+                .flatMap(notifier -> notifier.notify(payload)
+                        .doOnSuccess(v -> log.debug("Payload dispatched by notifier: {}", notifier.getClass().getSimpleName()))
+                        .doOnError(e -> log.error("Error dispatching payload via notifier {}: {}",
+                                notifier.getClass().getSimpleName(), e.getMessage(), e))
+                        .onErrorResume(e -> Mono.empty()) // Continue even if one notifier fails
+                )
+                .then();
     }
 
     @Override
     public boolean supports(Object payload) {
         // The composite adapter supports any payload that at least one of its delegates supports.
-        // Or, more simply, it can just always return true and let delegates filter.
-        // For now, we'll say it supports everything and delegates will filter.
-        return true;
+        return notifiers.stream().anyMatch(notifier -> notifier.supports(payload));
     }
 }

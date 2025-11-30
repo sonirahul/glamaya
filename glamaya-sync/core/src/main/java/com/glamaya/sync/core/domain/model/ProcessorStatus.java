@@ -26,10 +26,6 @@ public class ProcessorStatus {
     private boolean moreDataAvailable;
     private Integer totalItemsSynced;
 
-    public ProcessorStatus(ProcessorType processorType) {
-        this.processorType = processorType;
-    }
-
     /**
      * Factory method to create a new status initialized from configuration.
      * Uses initPage and pageSize if available; defaults are caller-defined.

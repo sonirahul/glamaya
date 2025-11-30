@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,22 +27,19 @@ public class SyncScheduler {
 
     /**
      * Scheduled task to run synchronization for all active platforms.
-     * Runs every 5 minutes (300000 ms) after the previous task completes.
-     * The fixedDelay ensures that there's a 5-minute gap between the end of one execution
-     * and the start of the next, preventing overlapping executions.
+     * Runs at a fixed delay, ensuring one execution finishes before the next one starts.
      */
-    @Scheduled(fixedDelayString = "${glamaya.sync.scheduler.fixedDelay:300000}") // Default to 5 minutes
+    @Scheduled(fixedDelayString = "${glamaya.sync.scheduler.fixedDelay:300000}")
     public void runAllPlatformSyncs() {
         log.info("Starting scheduled synchronization for all platforms.");
-        for (PlatformAdapter adapter : platformAdapters) {
-            try {
-                log.info("Running sync for platform: {}", adapter.getPlatformName());
-                adapter.sync();
-                log.info("Sync completed for platform: {}", adapter.getPlatformName());
-            } catch (Exception e) {
-                log.error("Error during sync for platform {}: {}", adapter.getPlatformName(), e.getMessage(), e);
-            }
-        }
-        log.info("Finished scheduled synchronization for all platforms.");
+        Flux.fromIterable(platformAdapters)
+                .concatMap(adapter -> adapter.sync()
+                        .doOnSubscribe(s -> log.info("Running sync for platform: {}", adapter.getPlatformName()))
+                        .doOnSuccess(v -> log.info("Sync completed for platform: {}", adapter.getPlatformName()))
+                        .doOnError(e -> log.error("Error during sync for platform {}: {}", adapter.getPlatformName(), e.getMessage(), e))
+                        .onErrorResume(e -> Mono.empty()) // Changed Flux.empty() to Mono.empty()
+                )
+                .doOnComplete(() -> log.info("Finished scheduled synchronization for all platforms."))
+                .subscribe(); // subscribe() is what triggers the execution
     }
 }

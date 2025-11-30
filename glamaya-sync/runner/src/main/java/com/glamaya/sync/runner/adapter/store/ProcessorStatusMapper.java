@@ -7,5 +7,6 @@ import org.mapstruct.Mapper;
 public interface ProcessorStatusMapper {
 
     ProcessorStatus toDomain(ProcessorStatusDocument document);
+
     ProcessorStatusDocument toDocument(ProcessorStatus domain);
 }

@@ -1,7 +1,7 @@
 package com.glamaya.sync.core.domain.port.out;
 
 import com.glamaya.sync.core.domain.model.SyncContext;
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 /**
  * An outbound port defining the contract for fetching raw data from an external platform.
@@ -15,7 +15,7 @@ public interface DataProvider<T> {
      *
      * @param context The SyncContext containing the current status (like last run date or cursor)
      *                and configuration needed to make the API call.
-     * @return A list of raw, platform-specific DTOs. Returns an empty list if no new data is found.
+     * @return A Flux that emits raw, platform-specific DTOs. Emits nothing if no new data is found.
      */
-    List<T> fetchData(SyncContext<?> context);
+    Flux<T> fetchData(SyncContext<?> context);
 }

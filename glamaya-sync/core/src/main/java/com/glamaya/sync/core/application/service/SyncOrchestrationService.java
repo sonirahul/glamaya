@@ -11,10 +11,13 @@ import com.glamaya.sync.core.domain.port.out.SyncProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,56 +41,63 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
     }
 
     @Override
-    public void sync(ProcessorType processorType) {
+    public Mono<Void> sync(ProcessorType processorType) {
         SyncProcessor<?, ?, ?> processor = syncProcessors.get(processorType);
         if (processor == null) {
             log.error("No SyncProcessor found for processor type: {}", processorType);
-            return;
+            return Mono.empty();
         }
-
-        executeSync(processor);
+        return executeSync(processor);
     }
 
-    private <P, C, T> void executeSync(SyncProcessor<P, C, T> processor) {
+    private <P, C, T> Mono<Void> executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
         ProcessorConfiguration<T> config = processor.getConfiguration();
 
-        if (config.isEnable()) {
-
-            log.info("Starting synchronization for processor type: {}", processorType);
-            ProcessorStatus status = ProcessorStatus
-                    .fromConfiguration(processorType, statusStorePort.findStatus(processorType).orElse(null), config);
-
-            int totalItemsProcessed = 0;
-
-            try {
-                SyncContext<T> syncContext = new SyncContext<>(status, config);
-                while (status.isMoreDataAvailable()) {
-                    log.info("Fetching page {} for processor type: {}", status.getNextPage(), processorType);
-                    List<P> rawData = processor.getDataProvider().fetchData(syncContext);
-
-                    if (rawData == null || rawData.isEmpty()) {
-                        log.info("No more data found for processor type: {}. Concluding sync.", processorType);
-                    } else {
-                        log.debug("Fetched {} raw items on page {}.", rawData.size(), status.getNextPage());
-                        for (P rawItem : rawData) {
-                            C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                            notificationPort.notify(canonicalModel);
-                            totalItemsProcessed++;
-                        }
-                    }
-                    status.setLastSuccessfulRun(Instant.now());
-                    statusStorePort.saveStatus(status);
-                }
-
-                log.info("Synchronization completed successfully for processor type: {}. Processed {} items in total.", processorType, totalItemsProcessed);
-            } catch (Exception e) {
-                log.error("Error during synchronization for processor type {} on page {}: {}", processorType, status.getNextPage(), e.getMessage(), e);
-                status.setNextPage(status.getNextPage());
-                statusStorePort.saveStatus(status);
-            }
-        } else {
+        if (!config.isEnable()) {
             log.info("Synchronization is disabled for processor type: {}", processorType);
+            return Mono.empty();
         }
+
+        // 1. Get the initial status
+        Mono<ProcessorStatus> initialStatusMono = statusStorePort.findStatus(processorType)
+                .map(Optional::of)
+                .defaultIfEmpty(Optional.empty())
+                .map(optStatus -> ProcessorStatus.fromConfiguration(processorType, optStatus.orElse(null), config));
+
+        return initialStatusMono.flatMap(initialStatus -> {
+            // Define the recursive function for fetching and processing pages
+            // This function needs to be defined here to capture the generic types P, C, T
+            // Using an anonymous inner class to satisfy definite assignment analysis for recursion
+            Function<ProcessorStatus, Flux<P>> fetchAndProcessPage = new Function<>() {
+                @Override
+                public Flux<P> apply(ProcessorStatus currentStatus) {
+                    if (!currentStatus.isMoreDataAvailable()) {
+                        return Flux.empty(); // Stop recursion
+                    }
+
+                    log.info("Fetching page {} for processor type: {}", currentStatus.getNextPage(), processorType);
+                    SyncContext<T> syncContext = new SyncContext<>(currentStatus, config);
+
+                    return processor.getDataProvider().fetchData(syncContext)
+                            .collectList()
+                            .flatMapMany(pageItems -> statusStorePort.saveStatus(currentStatus)
+                                    .thenMany(Flux.fromIterable(pageItems))
+                                    .concatWith(Flux.defer(() -> this.apply(currentStatus))));
+                }
+            };
+
+            return fetchAndProcessPage.apply(initialStatus)
+                    .flatMap(rawItem -> {
+                        C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
+                        return notificationPort.notify(canonicalModel);
+                    })
+                    .count() // Count total items processed
+                    .flatMap(totalItems -> {
+                        log.info("Sync completed for {}. Processed {} items in total.", processorType, totalItems);
+                        initialStatus.setLastSuccessfulRun(Instant.now());
+                        return statusStorePort.saveStatus(initialStatus); // Save final status
+                    });
+        }).then(); // Ensure a Mono<Void> is returned
     }
 }

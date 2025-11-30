@@ -2,10 +2,10 @@ package com.glamaya.sync.platform.woocommerce.config;
 
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import jakarta.annotation.PostConstruct;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +20,14 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "glamaya.sync.woocommerce.api")
 public class WooCommerceEndpointConfiguration {
 
-    /** YAML: endpoint-configs (String key -> APIConfig). */
+    /**
+     * YAML: endpoint-configs (String key -> APIConfig).
+     */
     private Map<String, APIConfig> endpointConfigs = new HashMap<>();
 
-    void setEndpointConfigs(Map<String, APIConfig> endpointConfigs) { this.endpointConfigs = endpointConfigs; }
+    void setEndpointConfigs(Map<String, APIConfig> endpointConfigs) {
+        this.endpointConfigs = endpointConfigs;
+    }
 
     @PostConstruct
     void validateAndNormalize() {

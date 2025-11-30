@@ -2,6 +2,7 @@ package com.glamaya.sync.runner;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -11,6 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication(scanBasePackages = {"com.glamaya.sync.core", "com.glamaya.sync.platform.woocommerce", "com.glamaya.sync.runner"})
 @EnableScheduling // Enable Spring's scheduled task execution
+@EnableReactiveMongoRepositories(basePackages = "com.glamaya.sync.runner.adapter.store")
+// Enable reactive MongoDB repositories
 public class GlamayaSyncApplication {
 
     public static void main(String[] args) {

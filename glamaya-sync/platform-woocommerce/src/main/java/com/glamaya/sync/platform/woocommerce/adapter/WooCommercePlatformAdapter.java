@@ -6,6 +6,8 @@ import com.glamaya.sync.core.domain.port.out.PlatformAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * WooCommerce-specific implementation of the PlatformAdapter outbound port.
@@ -28,17 +30,13 @@ public class WooCommercePlatformAdapter implements PlatformAdapter {
     }
 
     @Override
-    public void sync() {
+    public Mono<Void> sync() {
         log.info("Initiating full synchronization for WooCommerce platform.");
-
-        // Trigger synchronization for WooCommerce Orders
-        log.debug("Triggering sync for WooCommerce Orders...");
-        syncPlatformUseCase.sync(ProcessorType.WOOCOMMERCE_ORDER);
-
-        // TODO: Add calls for other WooCommerce entities as they are implemented
-        // syncPlatformUseCase.sync(ProcessorType.WOOCOMMERCE_PRODUCT);
-        // syncPlatformUseCase.sync(ProcessorType.WOOCOMMERCE_USER);
-
-        log.info("Completed full synchronization for WooCommerce platform.");
+        // Sequentially trigger sync for each processor type.
+        // Use concatMap to ensure they run one after the other, not in parallel.
+        return Flux.just(ProcessorType.WOOCOMMERCE_ORDER)
+                .concatMap(syncPlatformUseCase::sync)
+                .then()
+                .doOnSuccess(v -> log.info("Completed full synchronization for WooCommerce platform."));
     }
 }

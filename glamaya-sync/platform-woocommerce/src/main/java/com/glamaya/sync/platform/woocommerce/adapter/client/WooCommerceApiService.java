@@ -4,71 +4,53 @@ import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.WooCommerceEntityDescriptor;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
- * A generic service for interacting with the WooCommerce API.
+ * A generic service for interacting with the WooCommerce API in a reactive way.
  * It uses a descriptor pattern to fetch different types of entities (Orders, Products, etc.).
  *
  * @param <E> The type of the entity to fetch.
  */
+@Slf4j
 @Service
 public class WooCommerceApiService<E> {
-
-    private static final Logger log = LoggerFactory.getLogger(WooCommerceApiService.class);
 
     private final WebClient webClient;
     private final OAuthSignerPort oAuthSigner;
 
-    public WooCommerceApiService(WebClient webClient, OAuthSignerPort oAuthSigner) {
+    public WooCommerceApiService(
+            WebClient webClient,
+            OAuthSignerPort oAuthSigner) {
         this.webClient = webClient;
         this.oAuthSigner = oAuthSigner;
     }
 
-    public List<E> fetch(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, APIConfig config) {
+    /**
+     * Fetches a single page of entities from the WooCommerce API.
+     *
+     * @param descriptor The descriptor defining the entity-specific details.
+     * @param status     The current processor status, containing the page number.
+     * @param config     The API configuration, containing the URL and page size.
+     * @return A Flux emitting the entities found on the specified page.
+     */
+    public Flux<E> fetchPage(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, APIConfig config) {
         String relativeUrl = config.getQueryUrl();
-        int page = status.getNextPage();
-
-        try {
-            Map<String, String> queryParams = buildQueryParams(status, config);
-            List<E> entities = executeApiRequest(descriptor, relativeUrl, queryParams);
-            updateStatus(descriptor, status, entities, config);
-            return entities;
-        } catch (Exception e) {
-            log.error("Failed to fetch {} from WooCommerce API on page {}: {}",
-                    relativeUrl, page, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch data from " + relativeUrl + " on page " + page, e);
-        }
-    }
-
-    private Map<String, String> buildQueryParams(ProcessorStatus status, APIConfig config) {
-        Map<String, String> queryParams = new HashMap<>(Map.of(
-                "page", String.valueOf(status.getNextPage()),
-                "per_page", String.valueOf(config.getPageSize()),
-                "orderby", "modified",
-                "order", "asc",
-                "status", "any"
-        ));
-
-        if (status.isUseLastDateModifiedInQuery() && status.getLastDateModified() != null) {
-            queryParams.put("after", DateTimeFormatter.ISO_INSTANT.format(status.getLastDateModified()));
-        }
-        return queryParams;
-    }
-
-    private List<E> executeApiRequest(WooCommerceEntityDescriptor<E> descriptor, String relativeUrl, Map<String, String> queryParams) {
+        Map<String, String> queryParams = buildQueryParams(status, config);
         String oauthHeader = oAuthSigner.generateOAuth1Header(relativeUrl, queryParams);
-        log.info("Making GET request to WooCommerce API: {} with query params: {}", relativeUrl, queryParams);
 
         return webClient.get()
                 .uri(uriBuilder -> {
@@ -86,30 +68,58 @@ public class WooCommerceApiService<E> {
                                     return Mono.error(new RuntimeException("Remote API Error: " + resp.statusCode() + " - " + body));
                                 }))
                 .bodyToMono(descriptor.getListTypeReference())
-                .block();
+                .flatMapMany(list -> list == null ? Flux.empty() : Flux.fromIterable(list))
+                .onErrorResume(DecodingException.class, e -> {
+                    log.error("WebClient-level JSON decoding error. Returning empty Flux for page {}. Error: {}",
+                            status.getNextPage(), e.getMessage());
+                    return Flux.empty();
+                });
     }
 
-    private void updateStatus(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, List<E> entities, APIConfig config) {
-        if (entities == null || entities.isEmpty()) {
-            log.info("Received null/empty response for {} on page {}. Assuming no new data.",
-                    config.getQueryUrl(), status.getNextPage());
-            status.setMoreDataAvailable(false);
-            status.setNextPage(config.getInitPage());
-            status.setUseLastDateModifiedInQuery(true);
-            return;
+    private Map<String, String> buildQueryParams(ProcessorStatus status, APIConfig config) {
+        Map<String, String> queryParams = new HashMap<>(Map.of(
+                "page", String.valueOf(status.getNextPage()),
+                "per_page", String.valueOf(config.getPageSize()),
+                "orderby", "modified",
+                "order", "asc",
+                "status", "any"
+        ));
+
+        if (status.isUseLastDateModifiedInQuery() && status.getLastDateModified() != null) {
+            queryParams.put("after", DateTimeFormatter.ISO_INSTANT.format(status.getLastDateModified()));
         }
+        return queryParams;
+    }
 
-        log.info("Successfully retrieved {} entities from page {}.", entities.size(), status.getNextPage());
-        status.setTotalItemsSynced(status.getTotalItemsSynced() + entities.size());
-        status.setLastDateModified(descriptor.getLastModifiedExtractor().apply(entities.getLast()));
-
-        if (entities.size() < config.getPageSize()) {
+    /**
+     * Generic method to update ProcessorStatus after fetching a page of entities.
+     * @param status The ProcessorStatus to update
+     * @param pageItems The list of fetched entities
+     * @param config The APIConfig for the processor
+     * @param lastModifiedExtractor Function to extract last modified Instant from an entity
+     * @param <E> The entity type
+     */
+    public static <E> void updateStatusAfterPage(ProcessorStatus status, List<E> pageItems, APIConfig config,
+            Function<E, Instant> lastModifiedExtractor) {
+        if (pageItems.isEmpty()) {
+            log.info("Received empty page. Concluding sync for this processor.");
             status.setMoreDataAvailable(false);
             status.setNextPage(config.getInitPage());
             status.setUseLastDateModifiedInQuery(true);
         } else {
-            status.setNextPage(status.getNextPage() + 1);
-            status.setUseLastDateModifiedInQuery(false);
+            log.info("Successfully processed {} items from page {}.", pageItems.size(), status.getNextPage());
+            status.setTotalItemsSynced(status.getTotalItemsSynced() + pageItems.size());
+            E lastItem = pageItems.get(pageItems.size() - 1);
+            status.setLastDateModified(lastModifiedExtractor.apply(lastItem));
+
+            if (pageItems.size() < config.getPageSize()) {
+                status.setMoreDataAvailable(false);
+                status.setNextPage(config.getInitPage());
+                status.setUseLastDateModifiedInQuery(true);
+            } else {
+                status.setNextPage(status.getNextPage() + 1);
+                status.setUseLastDateModifiedInQuery(false);
+            }
         }
     }
 }

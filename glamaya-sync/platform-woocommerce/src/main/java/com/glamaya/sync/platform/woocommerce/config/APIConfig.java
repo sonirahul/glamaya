@@ -19,6 +19,11 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     private FetchDurationMs fetchDurationMs = new FetchDurationMs();
     private String queryUrl;
 
+    @Override
+    public APIConfig get() {
+        return this;
+    }
+
     /**
      * Nested object representing fetch duration configuration in milliseconds.
      */
@@ -27,10 +32,5 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     public static class FetchDurationMs {
         private long active;
         private long passive;
-    }
-
-    @Override
-    public APIConfig get() {
-        return this;
     }
 }

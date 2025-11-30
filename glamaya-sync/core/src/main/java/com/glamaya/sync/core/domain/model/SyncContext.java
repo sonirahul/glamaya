@@ -7,6 +7,7 @@ import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
  * and configuration needed for the current run.
  */
 public record SyncContext<T>(
-    ProcessorStatus status,
-    ProcessorConfiguration<T> configuration
-) {}
+        ProcessorStatus status,
+        ProcessorConfiguration<T> configuration
+) {
+}
