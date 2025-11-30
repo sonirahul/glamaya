@@ -12,9 +12,10 @@ glamaya:
         max-in-memory-size: 10485760 # 10MB
         # Timeout for waiting for a response from the server (in milliseconds).
         response-timeout-in-millis: 30000 # 30 seconds
+        # Endpoint configurations mapped dynamically
         endpoint-configs:
           WOOCOMMERCE_ORDER:
-            enable: false
+            enable: true
             reset-on-startup: false
             init-page: 1
             page-size: 10

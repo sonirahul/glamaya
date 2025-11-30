@@ -17,5 +17,5 @@ public interface DataProvider<T> {
      *                and configuration needed to make the API call.
      * @return A list of raw, platform-specific DTOs. Returns an empty list if no new data is found.
      */
-    List<T> fetchData(SyncContext context);
+    List<T> fetchData(SyncContext<?> context);
 }

@@ -22,8 +22,11 @@ public class ProcessorStatusDocument {
     @Id
     private ProcessorType processorType;
     private Instant lastSuccessfulRun;
+    private Instant lastDateModified;
+    private boolean useLastDateModifiedInQuery;
     private String cursor;
-    private int currentPage;
-    private int pageSize;
-    private int totalItemsSynced;
+    private Integer nextPage;
+    private Integer pageSize;
+    private boolean moreDataAvailable;
+    private Integer totalItemsSynced;
 }

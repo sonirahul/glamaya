@@ -1,7 +1,6 @@
 package com.glamaya.sync.platform.woocommerce.config;
 
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
-import com.glamaya.sync.core.domain.model.ProcessorType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,12 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class APIConfig implements ProcessorConfiguration<APIConfig> {
 
-    // Populated from YAML (orders-config.processor-type). Must be provided there; no default here.
-    private ProcessorType processorType;
     private boolean enable;
     private boolean resetOnStartup;
-    private int initPage;
-    private int pageSize;
+    private Integer initPage;
+    private Integer pageSize;
     private FetchDurationMs fetchDurationMs = new FetchDurationMs();
     private String queryUrl;
 

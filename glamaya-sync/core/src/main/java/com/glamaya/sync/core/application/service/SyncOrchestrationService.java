@@ -5,9 +5,9 @@ import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import com.glamaya.sync.core.domain.port.out.StatusStorePort;
 import com.glamaya.sync.core.domain.port.out.SyncProcessor;
-import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,8 +39,6 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
 
     @Override
     public void sync(ProcessorType processorType) {
-        log.info("Starting synchronization for processor type: {}", processorType);
-
         SyncProcessor<?, ?, ?> processor = syncProcessors.get(processorType);
         if (processor == null) {
             log.error("No SyncProcessor found for processor type: {}", processorType);
@@ -52,52 +50,44 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
 
     private <P, C, T> void executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
-        ProcessorConfiguration<T> configuration = processor.getConfiguration();
+        ProcessorConfiguration<T> config = processor.getConfiguration();
 
-        ProcessorStatus currentStatus = statusStorePort.findStatus(processorType)
-                .orElseGet(() -> new ProcessorStatus(processorType));
+        if (config.isEnable()) {
 
-        boolean hasMoreData = true;
-        int totalItemsProcessed = 0;
+            log.info("Starting synchronization for processor type: {}", processorType);
+            ProcessorStatus status = ProcessorStatus
+                    .fromConfiguration(processorType, statusStorePort.findStatus(processorType).orElse(null), config);
 
-        int currentPage = currentStatus.getCurrentPage() > 0 ? currentStatus.getCurrentPage() : 1;
+            int totalItemsProcessed = 0;
 
-        try {
-            while (hasMoreData) {
-                currentStatus.setCurrentPage(currentPage);
-                SyncContext<T> syncContext = new SyncContext<>(currentStatus, configuration);
+            try {
+                SyncContext<T> syncContext = new SyncContext<>(status, config);
+                while (status.isMoreDataAvailable()) {
+                    log.info("Fetching page {} for processor type: {}", status.getNextPage(), processorType);
+                    List<P> rawData = processor.getDataProvider().fetchData(syncContext);
 
-                log.info("Fetching page {} for processor type: {}", currentPage, processorType);
-                List<P> rawData = processor.getDataProvider().fetchData(syncContext);
-
-                if (rawData == null || rawData.isEmpty()) {
-                    log.info("No more data found for processor type: {}. Concluding sync.", processorType);
-                    hasMoreData = false;
-                } else {
-                    log.debug("Fetched {} raw items on page {}.", rawData.size(), currentPage);
-                    for (P rawItem : rawData) {
-                        C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                        notificationPort.notify(canonicalModel);
-                        totalItemsProcessed++;
-                    }
-
-                    if (rawData.size() < 100) { // Assuming a fixed page size of 100
-                        hasMoreData = false;
+                    if (rawData == null || rawData.isEmpty()) {
+                        log.info("No more data found for processor type: {}. Concluding sync.", processorType);
                     } else {
-                        currentPage++;
+                        log.debug("Fetched {} raw items on page {}.", rawData.size(), status.getNextPage());
+                        for (P rawItem : rawData) {
+                            C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
+                            notificationPort.notify(canonicalModel);
+                            totalItemsProcessed++;
+                        }
                     }
+                    status.setLastSuccessfulRun(Instant.now());
+                    statusStorePort.saveStatus(status);
                 }
+
+                log.info("Synchronization completed successfully for processor type: {}. Processed {} items in total.", processorType, totalItemsProcessed);
+            } catch (Exception e) {
+                log.error("Error during synchronization for processor type {} on page {}: {}", processorType, status.getNextPage(), e.getMessage(), e);
+                status.setNextPage(status.getNextPage());
+                statusStorePort.saveStatus(status);
             }
-
-            currentStatus.setLastSuccessfulRun(Instant.now());
-            currentStatus.setCurrentPage(1); // Reset for the next sync cycle.
-            statusStorePort.saveStatus(currentStatus);
-            log.info("Synchronization completed successfully for processor type: {}. Processed {} items in total.", processorType, totalItemsProcessed);
-
-        } catch (Exception e) {
-            log.error("Error during synchronization for processor type {} on page {}: {}", processorType, currentPage, e.getMessage(), e);
-            currentStatus.setCurrentPage(currentPage);
-            statusStorePort.saveStatus(currentStatus);
+        } else {
+            log.info("Synchronization is disabled for processor type: {}", processorType);
         }
     }
 }

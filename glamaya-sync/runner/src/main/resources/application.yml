@@ -11,7 +11,7 @@ spring:
   # MongoDB Configuration
   data:
     mongodb:
-      database: glamaya-sync-db
+      database: glamaya-sync-status
       host: localhost
       port: 27017
 
