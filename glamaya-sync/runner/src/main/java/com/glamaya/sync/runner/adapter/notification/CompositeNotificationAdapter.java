@@ -42,7 +42,7 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
         return Flux.fromIterable(notifiers)
                 .filter(notifier -> notifier.supports(payload))
                 .flatMap(notifier -> notifier.notify(payload)
-                        .doOnSuccess(v -> log.debug("Payload dispatched by notifier: {}", notifier.getClass().getSimpleName()))
+                        .doOnSuccess(v -> log.info("Payload dispatched by notifier: {}", notifier.getClass().getSimpleName()))
                         .doOnError(e -> log.error("Error dispatching payload via notifier {}: {}",
                                 notifier.getClass().getSimpleName(), e.getMessage(), e))
                         .onErrorResume(e -> Mono.empty()) // Continue even if one notifier fails

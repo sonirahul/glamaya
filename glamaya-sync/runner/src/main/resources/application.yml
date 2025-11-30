@@ -7,7 +7,17 @@ spring:
       - "optional:classpath:application-woocommerce.yml"
   # Kafka Configuration
   kafka:
-    bootstrap-servers: localhost:9092 # Default Kafka broker location
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092} # Use environment variable or default
+    client-id: ${spring.application.name}
+    security:
+      protocol: ${SPRING_KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+    producer:
+      compression-type: zstd
+      properties:
+        enable.idempotence: true
+        linger.ms: 25
+      batch-size: 32768 # 32KB in bytes
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # Added for object serialization
   # MongoDB Configuration
   data:
     mongodb:
@@ -23,7 +33,7 @@ glamaya:
   notifications:
     kafka:
       # Set to 'true' to enable sending notifications to Kafka.
-      enabled: false
+      enabled: true
       topic: glamaya-sync-events # The Kafka topic to publish events to.
 
 # --- LOGGING ---

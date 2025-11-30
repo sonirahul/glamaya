@@ -1,8 +1,7 @@
 package com.glamaya.sync.runner.adapter.notification;
 
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
@@ -13,11 +12,11 @@ import reactor.core.publisher.Mono;
  * Reactive Kafka implementation of the NotificationPort.
  * Dispatches canonical domain models to a Kafka topic.
  */
+@Slf4j
 @Component
 @ConditionalOnProperty(value = "glamaya.notifications.kafka.enabled", havingValue = "true")
 public class KafkaNotificationAdapter implements NotificationPort<Object> {
 
-    private static final Logger log = LoggerFactory.getLogger(KafkaNotificationAdapter.class);
     private final ReactiveKafkaProducerTemplate<String, Object> kafkaTemplate;
     private final String topic;
 
@@ -30,7 +29,7 @@ public class KafkaNotificationAdapter implements NotificationPort<Object> {
 
     @Override
     public Mono<Void> notify(Object payload) {
-        log.info("Sending payload to Kafka topic '{}': {}", topic, payload);
+        log.info("Sending payload to Kafka topic '{}'", topic);
         return kafkaTemplate.send(topic, payload).then();
     }
 

@@ -107,7 +107,7 @@ public class WooCommerceApiService<E> {
             status.setNextPage(config.getInitPage());
             status.setUseLastDateModifiedInQuery(true);
         } else {
-            log.info("Successfully processed {} items from page {}.", pageItems.size(), status.getNextPage());
+            log.info("Successfully fetched {} items from page {}.", pageItems.size(), status.getNextPage());
             status.setTotalItemsSynced(status.getTotalItemsSynced() + pageItems.size());
             E lastItem = pageItems.get(pageItems.size() - 1);
             status.setLastDateModified(lastModifiedExtractor.apply(lastItem));

@@ -90,7 +90,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
             return fetchAndProcessPage.apply(initialStatus)
                     .flatMap(rawItem -> {
                         C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                        return notificationPort.notify(canonicalModel);
+                        return notificationPort.notify(canonicalModel).then(Mono.just(1)); // Emit 1 after notification
                     })
                     .count() // Count total items processed
                     .flatMap(totalItems -> {
@@ -98,6 +98,6 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                         initialStatus.setLastSuccessfulRun(Instant.now());
                         return statusStorePort.saveStatus(initialStatus); // Save final status
                     });
-        }).then(); // Ensure a Mono<Void> is returned
+        }).then();
     }
 }
