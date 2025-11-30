@@ -45,6 +45,8 @@ public class MongoProcessorStatusRepository implements StatusStorePort {
         domain.setLastSuccessfulRun(document.getLastSuccessfulRun());
         domain.setCursor(document.getCursor());
         domain.setCurrentPage(document.getCurrentPage());
+        domain.setPageSize(document.getPageSize());
+        domain.setTotalItemsSynced(document.getTotalItemsSynced());
         return domain;
     }
 
@@ -53,7 +55,9 @@ public class MongoProcessorStatusRepository implements StatusStorePort {
                 domain.getProcessorType(),
                 domain.getLastSuccessfulRun(),
                 domain.getCursor(),
-                domain.getCurrentPage()
+                domain.getCurrentPage(),
+                domain.getPageSize(),
+                domain.getTotalItemsSynced()
         );
     }
 }

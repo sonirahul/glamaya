@@ -24,10 +24,10 @@ public class WooCommerceOrderProcessor implements SyncProcessor<com.glamaya.data
     public WooCommerceOrderProcessor(
             WooCommerceOrderDataProvider dataProvider,
             WooCommerceOrderDataMapper dataMapper,
-            @Qualifier("wooOrdersApiConfig") APIConfig apiConfig) {
+            @Qualifier("wooOrdersProcessorConfig") ProcessorConfiguration<APIConfig> processorConfiguration) {
         this.dataProvider = dataProvider;
         this.dataMapper = dataMapper;
-        this.configuration = new SimpleProcessorConfiguration<>(apiConfig);
+        this.configuration = processorConfiguration;
     }
 
     @Override
