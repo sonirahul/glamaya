@@ -1,4 +1,4 @@
-package com.glamaya.sync.platform.woocommerce.adapter.client.strategy;
+package com.glamaya.sync.platform.woocommerce.adapter.client.descriptor;
 
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * A strategy interface that defines the entity-specific details required by the generic
+ * A descriptor interface that defines the entity-specific details required by the generic
  * WooCommerceApiService to fetch data.
  *
  * @param <E> The type of the entity (e.g., Order, Product).
  */
-public interface WooCommerceEntityStrategy<E> {
+public interface WooCommerceEntityDescriptor<E> {
 
     /**
      * Provides the ParameterizedTypeReference needed by WebClient to deserialize a list of entities.

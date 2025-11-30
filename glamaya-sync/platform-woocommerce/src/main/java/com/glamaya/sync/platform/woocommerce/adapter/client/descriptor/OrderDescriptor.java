@@ -1,4 +1,4 @@
-package com.glamaya.sync.platform.woocommerce.adapter.client.strategy;
+package com.glamaya.sync.platform.woocommerce.adapter.client.descriptor;
 
 import com.glamaya.datacontracts.woocommerce.Order;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * The concrete strategy for fetching WooCommerce Order entities.
+ * The concrete descriptor for fetching WooCommerce Order entities.
  */
 @Component
-public class OrderStrategy implements WooCommerceEntityStrategy<Order> {
+public class OrderDescriptor implements WooCommerceEntityDescriptor<Order> {
 
     private static final ParameterizedTypeReference<List<Order>> ORDER_LIST_TYPE = new ParameterizedTypeReference<>() {};
     private static final Function<String, Instant> STRING_DATE_TO_INSTANT = date ->

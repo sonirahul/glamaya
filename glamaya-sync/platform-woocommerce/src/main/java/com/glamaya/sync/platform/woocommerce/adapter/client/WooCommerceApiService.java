@@ -1,7 +1,7 @@
 package com.glamaya.sync.platform.woocommerce.adapter.client;
 
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
-import com.glamaya.sync.platform.woocommerce.adapter.client.strategy.WooCommerceEntityStrategy;
+import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.WooCommerceEntityDescriptor;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * A generic service for interacting with the WooCommerce API.
- * It uses a strategy pattern to fetch different types of entities (Orders, Products, etc.).
+ * It uses a descriptor pattern to fetch different types of entities (Orders, Products, etc.).
  *
  * @param <E> The type of the entity to fetch.
  */
@@ -35,14 +35,14 @@ public class WooCommerceApiService<E> {
         this.oAuthSigner = oAuthSigner;
     }
 
-    public List<E> fetch(WooCommerceEntityStrategy<E> strategy, ProcessorStatus status, APIConfig config) {
+    public List<E> fetch(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, APIConfig config) {
         String relativeUrl = config.getQueryUrl();
         int page = status.getNextPage();
 
         try {
             Map<String, String> queryParams = buildQueryParams(status, config);
-            List<E> entities = executeApiRequest(strategy, relativeUrl, queryParams);
-            updateStatus(strategy, status, entities, config);
+            List<E> entities = executeApiRequest(descriptor, relativeUrl, queryParams);
+            updateStatus(descriptor, status, entities, config);
             return entities;
         } catch (Exception e) {
             log.error("Failed to fetch {} from WooCommerce API on page {}: {}",
@@ -66,7 +66,7 @@ public class WooCommerceApiService<E> {
         return queryParams;
     }
 
-    private List<E> executeApiRequest(WooCommerceEntityStrategy<E> strategy, String relativeUrl, Map<String, String> queryParams) {
+    private List<E> executeApiRequest(WooCommerceEntityDescriptor<E> descriptor, String relativeUrl, Map<String, String> queryParams) {
         String oauthHeader = oAuthSigner.generateOAuth1Header(relativeUrl, queryParams);
         log.info("Making GET request to WooCommerce API: {} with query params: {}", relativeUrl, queryParams);
 
@@ -85,11 +85,11 @@ public class WooCommerceApiService<E> {
                                     log.error("WooCommerce API Error: {} - {}", resp.statusCode(), body);
                                     return Mono.error(new RuntimeException("Remote API Error: " + resp.statusCode() + " - " + body));
                                 }))
-                .bodyToMono(strategy.getListTypeReference())
+                .bodyToMono(descriptor.getListTypeReference())
                 .block();
     }
 
-    private void updateStatus(WooCommerceEntityStrategy<E> strategy, ProcessorStatus status, List<E> entities, APIConfig config) {
+    private void updateStatus(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, List<E> entities, APIConfig config) {
         if (entities == null || entities.isEmpty()) {
             log.info("Received null/empty response for {} on page {}. Assuming no new data.",
                     config.getQueryUrl(), status.getNextPage());
@@ -101,8 +101,7 @@ public class WooCommerceApiService<E> {
 
         log.info("Successfully retrieved {} entities from page {}.", entities.size(), status.getNextPage());
         status.setTotalItemsSynced(status.getTotalItemsSynced() + entities.size());
-        E lastEntity = entities.get(entities.size() - 1);
-        status.setLastDateModified(strategy.getLastModifiedExtractor().apply(lastEntity));
+        status.setLastDateModified(descriptor.getLastModifiedExtractor().apply(entities.getLast()));
 
         if (entities.size() < config.getPageSize()) {
             status.setMoreDataAvailable(false);
