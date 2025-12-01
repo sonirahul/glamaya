@@ -81,7 +81,7 @@ public class WooCommerceEndpointConfiguration {
                     APIConfig.NotificationConfig nc = new APIConfig.NotificationConfig();
                     nc.setEnable(v.getEnable());
                     nc.setTopic(v.getTopic());
-                    nc.setWebhook(v.getWebhook());
+                    nc.setUrl(v.getUrl());
                     notifCopy.put(type, nc);
                 }
             });

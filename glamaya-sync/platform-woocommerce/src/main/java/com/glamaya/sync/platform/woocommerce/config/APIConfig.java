@@ -36,7 +36,7 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     public static class NotificationConfig {
         private Boolean enable;
         private String topic;
-        private String webhook;
+        private String url;
         // Add other fields as needed for future notification types
     }
 
@@ -63,6 +63,6 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
         @Override
         public String getTopic() { return delegate.getTopic(); }
         @Override
-        public String getWebhook() { return delegate.getWebhook(); }
+        public String getUrl() { return delegate.getUrl(); }
     }
 }
