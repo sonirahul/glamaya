@@ -3,8 +3,7 @@ package com.glamaya.sync.platform.woocommerce.adapter;
 import com.glamaya.sync.core.application.usecase.SyncPlatformUseCase;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.port.out.PlatformAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,10 +13,10 @@ import reactor.core.publisher.Mono;
  * This adapter orchestrates the synchronization of various WooCommerce entities
  * by delegating to the core SyncPlatformUseCase.
  */
+@Slf4j
 @Component
 public class WooCommercePlatformAdapter implements PlatformAdapter {
 
-    private static final Logger log = LoggerFactory.getLogger(WooCommercePlatformAdapter.class);
     private final SyncPlatformUseCase syncPlatformUseCase;
 
     public WooCommercePlatformAdapter(SyncPlatformUseCase syncPlatformUseCase) {
@@ -34,7 +33,7 @@ public class WooCommercePlatformAdapter implements PlatformAdapter {
         log.info("Initiating full synchronization for WooCommerce platform.");
         // Sequentially trigger sync for each processor type.
         // Use concatMap to ensure they run one after the other, not in parallel.
-        return Flux.just(ProcessorType.WOOCOMMERCE_ORDER)
+        return Flux.just(ProcessorType.WOOCOMMERCE_ORDER, ProcessorType.WOOCOMMERCE_USER)
                 .concatMap(syncPlatformUseCase::sync)
                 .then()
                 .doOnSuccess(v -> log.info("Completed full synchronization for WooCommerce platform."));

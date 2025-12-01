@@ -1,7 +1,11 @@
 package com.glamaya.sync.platform.woocommerce.config;
 
+import com.glamaya.datacontracts.ecommerce.mapper.ContactMapperFactory;
 import com.glamaya.datacontracts.ecommerce.mapper.OrderMapperFactory;
 import com.glamaya.datacontracts.ecommerce.mapper.WooOrderToOrderMapperFactoryImpl;
+import com.glamaya.datacontracts.ecommerce.mapper.WooUserToContactMapperFactoryImpl;
+import com.glamaya.datacontracts.woocommerce.Order;
+import com.glamaya.datacontracts.woocommerce.User;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -70,7 +74,18 @@ public class WooCommerceModuleConfiguration {
      * @return An instance of WooOrderToOrderMapperFactoryImpl.
      */
     @Bean
-    public OrderMapperFactory wooOrderToOrderMapperFactory() {
+    public OrderMapperFactory<Order> wooOrderToOrderMapperFactory() {
         return new WooOrderToOrderMapperFactoryImpl();
+    }
+
+    /**
+     * Provides the ContactMapperFactory implementation for WooCommerce orders.
+     * This is required by the WooCommerceUserDataMapper.
+     *
+     * @return An instance of WooUserToContactMapperFactoryImpl.
+     */
+    @Bean
+    public ContactMapperFactory<User> wooUserToContactMapperFactory() {
+        return new WooUserToContactMapperFactoryImpl();
     }
 }
