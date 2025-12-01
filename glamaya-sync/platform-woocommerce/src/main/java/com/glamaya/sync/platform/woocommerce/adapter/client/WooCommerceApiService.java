@@ -13,8 +13,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -47,9 +45,8 @@ public class WooCommerceApiService<E> {
      * @param config     The API configuration, containing the URL and page size.
      * @return A Flux emitting the entities found on the specified page.
      */
-    public Flux<E> fetchPage(WooCommerceEntityDescriptor<E> descriptor, ProcessorStatus status, APIConfig config) {
+    public Flux<E> fetchPage(WooCommerceEntityDescriptor<E> descriptor, Map<String, String> queryParams, ProcessorStatus status, APIConfig config) {
         String relativeUrl = config.getQueryUrl();
-        Map<String, String> queryParams = buildQueryParams(status, config);
         String oauthHeader = oAuthSigner.generateOAuth1Header(relativeUrl, queryParams);
 
         return webClient.get()
@@ -74,21 +71,6 @@ public class WooCommerceApiService<E> {
                             status.getNextPage(), e.getMessage());
                     return Flux.empty();
                 });
-    }
-
-    private Map<String, String> buildQueryParams(ProcessorStatus status, APIConfig config) {
-        Map<String, String> queryParams = new HashMap<>(Map.of(
-                "page", String.valueOf(status.getNextPage()),
-                "per_page", String.valueOf(config.getPageSize()),
-                "orderby", "modified",
-                "order", "asc",
-                "status", "any"
-        ));
-
-        if (status.isUseLastDateModifiedInQuery() && status.getLastDateModified() != null) {
-            queryParams.put("after", DateTimeFormatter.ISO_INSTANT.format(status.getLastDateModified()));
-        }
-        return queryParams;
     }
 
     /**

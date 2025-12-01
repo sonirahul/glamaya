@@ -2,14 +2,14 @@ package com.glamaya.sync.platform.woocommerce.adapter.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.glamaya.datacontracts.woocommerce.Order;
-import com.glamaya.datacontracts.woocommerce.OrderOrderBy;
-import com.glamaya.datacontracts.woocommerce.OrderSearchRequest;
 import com.glamaya.datacontracts.woocommerce.SortOrder;
+import com.glamaya.datacontracts.woocommerce.User;
+import com.glamaya.datacontracts.woocommerce.UserOrderBy;
+import com.glamaya.datacontracts.woocommerce.UserSearchRequest;
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.DataProvider;
-import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.OrderDescriptor;
+import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.UserDescriptor;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,41 +18,41 @@ import reactor.core.publisher.Flux;
 import java.util.Map;
 
 /**
- * Implementation of DataProvider for fetching WooCommerce Orders.
+ * Implementation of DataProvider for fetching WooCommerce Users.
  * This class orchestrates fetching a page and updating the status based on the result.
  */
 @Slf4j
 @Component
-public class WooCommerceOrderDataProvider implements DataProvider<Order> {
+public class WooCommerceUserDataProvider implements DataProvider<User> {
 
-    private final WooCommerceApiService<Order> apiService;
-    private final OrderDescriptor orderDescriptor;
+    private final WooCommerceApiService<User> apiService;
+    private final UserDescriptor userDescriptor;
     private final ObjectMapper objectMapper;
 
-    public WooCommerceOrderDataProvider(WooCommerceApiService<Order> apiService, OrderDescriptor orderDescriptor, ObjectMapper objectMapper) {
+    public WooCommerceUserDataProvider(WooCommerceApiService<User> apiService, UserDescriptor userDescriptor, ObjectMapper objectMapper) {
         this.apiService = apiService;
-        this.orderDescriptor = orderDescriptor;
+        this.userDescriptor = userDescriptor;
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public Flux<Order> fetchData(SyncContext<?> context) {
+    public Flux<User> fetchData(SyncContext<?> context) {
         var config = (APIConfig) context.configuration().get();
         var status = context.status();
         var queryParams = buildQueryParams(status, config);
 
-        return apiService.fetchPage(orderDescriptor, queryParams, status, config)
+        return apiService.fetchPage(userDescriptor, queryParams, status, config)
                 .collectList()
                 .doOnNext(pageItems -> WooCommerceApiService.updateStatusAfterPage(status, pageItems, config,
-                        orderDescriptor.getLastModifiedExtractor()))
+                        userDescriptor.getLastModifiedExtractor()))
                 .flatMapMany(Flux::fromIterable);
     }
 
     private Map<String, String> buildQueryParams(ProcessorStatus statusTracker, APIConfig config) {
 
-        var builder = OrderSearchRequest.builder()
+        var builder = UserSearchRequest.builder()
                 .withFetchLatest(null)
-                .withOrderby(OrderOrderBy.date_modified)
+                .withOrderby(UserOrderBy.id)
                 .withOrder(SortOrder.asc)
                 .withPage(Long.valueOf(statusTracker.getNextPage()))
                 .withPerPage(Long.valueOf(config.getPageSize()));
@@ -61,6 +61,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
             builder.withModifiedAfter(statusTracker.getLastDateModified());
         }
 
-        return objectMapper.convertValue(builder.build(), new TypeReference<>() {});
+        return objectMapper.convertValue(builder.build(), new TypeReference<>() {
+        });
     }
 }
