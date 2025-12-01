@@ -1,9 +1,9 @@
 package com.glamaya.sync.runner.adapter.notification;
 
+import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -13,29 +13,34 @@ import reactor.core.publisher.Mono;
  * Dispatches canonical domain models to a Kafka topic.
  */
 @Slf4j
-@Component
-@ConditionalOnProperty(value = "glamaya.notifications.kafka.enabled", havingValue = "true")
+@Component("kafkaNotificationAdapter")
 public class KafkaNotificationAdapter implements NotificationPort<Object> {
 
     private final ReactiveKafkaProducerTemplate<String, Object> kafkaTemplate;
-    private final String topic;
 
     public KafkaNotificationAdapter(
-            ReactiveKafkaProducerTemplate<String, Object> kafkaTemplate,
-            @Value("${glamaya.notifications.kafka.topic}") String topic) {
+            ReactiveKafkaProducerTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.topic = topic;
     }
 
     @Override
-    public Mono<Void> notify(Object payload) {
-        log.info("Sending payload to Kafka topic '{}'", topic);
+    public boolean supports(NotificationType type) {
+        return type == NotificationType.KAFKA;
+    }
+
+    @Override
+    public Mono<Void> notify(Object payload,
+                             ProcessorConfiguration<?> processorConfiguration,
+                             NotificationType type) {
+        if (type != NotificationType.KAFKA) {
+            return Mono.empty();
+        }
+        var cfg = processorConfiguration.getNotificationConfig(NotificationType.KAFKA);
+        if (cfg == null || !Boolean.TRUE.equals(cfg.getEnable()) || cfg.getTopic() == null || cfg.getTopic().isBlank()) {
+            return Mono.empty();
+        }
+        String topic = cfg.getTopic();
+        log.info("[KafkaNotificationAdapter] Sending payload to Kafka topic='{}'", topic);
         return kafkaTemplate.send(topic, payload).then();
-    }
-
-    @Override
-    public boolean supports(Object payload) {
-        // This Kafka adapter supports all object types.
-        return true;
     }
 }

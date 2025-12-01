@@ -1,5 +1,6 @@
 package com.glamaya.sync.platform.woocommerce.config;
 
+import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import jakarta.annotation.PostConstruct;
@@ -7,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +73,20 @@ public class WooCommerceEndpointConfiguration {
             copy.setFetchDurationMs(fm);
         }
         copy.setQueryUrl(src.getQueryUrl());
+        // Deep copy notifications map using EnumMap
+        if (src.getNotifications() != null) {
+            Map<NotificationType, APIConfig.NotificationConfig> notifCopy = new EnumMap<>(NotificationType.class);
+            src.getNotifications().forEach((type, v) -> {
+                if (v != null && type != null) {
+                    APIConfig.NotificationConfig nc = new APIConfig.NotificationConfig();
+                    nc.setEnable(v.getEnable());
+                    nc.setTopic(v.getTopic());
+                    nc.setWebhook(v.getWebhook());
+                    notifCopy.put(type, nc);
+                }
+            });
+            copy.setNotifications(notifCopy);
+        }
         return copy;
     }
 }

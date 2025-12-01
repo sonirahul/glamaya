@@ -1,8 +1,12 @@
 package com.glamaya.sync.platform.woocommerce.config;
 
+import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Generic API configuration container for WooCommerce module.
@@ -18,19 +22,47 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     private Integer pageSize;
     private FetchDurationMs fetchDurationMs = new FetchDurationMs();
     private String queryUrl;
+    private Map<NotificationType, NotificationConfig> notifications = new EnumMap<>(NotificationType.class);
+
+    @Data
+    @NoArgsConstructor
+    public static class FetchDurationMs {
+        private long active;
+        private long passive;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class NotificationConfig {
+        private Boolean enable;
+        private String topic;
+        private String webhook;
+        // Add other fields as needed for future notification types
+    }
 
     @Override
     public APIConfig get() {
         return this;
     }
 
-    /**
-     * Nested object representing fetch duration configuration in milliseconds.
-     */
-    @Data
-    @NoArgsConstructor
-    public static class FetchDurationMs {
-        private long active;
-        private long passive;
+    @Override
+    public ProcessorConfiguration.NotificationConfig getNotificationConfig(NotificationType notificationType) {
+        if (notificationType == null) return null;
+        NotificationConfig config = notifications.get(notificationType);
+        if (config == null) return null;
+        return new NotificationConfigCoreImpl(config);
+    }
+
+    public static class NotificationConfigCoreImpl implements ProcessorConfiguration.NotificationConfig {
+        private final NotificationConfig delegate;
+        public NotificationConfigCoreImpl(NotificationConfig delegate) {
+            this.delegate = delegate;
+        }
+        @Override
+        public Boolean getEnable() { return delegate.getEnable(); }
+        @Override
+        public String getTopic() { return delegate.getTopic(); }
+        @Override
+        public String getWebhook() { return delegate.getWebhook(); }
     }
 }

@@ -1,6 +1,7 @@
 package com.glamaya.sync.core.application.service;
 
 import com.glamaya.sync.core.application.usecase.SyncPlatformUseCase;
+import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.model.SyncContext;
@@ -8,9 +9,7 @@ import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import com.glamaya.sync.core.domain.port.out.StatusStorePort;
 import com.glamaya.sync.core.domain.port.out.SyncProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -21,10 +20,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
+@Slf4j
 public class SyncOrchestrationService implements SyncPlatformUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(SyncOrchestrationService.class);
 
     private final StatusStorePort statusStorePort;
     private final NotificationPort<Object> notificationPort;
@@ -90,7 +87,9 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
             return fetchAndProcessPage.apply(initialStatus)
                     .flatMap(rawItem -> {
                         C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                        return notificationPort.notify(canonicalModel).then(Mono.just(1)); // Emit 1 after notification
+                        return Flux.fromArray(NotificationType.values())
+                                .flatMap(type -> notificationPort.notify(canonicalModel, config, type))
+                                .then(Mono.just(1));
                     })
                     .count() // Count total items processed
                     .flatMap(totalItems -> {

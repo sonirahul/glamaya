@@ -1,6 +1,8 @@
 package com.glamaya.sync.runner.adapter.notification;
 
+import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
+import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
@@ -9,13 +11,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * A composite implementation of NotificationPort that dispatches notifications
  * to all other registered NotificationPort beans. This enables a "fan-out" mechanism.
  */
-@Component
+@Component("compositeNotificationAdapter")
 @Primary // Ensures this is the default implementation injected when NotificationPort is requested
 public class CompositeNotificationAdapter implements NotificationPort<Object> {
 
@@ -28,31 +29,31 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
      *
      * @param allNotificationPorts A list of all NotificationPort beans in the application context.
      */
-    public CompositeNotificationAdapter(List<NotificationPort> allNotificationPorts) {
+    public CompositeNotificationAdapter(List<NotificationPort<Object>> allNotificationPorts) {
         this.notifiers = allNotificationPorts.stream()
                 .filter(n -> n != this) // Exclude self to prevent infinite loop
-                .map(n -> (NotificationPort<Object>) n) // Cast to generic type
-                .collect(Collectors.toList());
+                .toList();
         log.info("Initialized CompositeNotificationAdapter with {} leaf notifiers.", notifiers.size());
     }
 
     @Override
-    public Mono<Void> notify(Object payload) {
-        log.debug("CompositeNotificationAdapter dispatching payload to {} notifiers.", notifiers.size());
-        return Flux.fromIterable(notifiers)
-                .filter(notifier -> notifier.supports(payload))
-                .flatMap(notifier -> notifier.notify(payload)
-                        .doOnSuccess(v -> log.info("Payload dispatched by notifier: {}", notifier.getClass().getSimpleName()))
-                        .doOnError(e -> log.error("Error dispatching payload via notifier {}: {}",
-                                notifier.getClass().getSimpleName(), e.getMessage(), e))
-                        .onErrorResume(e -> Mono.empty()) // Continue even if one notifier fails
-                )
-                .then();
+    public boolean supports(NotificationType type) {
+        return true; // composite delegates to leaf supports
     }
 
     @Override
-    public boolean supports(Object payload) {
-        // The composite adapter supports any payload that at least one of its delegates supports.
-        return notifiers.stream().anyMatch(notifier -> notifier.supports(payload));
+    public Mono<Void> notify(Object payload,
+                             ProcessorConfiguration<?> processorConfiguration,
+                             NotificationType type) {
+        // Retrieve channel-specific config once; if absent, skip.
+        var channelCfg = processorConfiguration.getNotificationConfig(type);
+        if (channelCfg == null) {
+            return Mono.empty();
+        }
+        return Flux.fromIterable(notifiers)
+                .filter(n -> n.supports(type))
+                .flatMap(n -> n.notify(payload, processorConfiguration, type)
+                        .onErrorResume(e -> Mono.empty()))
+                .then();
     }
 }

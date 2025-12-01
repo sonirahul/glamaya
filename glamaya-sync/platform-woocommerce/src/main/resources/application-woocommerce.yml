@@ -23,6 +23,13 @@ glamaya:
               active: 1000
               passive: 60000
             query-url: "/wp-json/wc/v3/orders"
+            notifications:
+              kafka:
+                enable: true
+                topic: "woocommerce-orders"
+              n8n:
+                enable: false
+                webhook: "some end point"
           WOOCOMMERCE_USER:
             enable: false
             reset-on-startup: false
