@@ -19,7 +19,8 @@ import java.util.function.Function;
 @Component
 public class OrderDescriptor implements WooCommerceEntityDescriptor<Order> {
 
-    private static final ParameterizedTypeReference<List<Order>> ORDER_LIST_TYPE = new ParameterizedTypeReference<>() {};
+    private static final ParameterizedTypeReference<List<Order>> ORDER_LIST_TYPE = new ParameterizedTypeReference<>() {
+    };
     private static final Function<String, Instant> STRING_DATE_TO_INSTANT = date ->
             Optional.ofNullable(date).filter(StringUtils::hasText)
                     .map(d -> LocalDateTime.parse(d, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toInstant(ZoneOffset.UTC))

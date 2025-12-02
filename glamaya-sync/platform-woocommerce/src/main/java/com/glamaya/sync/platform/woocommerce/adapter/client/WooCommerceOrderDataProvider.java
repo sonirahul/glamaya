@@ -61,6 +61,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
             builder.withModifiedAfter(statusTracker.getLastDateModified());
         }
 
-        return objectMapper.convertValue(builder.build(), new TypeReference<>() {});
+        return objectMapper.convertValue(builder.build(), new TypeReference<>() {
+        });
     }
 }

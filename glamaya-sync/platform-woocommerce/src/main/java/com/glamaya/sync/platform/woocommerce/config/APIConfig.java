@@ -24,6 +24,19 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     private String queryUrl;
     private Map<NotificationType, NotificationConfig> notifications = new EnumMap<>(NotificationType.class);
 
+    @Override
+    public APIConfig get() {
+        return this;
+    }
+
+    @Override
+    public ProcessorConfiguration.NotificationConfig getNotificationConfig(NotificationType notificationType) {
+        if (notificationType == null) return null;
+        NotificationConfig config = notifications.get(notificationType);
+        if (config == null) return null;
+        return new NotificationConfigCoreImpl(config);
+    }
+
     @Data
     @NoArgsConstructor
     public static class FetchDurationMs {
@@ -40,29 +53,26 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
         // Add other fields as needed for future notification types
     }
 
-    @Override
-    public APIConfig get() {
-        return this;
-    }
-
-    @Override
-    public ProcessorConfiguration.NotificationConfig getNotificationConfig(NotificationType notificationType) {
-        if (notificationType == null) return null;
-        NotificationConfig config = notifications.get(notificationType);
-        if (config == null) return null;
-        return new NotificationConfigCoreImpl(config);
-    }
-
     public static class NotificationConfigCoreImpl implements ProcessorConfiguration.NotificationConfig {
         private final NotificationConfig delegate;
+
         public NotificationConfigCoreImpl(NotificationConfig delegate) {
             this.delegate = delegate;
         }
+
         @Override
-        public Boolean getEnable() { return delegate.getEnable(); }
+        public Boolean getEnable() {
+            return delegate.getEnable();
+        }
+
         @Override
-        public String getTopic() { return delegate.getTopic(); }
+        public String getTopic() {
+            return delegate.getTopic();
+        }
+
         @Override
-        public String getUrl() { return delegate.getUrl(); }
+        public String getUrl() {
+            return delegate.getUrl();
+        }
     }
 }
