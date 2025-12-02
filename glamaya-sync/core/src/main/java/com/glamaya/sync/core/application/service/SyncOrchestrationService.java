@@ -41,7 +41,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
     public Mono<Void> sync(ProcessorType processorType) {
         SyncProcessor<?, ?, ?> processor = syncProcessors.get(processorType);
         if (processor == null) {
-            log.error("No SyncProcessor found for processor type: {}", processorType);
+            log.error("{}: Not configured for synchronization.", processorType);
             return Mono.empty();
         }
         return executeSync(processor);
@@ -52,7 +52,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
         ProcessorConfiguration<T> config = processor.getConfiguration();
 
         if (!config.isEnable()) {
-            log.info("Synchronization is disabled for processor type: {}", processorType);
+            log.info("{}: Synchronization is disabled.", processorType);
             return Mono.empty();
         }
 
@@ -73,7 +73,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                         return Flux.empty(); // Stop recursion
                     }
 
-                    log.info("Fetching page {} for processor type: {}", currentStatus.getNextPage(), processorType);
+                    log.info("{}: Fetching page {}, per-page {}.", processorType, currentStatus.getNextPage(), currentStatus.getPageSize());
                     SyncContext<T> syncContext = new SyncContext<>(currentStatus, config);
 
                     return processor.getDataProvider().fetchData(syncContext)
@@ -93,7 +93,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                     })
                     .count() // Count total items processed
                     .flatMap(totalItems -> {
-                        log.info("Sync completed for {}. Processed {} items in total.", processorType, totalItems);
+                        log.info("{}: Sync completed. Processed {} items in total.", processorType, totalItems);
                         initialStatus.setLastSuccessfulRun(Instant.now());
                         return statusStorePort.saveStatus(initialStatus); // Save final status
                     });

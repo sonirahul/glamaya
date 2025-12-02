@@ -84,12 +84,12 @@ public class WooCommerceApiService<E> {
     public static <E> void updateStatusAfterPage(ProcessorStatus status, List<E> pageItems, APIConfig config,
             Function<E, Instant> lastModifiedExtractor) {
         if (pageItems.isEmpty()) {
-            log.info("Received empty page. Concluding sync for this processor.");
+            log.info("{}: Received empty page. Concluding sync process.", status.getProcessorType());
             status.setMoreDataAvailable(false);
             status.setNextPage(config.getInitPage());
             status.setUseLastDateModifiedInQuery(true);
         } else {
-            log.info("Successfully fetched {} items from page {}.", pageItems.size(), status.getNextPage());
+            log.info("{}: Fetched {} items from page {}.", status.getProcessorType(), pageItems.size(), status.getNextPage());
             status.setTotalItemsSynced(status.getTotalItemsSynced() + pageItems.size());
             E lastItem = pageItems.get(pageItems.size() - 1);
             status.setLastDateModified(lastModifiedExtractor.apply(lastItem));

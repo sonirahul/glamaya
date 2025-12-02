@@ -40,7 +40,7 @@ public class KafkaNotificationAdapter implements NotificationPort<Object> {
             return Mono.empty();
         }
         String topic = cfg.getTopic();
-        log.info("[KafkaNotificationAdapter] Sending payload to Kafka topic='{}'", topic);
+        log.debug("[KafkaNotificationAdapter] Sending payload to Kafka topic='{}'", topic);
         return kafkaTemplate.send(topic, payload).then();
     }
 }

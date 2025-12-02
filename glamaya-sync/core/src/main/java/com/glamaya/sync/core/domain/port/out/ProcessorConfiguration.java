@@ -33,7 +33,7 @@ public interface ProcessorConfiguration<T> {
     interface NotificationConfig {
         Boolean getEnable();
         String getTopic();
-        String getWebhook();
+        String getUrl();
         // Add other generic notification fields as needed
     }
 }
