@@ -23,6 +23,15 @@ public interface ProcessorConfiguration<T> {
     String getQueryUrl();
 
     /**
+     * Optional pacing configuration in milliseconds.
+     * If getFetchActiveDelayMs() > 0, orchestrator will use this fixed delay between page fetches.
+     * Otherwise, orchestrator will use exponential backoff capped by getFetchPassiveDelayMs().
+     * If passive is null/<=0, orchestrator will apply a sensible default cap.
+     */
+    Long getFetchActiveDelayMs();
+    Long getFetchPassiveDelayMs();
+
+    /**
      * Returns the notification configuration for the given notification type for this processor.
      */
     NotificationConfig getNotificationConfig(NotificationType notificationType);

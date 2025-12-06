@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +64,12 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                 .map(optStatus -> ProcessorStatus.fromConfiguration(processorType, optStatus.orElse(null), config));
 
         return initialStatusMono.flatMap(initialStatus -> {
-            // Define the recursive function for fetching and processing pages
-            // This function needs to be defined here to capture the generic types P, C, T
-            // Using an anonymous inner class to satisfy definite assignment analysis for recursion
+            // Backoff state stored locally per run
+            final int[] backoffAttempts = new int[]{0};
+            final Duration passiveCap = toDuration(config.getFetchPassiveDelayMs(), 60_000L);
+            final Duration activeDelay = toDuration(config.getFetchActiveDelayMs(), 0L);
+
+            // Recursive function for fetching and processing pages with pacing
             Function<ProcessorStatus, Flux<P>> fetchAndProcessPage = new Function<>() {
                 @Override
                 public Flux<P> apply(ProcessorStatus currentStatus) {
@@ -78,9 +82,21 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
 
                     return processor.getDataProvider().fetchData(syncContext)
                             .collectList()
-                            .flatMapMany(pageItems -> statusStorePort.saveStatus(currentStatus)
-                                    .thenMany(Flux.fromIterable(pageItems))
-                                    .concatWith(Flux.defer(() -> this.apply(currentStatus))));
+                            .flatMapMany(pageItems -> {
+                                // Update status persistence and emit items
+                                return statusStorePort.saveStatus(currentStatus)
+                                        .thenMany(Flux.fromIterable(pageItems))
+                                        .concatWith(Flux.defer(() -> {
+                                            // Compute next delay
+                                            Duration nextDelay = computeNextDelayUsingStatus(currentStatus, activeDelay, passiveCap, backoffAttempts);
+                                            if (nextDelay != null && !nextDelay.isZero() && !nextDelay.isNegative()) {
+                                                log.debug("{}: Delaying next page by {} ms (attempts={}).", processorType, nextDelay.toMillis(), backoffAttempts[0]);
+                                                return Mono.delay(nextDelay).thenMany(this.apply(currentStatus));
+                                            } else {
+                                                return this.apply(currentStatus);
+                                            }
+                                        }));
+                            });
                 }
             };
 
@@ -98,5 +114,29 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
                         return statusStorePort.saveStatus(initialStatus); // Save final status
                     });
         }).then();
+    }
+
+    private Duration toDuration(Long ms, long defaultMs) {
+        long val = ms != null ? ms : defaultMs;
+        if (val <= 0) return Duration.ZERO;
+        return Duration.ofMillis(val);
+    }
+
+    private Duration computeNextDelayUsingStatus(ProcessorStatus status, Duration activeDelay, Duration passiveCap, int[] backoffAttempts) {
+        if (status.isMoreDataAvailable()) {
+            // In active paging mode: prefer configured active delay if present; otherwise no delay.
+            if (activeDelay != null && !activeDelay.isZero() && !activeDelay.isNegative()) {
+                backoffAttempts[0] = 0; // reset backoff when actively paging
+                return activeDelay;
+            }
+            backoffAttempts[0] = 0;
+            return Duration.ZERO;
+        }
+        // No more data indicated: apply exponential backoff capped by passive cap.
+        long initialMs = 250L;
+        long nextMs = (long) (initialMs * Math.pow(2, Math.max(0, backoffAttempts[0])));
+        backoffAttempts[0] = Math.min(backoffAttempts[0] + 1, 30);
+        long capped = Math.min(nextMs, passiveCap.toMillis());
+        return Duration.ofMillis(capped);
     }
 }

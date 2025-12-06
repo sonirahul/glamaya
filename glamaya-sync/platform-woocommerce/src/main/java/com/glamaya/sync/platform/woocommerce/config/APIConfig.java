@@ -30,6 +30,16 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     }
 
     @Override
+    public Long getFetchActiveDelayMs() {
+        return fetchDurationMs != null ? fetchDurationMs.getActive() : null;
+    }
+
+    @Override
+    public Long getFetchPassiveDelayMs() {
+        return fetchDurationMs != null ? fetchDurationMs.getPassive() : null;
+    }
+
+    @Override
     public ProcessorConfiguration.NotificationConfig getNotificationConfig(NotificationType notificationType) {
         if (notificationType == null) return null;
         NotificationConfig config = notifications.get(notificationType);
