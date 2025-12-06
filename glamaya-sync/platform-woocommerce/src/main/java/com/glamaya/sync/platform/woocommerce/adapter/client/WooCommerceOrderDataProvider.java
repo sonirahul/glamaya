@@ -10,6 +10,7 @@ import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.DataProvider;
 import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.OrderDescriptor;
+import com.glamaya.sync.platform.woocommerce.adapter.util.WooPagination;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class WooCommerceOrderDataProvider implements DataProvider<Order> {
 
         return apiService.fetchPage(orderDescriptor, queryParams, status, config)
                 .collectList()
-                .doOnNext(pageItems -> WooCommerceApiService.updateStatusAfterPage(status, pageItems, config,
+                .doOnNext(pageItems -> WooPagination.updateStatusAfterPage(status, pageItems, config,
                         orderDescriptor.getLastModifiedExtractor()))
                 .flatMapMany(Flux::fromIterable);
     }

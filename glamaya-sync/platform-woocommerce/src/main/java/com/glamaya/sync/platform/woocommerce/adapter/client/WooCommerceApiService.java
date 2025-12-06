@@ -1,6 +1,5 @@
 package com.glamaya.sync.platform.woocommerce.adapter.client;
 
-import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.WooCommerceEntityDescriptor;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
@@ -12,10 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * A generic service for interacting with the WooCommerce API in a reactive way.
@@ -38,39 +34,6 @@ public class WooCommerceApiService<E> {
     }
 
     /**
-     * Generic method to update ProcessorStatus after fetching a page of entities.
-     *
-     * @param status                The ProcessorStatus to update
-     * @param pageItems             The list of fetched entities
-     * @param config                The APIConfig for the processor
-     * @param lastModifiedExtractor Function to extract last modified Instant from an entity
-     * @param <E>                   The entity type
-     */
-    public static <E> void updateStatusAfterPage(ProcessorStatus status, List<E> pageItems, APIConfig config,
-                                                 Function<E, Instant> lastModifiedExtractor) {
-        if (pageItems.isEmpty()) {
-            log.info("{}: Received empty page. Concluding sync process.", status.getProcessorType());
-            status.setMoreDataAvailable(false);
-            status.setNextPage(config.getInitPage());
-            status.setUseLastDateModifiedInQuery(true);
-        } else {
-            log.info("{}: Fetched {} items from page {}.", status.getProcessorType(), pageItems.size(), status.getNextPage());
-            status.setTotalItemsSynced(status.getTotalItemsSynced() + pageItems.size());
-            E lastItem = pageItems.get(pageItems.size() - 1);
-            status.setLastDateModified(lastModifiedExtractor.apply(lastItem));
-
-            if (pageItems.size() < config.getPageSize()) {
-                status.setMoreDataAvailable(false);
-                status.setNextPage(config.getInitPage());
-                status.setUseLastDateModifiedInQuery(true);
-            } else {
-                status.setNextPage(status.getNextPage() + 1);
-                status.setUseLastDateModifiedInQuery(false);
-            }
-        }
-    }
-
-    /**
      * Fetches a single page of entities from the WooCommerce API.
      *
      * @param descriptor The descriptor defining the entity-specific details.
@@ -78,7 +41,7 @@ public class WooCommerceApiService<E> {
      * @param config     The API configuration, containing the URL and page size.
      * @return A Flux emitting the entities found on the specified page.
      */
-    public Flux<E> fetchPage(WooCommerceEntityDescriptor<E> descriptor, Map<String, String> queryParams, ProcessorStatus status, APIConfig config) {
+    public Flux<E> fetchPage(WooCommerceEntityDescriptor<E> descriptor, Map<String, String> queryParams, com.glamaya.sync.core.domain.model.ProcessorStatus status, APIConfig config) {
         String relativeUrl = config.getQueryUrl();
         String oauthHeader = oAuthSigner.generateOAuth1Header(relativeUrl, queryParams);
 
