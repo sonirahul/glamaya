@@ -3,8 +3,7 @@ package com.glamaya.sync.runner.adapter.notification;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -16,11 +15,11 @@ import java.util.List;
  * A composite implementation of NotificationPort that dispatches notifications
  * to all other registered NotificationPort beans. This enables a "fan-out" mechanism.
  */
+@Slf4j
 @Component("compositeNotificationAdapter")
 @Primary // Ensures this is the default implementation injected when NotificationPort is requested
 public class CompositeNotificationAdapter implements NotificationPort<Object> {
 
-    private static final Logger log = LoggerFactory.getLogger(CompositeNotificationAdapter.class);
     private final List<NotificationPort<Object>> notifiers;
 
     /**

@@ -1,6 +1,8 @@
 package com.glamaya.sync.core.domain.port.out;
 
-import reactor.core.publisher.Mono;
+import com.glamaya.sync.core.domain.model.ProcessorType;
+
+import java.util.List;
 
 /**
  * Represents the main contract for a platform-specific integration.
@@ -17,11 +19,8 @@ public interface PlatformAdapter {
     String getPlatformName();
 
     /**
-     * Triggers the synchronization process for all supported entities (e.g., Orders, Products)
-     * for this specific platform. The implementation will contain the logic to orchestrate
-     * fetching, mapping, and publishing for its entities.
-     *
-     * @return A Mono<Void> that completes when all sync processes for the platform are finished.
+     * Returns the processor types owned by this platform.
+     * Used by the orchestrator to run platform-scoped processors with concurrency.
      */
-    Mono<Void> sync();
+    List<ProcessorType> getProcessorTypes();
 }

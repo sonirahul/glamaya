@@ -79,7 +79,7 @@ Follow these steps to add (e.g.) `WOOCOMMERCE_PRODUCT`:
 2. Define platform-specific configuration class (similar to `APIConfig`) implementing `ProcessorConfiguration`.
 3. Implement each required `DataProvider` and `DataMapper` pairing for the initial set of `ProcessorType` values (add
    new enum entries).
-4. Provide a `PlatformAdapter` (e.g. `ShopifyPlatformAdapter`) that calls `syncPlatformUseCase.sync(<ProcessorType>)`
+4. Provide a `PlatformAdapter` (e.g. `ShopifyPlatformAdapter`) that calls `syncOrchestrator.sync(<ProcessorType>)`
    for each supported processor in sequence.
 5. Add YAML file: `application-shopify.yml` with `glamaya.sync.shopify.api.endpoint-configs` structure and notification
    blocks.

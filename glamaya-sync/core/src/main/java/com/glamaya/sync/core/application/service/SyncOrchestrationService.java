@@ -1,6 +1,6 @@
 package com.glamaya.sync.core.application.service;
 
-import com.glamaya.sync.core.application.usecase.SyncPlatformUseCase;
+import com.glamaya.sync.core.application.usecase.SyncOrchestrator;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.ProcessorType;
@@ -18,11 +18,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class SyncOrchestrationService implements SyncPlatformUseCase {
+public class SyncOrchestrationService implements SyncOrchestrator {
 
     private final StatusStorePort statusStorePort;
     private final NotificationPort<Object> notificationPort;
@@ -39,7 +40,7 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
     }
 
     @Override
-    public Mono<Void> sync(ProcessorType processorType) {
+    public Mono<Void> syncSequential(ProcessorType processorType) {
         SyncProcessor<?, ?, ?> processor = syncProcessors.get(processorType);
         if (processor == null) {
             log.error("{}: Not configured for synchronization.", processorType);
@@ -48,8 +49,50 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
         return executeSync(processor);
     }
 
+    /**
+     * Runs synchronization for all configured processors in parallel.
+     *
+     * @param maxConcurrency maximum number of processors to run in parallel; if <=0, defaults to size of processors map.
+     */
+    @Override
+    public Mono<Void> syncParallel(int maxConcurrency) {
+        int concurrency = maxConcurrency > 0 ? Math.min(maxConcurrency, syncProcessors.size()) : syncProcessors.size();
+        log.info("SyncOrchestrationService: triggering syncAll for {} processors with concurrency {}.", syncProcessors.size(), concurrency);
+        syncProcessors.keySet().forEach(pt -> log.info("Registered processor: {}", pt));
+        return Flux.fromIterable(syncProcessors.values())
+                .flatMap(proc -> {
+                    ProcessorType pt = proc.getProcessorType();
+                    log.info("Starting executeSync for {}", pt);
+                    return executeSync(proc)
+                            .doOnSuccess(v -> log.info("Completed executeSync for {}", pt));
+                }, concurrency)
+                .then();
+    }
+
+    /**
+     * Runs synchronization for a specific set of processor types (e.g., a platform) in parallel.
+     */
+    @Override
+    public Mono<Void> syncPlatformParallel(List<ProcessorType> types, int maxConcurrency) {
+        Set<ProcessorType> filter = Set.copyOf(types);
+        int available = (int) syncProcessors.keySet().stream().filter(filter::contains).count();
+        int concurrency = maxConcurrency > 0 ? Math.min(maxConcurrency, available) : available;
+        log.info("SyncOrchestrationService: triggering syncFor {} processors with concurrency {}.", available, concurrency);
+        return Flux.fromIterable(syncProcessors.entrySet())
+                .filter(entry -> filter.contains(entry.getKey()))
+                .flatMap(entry -> {
+                    ProcessorType pt = entry.getKey();
+                    SyncProcessor<?, ?, ?> proc = entry.getValue();
+                    log.info("Starting executeSync for {}", pt);
+                    return executeSync(proc)
+                            .doOnSuccess(v -> log.info("Completed executeSync for {}", pt));
+                }, concurrency)
+                .then();
+    }
+
     private <P, C, T> Mono<Void> executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
+        log.info("executeSync invoked for {}", processorType);
         ProcessorConfiguration<T> config = processor.getConfiguration();
 
         if (!config.isEnable()) {
@@ -57,86 +100,65 @@ public class SyncOrchestrationService implements SyncPlatformUseCase {
             return Mono.empty();
         }
 
-        // 1. Get the initial status
+        // Build initial status from store + configuration
         Mono<ProcessorStatus> initialStatusMono = statusStorePort.findStatus(processorType)
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty())
                 .map(optStatus -> ProcessorStatus.fromConfiguration(processorType, optStatus.orElse(null), config));
 
-        return initialStatusMono.flatMap(initialStatus -> {
-            // Backoff state stored locally per run
-            final int[] backoffAttempts = new int[]{0};
-            final Duration passiveCap = toDuration(config.getFetchPassiveDelayMs(), 60_000L);
-            final Duration activeDelay = toDuration(config.getFetchActiveDelayMs(), 0L);
+        // Active delay to pace page fetches (0 means no delay)
+        Duration activeDelay = toDuration(config.getFetchActiveDelayMs());
 
-            // Recursive function for fetching and processing pages with pacing
-            Function<ProcessorStatus, Flux<P>> fetchAndProcessPage = new Function<>() {
-                @Override
-                public Flux<P> apply(ProcessorStatus currentStatus) {
-                    if (!currentStatus.isMoreDataAvailable()) {
-                        return Flux.empty(); // Stop recursion
-                    }
+        return initialStatusMono.flatMap(initialStatus ->
+                // Start recursive page processing
+                processPages(processor, config, initialStatus, activeDelay)
+                        // After all pages processed, notify for each item
+                        .flatMap(rawItem -> {
+                            C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
+                            return Flux.fromArray(NotificationType.values())
+                                    .flatMap(type -> notificationPort.notify(canonicalModel, config, type))
+                                    .then(Mono.just(1));
+                        })
+                        .count()
+                        .flatMap(totalItems -> {
+                            log.info("{}: Sync completed. Processed {} items in total.", processorType, totalItems);
+                            initialStatus.setLastSuccessfulRun(Instant.now());
+                            return statusStorePort.saveStatus(initialStatus);
+                        })
+        ).then();
+    }
 
-                    log.info("{}: Fetching page {}, per-page {}.", processorType, currentStatus.getNextPage(), currentStatus.getPageSize());
-                    SyncContext<T> syncContext = new SyncContext<>(currentStatus, config);
-
-                    return processor.getDataProvider().fetchData(syncContext)
-                            .collectList()
-                            .flatMapMany(pageItems -> {
-                                // Update status persistence and emit items
-                                return statusStorePort.saveStatus(currentStatus)
-                                        .thenMany(Flux.fromIterable(pageItems))
-                                        .concatWith(Flux.defer(() -> {
-                                            // Compute next delay
-                                            Duration nextDelay = computeNextDelayUsingStatus(currentStatus, activeDelay, passiveCap, backoffAttempts);
-                                            if (nextDelay != null && !nextDelay.isZero() && !nextDelay.isNegative()) {
-                                                log.debug("{}: Delaying next page by {} ms (attempts={}).", processorType, nextDelay.toMillis(), backoffAttempts[0]);
-                                                return Mono.delay(nextDelay).thenMany(this.apply(currentStatus));
-                                            } else {
-                                                return this.apply(currentStatus);
-                                            }
-                                        }));
-                            });
+    private <P, T> Flux<P> processPages(SyncProcessor<P, ?, T> processor,
+                                        ProcessorConfiguration<T> config,
+                                        ProcessorStatus status,
+                                        Duration activeDelay) {
+        // Define recursive function: fetch -> persist -> emit -> delay -> recur
+        Function<ProcessorStatus, Flux<P>> loop = new Function<>() {
+            @Override
+            public Flux<P> apply(ProcessorStatus current) {
+                if (!current.isMoreDataAvailable()) {
+                    return Flux.empty();
                 }
-            };
+                log.info("{}: Fetching page {}, per-page {}.", processor.getProcessorType(), current.getNextPage(), current.getPageSize());
+                SyncContext<T> ctx = new SyncContext<>(current, config);
 
-            return fetchAndProcessPage.apply(initialStatus)
-                    .flatMap(rawItem -> {
-                        C canonicalModel = processor.getDataMapper().mapToCanonical(rawItem);
-                        return Flux.fromArray(NotificationType.values())
-                                .flatMap(type -> notificationPort.notify(canonicalModel, config, type))
-                                .then(Mono.just(1));
-                    })
-                    .count() // Count total items processed
-                    .flatMap(totalItems -> {
-                        log.info("{}: Sync completed. Processed {} items in total.", processorType, totalItems);
-                        initialStatus.setLastSuccessfulRun(Instant.now());
-                        return statusStorePort.saveStatus(initialStatus); // Save final status
-                    });
-        }).then();
-    }
-
-    private Duration toDuration(Long ms, long defaultMs) {
-        long val = ms != null ? ms : defaultMs;
-        if (val <= 0) return Duration.ZERO;
-        return Duration.ofMillis(val);
-    }
-
-    private Duration computeNextDelayUsingStatus(ProcessorStatus status, Duration activeDelay, Duration passiveCap, int[] backoffAttempts) {
-        if (status.isMoreDataAvailable()) {
-            // In active paging mode: prefer configured active delay if present; otherwise no delay.
-            if (activeDelay != null && !activeDelay.isZero() && !activeDelay.isNegative()) {
-                backoffAttempts[0] = 0; // reset backoff when actively paging
-                return activeDelay;
+                return processor.getDataProvider().fetchData(ctx)
+                        .collectList()
+                        .flatMapMany(items -> statusStorePort.saveStatus(current)
+                                .thenMany(Flux.fromIterable(items))
+                                .concatWith(Flux.defer(() -> {
+                                    if (!activeDelay.isZero() && !activeDelay.isNegative()) {
+                                        return Mono.delay(activeDelay).thenMany(this.apply(current));
+                                    }
+                                    return this.apply(current);
+                                })));
             }
-            backoffAttempts[0] = 0;
-            return Duration.ZERO;
-        }
-        // No more data indicated: apply exponential backoff capped by passive cap.
-        long initialMs = 250L;
-        long nextMs = (long) (initialMs * Math.pow(2, Math.max(0, backoffAttempts[0])));
-        backoffAttempts[0] = Math.min(backoffAttempts[0] + 1, 30);
-        long capped = Math.min(nextMs, passiveCap.toMillis());
-        return Duration.ofMillis(capped);
+        };
+        return loop.apply(status);
+    }
+
+    private Duration toDuration(Long ms) {
+        if (ms == null || ms <= 0) return Duration.ZERO;
+        return Duration.ofMillis(ms);
     }
 }

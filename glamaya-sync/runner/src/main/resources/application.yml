@@ -30,6 +30,10 @@ glamaya:
     scheduler:
       # How often the sync job runs. Default is 5 minutes.
       fixedDelay: 300000
+    concurrency:
+      max: 3
+    execution:
+      mode: sequential
   notifications:
     kafka:
       # Set to 'true' to enable sending notifications to Kafka.
