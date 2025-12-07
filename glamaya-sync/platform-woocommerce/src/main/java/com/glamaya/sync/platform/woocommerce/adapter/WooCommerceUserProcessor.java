@@ -2,6 +2,7 @@ package com.glamaya.sync.platform.woocommerce.adapter;
 
 import com.glamaya.datacontracts.ecommerce.Contact;
 import com.glamaya.datacontracts.woocommerce.User;
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.platform.woocommerce.adapter.client.WooCommerceUserDataProvider;
 import com.glamaya.sync.platform.woocommerce.adapter.mapper.WooCommerceUserDataMapper;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
  * making them available to the SyncOrchestrationService in a type-safe manner.
  */
 @Component
-public class WooCommerceUserProcessor extends AbstractWooCommerceProcessor<User, Contact> {
+public class WooCommerceUserProcessor extends AbstractWooCommerceProcessor<User, EcomModel<Contact>> {
 
     public WooCommerceUserProcessor(
             WooCommerceUserDataProvider dataProvider,

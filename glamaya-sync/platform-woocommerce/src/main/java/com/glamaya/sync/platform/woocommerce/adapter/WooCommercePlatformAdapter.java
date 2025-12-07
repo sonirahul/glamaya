@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.glamaya.sync.platform.woocommerce.common.Constants.PLATFORM_NAME;
+
 /**
  * WooCommerce-specific implementation of the PlatformAdapter outbound port.
  * This adapter orchestrates the synchronization of various WooCommerce entities
@@ -18,7 +20,7 @@ public class WooCommercePlatformAdapter implements PlatformAdapter {
 
     @Override
     public String getPlatformName() {
-        return "WooCommerce";
+        return PLATFORM_NAME;
     }
 
     @Override

@@ -11,16 +11,16 @@ import com.glamaya.sync.platform.woocommerce.config.APIConfig;
  * Abstract base processor to reduce duplication across WooCommerce processors.
  * Provides common wiring for DataProvider, DataMapper, ProcessorType, and configuration.
  */
-public abstract class AbstractWooCommerceProcessor<S, T> implements SyncProcessor<S, T, APIConfig> {
+public abstract class AbstractWooCommerceProcessor<P, C> implements SyncProcessor<P, C, APIConfig> {
 
-    private final DataProvider<S> dataProvider;
-    private final DataMapper<S, T> dataMapper;
+    private final DataProvider<P> dataProvider;
+    private final DataMapper<P, C> dataMapper;
     private final ProcessorType processorType;
     private final ProcessorConfiguration<APIConfig> configuration;
 
     protected AbstractWooCommerceProcessor(
-            DataProvider<S> dataProvider,
-            DataMapper<S, T> dataMapper,
+            DataProvider<P> dataProvider,
+            DataMapper<P, C> dataMapper,
             ProcessorType processorType,
             ProcessorConfiguration<APIConfig> configuration) {
         this.dataProvider = dataProvider;
@@ -30,12 +30,12 @@ public abstract class AbstractWooCommerceProcessor<S, T> implements SyncProcesso
     }
 
     @Override
-    public DataProvider<S> getDataProvider() {
+    public DataProvider<P> getDataProvider() {
         return dataProvider;
     }
 
     @Override
-    public DataMapper<S, T> getDataMapper() {
+    public DataMapper<P, C> getDataMapper() {
         return dataMapper;
     }
 

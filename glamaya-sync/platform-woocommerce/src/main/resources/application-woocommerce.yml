@@ -29,6 +29,21 @@ glamaya:
               WEBHOOK:
                 enable: false
                 url: "some end point"
+          WOOCOMMERCE_ORDER_TO_CONTACT:
+            enable: true
+            reset-on-startup: false
+            init-page: 1
+            page-size: 10
+            fetch-duration-ms:
+              active: 1000
+            query-url: "/wp-json/wc/v3/orders"
+            notifications:
+              KAFKA:
+                enable: true
+                topic: "ecom-users"
+              WEBHOOK:
+                enable: false
+                url: "some end point"
           WOOCOMMERCE_USER:
             enable: true
             reset-on-startup: false

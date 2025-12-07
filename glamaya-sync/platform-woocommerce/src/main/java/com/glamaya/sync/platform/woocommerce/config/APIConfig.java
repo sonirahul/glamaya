@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.EnumMap;
 import java.util.Map;
 
+import static com.glamaya.sync.platform.woocommerce.common.Constants.PLATFORM_NAME;
+
 /**
  * Generic API configuration container for WooCommerce module.
  * Values are bound from application-woocommerce.yml (orders-config section).
@@ -63,6 +65,11 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
 
         public NotificationConfigCoreImpl(NotificationConfig delegate) {
             this.delegate = delegate;
+        }
+
+        @Override
+        public String getPlatformName() {
+            return PLATFORM_NAME;
         }
 
         @Override

@@ -33,6 +33,9 @@ public interface ProcessorConfiguration<T> {
      * Core notification configuration abstraction, not platform-specific.
      */
     interface NotificationConfig {
+
+        String getPlatformName();
+
         Boolean getEnable();
 
         String getTopic();

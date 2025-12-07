@@ -6,6 +6,7 @@ package com.glamaya.sync.core.domain.model;
  */
 public enum ProcessorType {
     WOOCOMMERCE_ORDER,
+    WOOCOMMERCE_ORDER_TO_CONTACT,
     WOOCOMMERCE_PRODUCT,
     WOOCOMMERCE_USER,
 

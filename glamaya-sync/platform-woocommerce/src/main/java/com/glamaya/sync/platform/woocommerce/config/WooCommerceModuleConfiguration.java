@@ -2,6 +2,7 @@ package com.glamaya.sync.platform.woocommerce.config;
 
 import com.glamaya.datacontracts.ecommerce.mapper.ContactMapperFactory;
 import com.glamaya.datacontracts.ecommerce.mapper.OrderMapperFactory;
+import com.glamaya.datacontracts.ecommerce.mapper.WooOrderToContactMapperFactoryImpl;
 import com.glamaya.datacontracts.ecommerce.mapper.WooOrderToOrderMapperFactoryImpl;
 import com.glamaya.datacontracts.ecommerce.mapper.WooUserToContactMapperFactoryImpl;
 import com.glamaya.datacontracts.woocommerce.Order;
@@ -87,5 +88,16 @@ public class WooCommerceModuleConfiguration {
     @Bean
     public ContactMapperFactory<User> wooUserToContactMapperFactory() {
         return new WooUserToContactMapperFactoryImpl();
+    }
+
+    /**
+     * Provides the ContactMapperFactory implementation for WooCommerce orders to contact.
+     * This is required by the WooCommerceOrderToContactDataMapper.
+     *
+     * @return An instance of WooUserToContactMapperFactoryImpl.
+     */
+    @Bean
+    public ContactMapperFactory<Order> wooOrderToContactMapperFactoryImpl() {
+        return new WooOrderToContactMapperFactoryImpl();
     }
 }
