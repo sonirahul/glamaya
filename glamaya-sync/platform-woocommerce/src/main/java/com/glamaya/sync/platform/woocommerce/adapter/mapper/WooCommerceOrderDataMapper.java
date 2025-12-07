@@ -6,6 +6,8 @@ import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.port.out.DataMapper;
 import org.springframework.stereotype.Component;
 
+import static com.glamaya.sync.platform.woocommerce.common.Constants.PLATFORM_NAME;
+
 /**
  * Implementation of DataMapper for converting WooCommerce Order DTOs to Canonical Order domain models.
  */
@@ -22,7 +24,7 @@ public class WooCommerceOrderDataMapper implements DataMapper<com.glamaya.dataco
     public EcomModel<Order> mapToCanonical(com.glamaya.datacontracts.woocommerce.Order platformModel) {
         // Use the injected OrderMapperFactory to perform the conversion
 
-        var order = orderMapperFactory.toGlamayaOrder(platformModel);
+        var order = orderMapperFactory.toGlamayaOrder(platformModel, PLATFORM_NAME);
         return new EcomModel<>(order.getId(), order);
     }
 }

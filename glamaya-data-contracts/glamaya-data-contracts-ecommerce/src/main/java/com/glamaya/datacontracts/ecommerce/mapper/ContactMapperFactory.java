@@ -14,12 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public interface ContactMapperFactory<T> {
+public interface ContactMapperFactory<S> {
 
     String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
     PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 
-    Contact toGlamayaContact(T data, String sourceAccountName);
+    Contact toGlamayaContact(S source, String sourceAccountName);
 
     default boolean matches(String classType) {
         if (classType == null) {

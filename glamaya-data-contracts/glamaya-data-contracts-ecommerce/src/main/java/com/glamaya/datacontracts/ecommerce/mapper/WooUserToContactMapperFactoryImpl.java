@@ -55,11 +55,11 @@ public class WooUserToContactMapperFactoryImpl implements ContactMapperFactory<U
                 .withSourceName(sourceAccountName)
                 .withSourceType(SourceType.WOOCOMMERCE_USER)
                 .withSourceId(user.getId())
-                .withUserId(user.getId()).build();
+                .withId(user.getId()).build();
         var sources = List.of(source);
 
         String uuid = UUID.nameUUIDFromBytes((source.getSourceName() + "-" + source.getSourceType()
-                + "-" + source.getSourceId() + "-" + source.getUserId()).toUpperCase()
+                + "-" + source.getSourceId() + "-" + source.getId()).toUpperCase()
                 .getBytes(StandardCharsets.UTF_8)).toString();
 
         return Contact.builder()

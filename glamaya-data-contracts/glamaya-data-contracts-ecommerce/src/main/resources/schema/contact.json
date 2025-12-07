@@ -170,9 +170,9 @@
           "type": "string",
           "description": "Unique identifier for the source, e.g., WooCommerce order ID or user ID"
         },
-        "userId": {
+        "id": {
           "type": "string",
-          "description": "Unique identifier for the user in the source system, if applicable"
+          "description": "Unique identifier for the entity in the source system, if applicable"
         }
       }
     },

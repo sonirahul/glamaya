@@ -19,7 +19,7 @@ import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_T
 public class WooOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.woocommerce.Order> {
 
     @Override
-    public Order toGlamayaOrder(com.glamaya.datacontracts.woocommerce.Order source) {
+    public Order toGlamayaOrder(com.glamaya.datacontracts.woocommerce.Order source, String sourceAccountName) {
 
         if (source == null) return null;
         var target = Order.builder().build();

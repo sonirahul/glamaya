@@ -7,6 +7,6 @@ import com.glamaya.datacontracts.ecommerce.Order;
  * Similar pattern to ContactMapperFactory.
  */
 public interface OrderMapperFactory<S> {
-    Order toGlamayaOrder(S source);
+    Order toGlamayaOrder(S source, String sourceAccountName);
 }
 

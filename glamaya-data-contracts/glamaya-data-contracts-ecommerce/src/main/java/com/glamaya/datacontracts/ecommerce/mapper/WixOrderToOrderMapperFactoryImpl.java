@@ -14,7 +14,7 @@ import java.util.List;
 public class WixOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.glamaya.datacontracts.wix.Order> {
 
     @Override
-    public Order toGlamayaOrder(com.glamaya.datacontracts.wix.Order source) {
+    public Order toGlamayaOrder(com.glamaya.datacontracts.wix.Order source, String sourceAccountName) {
 
         if (source == null) return null;
         var target = Order.builder().build();

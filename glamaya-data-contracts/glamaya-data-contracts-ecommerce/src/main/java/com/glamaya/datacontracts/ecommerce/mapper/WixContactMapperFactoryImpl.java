@@ -57,7 +57,7 @@ public class WixContactMapperFactoryImpl implements ContactMapperFactory<com.gla
                 .withSourceName(sourceAccountName)
                 .withSourceType(SourceType.WIX)
                 .withSourceId(user.getId())
-                .withUserId(user.getId())
+                .withId(user.getId())
                 .build());
 
         return Contact.builder()
