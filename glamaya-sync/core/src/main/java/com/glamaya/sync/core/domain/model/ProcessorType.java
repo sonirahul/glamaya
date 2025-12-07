@@ -12,5 +12,7 @@ public enum ProcessorType {
 
     WIX_ORDER,
     WIX_PRODUCT,
-    WIX_CONTACT
+    WIX_CONTACT,
+
+    WHATSAPP
 }
