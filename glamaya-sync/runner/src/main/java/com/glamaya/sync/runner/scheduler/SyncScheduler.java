@@ -3,6 +3,7 @@ package com.glamaya.sync.runner.scheduler;
 import com.glamaya.sync.core.application.usecase.SyncOrchestrator;
 import com.glamaya.sync.core.domain.model.ExecutionMode;
 import com.glamaya.sync.core.domain.port.out.PlatformAdapter;
+import com.glamaya.sync.runner.common.LoggerConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +34,7 @@ public class SyncScheduler {
         this.platformAdapters = platformAdapters;
         this.maxConcurrency = maxConcurrency;
         this.executionMode = ExecutionMode.fromString(executionMode);
-        log.info("SyncScheduler initialized. Platforms={}, Max concurrency={}, Mode={}.", platformAdapters.size(), this.maxConcurrency, this.executionMode);
+        log.info(LoggerConstants.SCHEDULER_INIT, platformAdapters.size(), this.maxConcurrency, this.executionMode);
     }
 
     /**
@@ -41,7 +42,7 @@ public class SyncScheduler {
      */
     @Scheduled(fixedDelayString = "${glamaya.sync.scheduler.fixedDelay:300000}")
     public void run() {
-        log.info("Starting scheduled synchronization. Mode={}, cap={}", executionMode, maxConcurrency);
+        log.info(LoggerConstants.SCHEDULER_START, executionMode, maxConcurrency);
         switch (executionMode) {
             case SEQUENTIAL -> runSequentialSync();
             case PLATFORM_PARALLEL -> runPlatformParallelSync();
@@ -52,31 +53,31 @@ public class SyncScheduler {
     private void runSequentialSync() {
         Flux.fromIterable(sortedAdapters())
                 .concatMap(adapter -> {
-                    log.info("Platform '{}' starting (processors sequential).", adapter.getPlatformName());
+                    log.info(LoggerConstants.SCHEDULER_PLATFORM_START, adapter.getPlatformName(), 1, executionMode);
                     return Flux.fromIterable(adapter.getProcessorTypes())
                             .concatMap(syncOrchestrator::syncSequential)
                             .then()
-                            .doOnSuccess(v -> log.info("Platform '{}' completed.", adapter.getPlatformName()));
+                            .doOnSuccess(v -> log.info(LoggerConstants.SCHEDULER_PLATFORM_COMPLETE, adapter.getPlatformName(), 1, executionMode));
                 })
-                .doOnComplete(() -> log.info("Finished scheduled synchronization for all platforms (single)."))
+                .doOnComplete(() -> log.info(LoggerConstants.SCHEDULER_ALL_COMPLETE, executionMode))
                 .subscribe();
     }
 
     private void runPlatformParallelSync() {
         Flux.fromIterable(sortedAdapters())
                 .concatMap(adapter -> {
-                    log.info("Platform '{}' starting (processors parallel cap={}).", adapter.getPlatformName(), maxConcurrency);
+                    log.info(LoggerConstants.SCHEDULER_PLATFORM_START, adapter.getPlatformName(), maxConcurrency, executionMode);
                     return syncOrchestrator.syncPlatformParallel(adapter.getProcessorTypes(), maxConcurrency)
-                            .doOnSuccess(v -> log.info("Platform '{}' completed.", adapter.getPlatformName()));
+                            .doOnSuccess(v -> log.info(LoggerConstants.SCHEDULER_PLATFORM_COMPLETE, adapter.getPlatformName(), maxConcurrency, executionMode));
                 })
-                .doOnComplete(() -> log.info("Finished scheduled synchronization for all platforms (parallel per platform)."))
+                .doOnComplete(() -> log.info(LoggerConstants.SCHEDULER_ALL_COMPLETE, executionMode))
                 .subscribe();
     }
 
     private void runParallelSync() {
-        log.info("Global parallel execution (cap={}).", maxConcurrency);
+        log.info(LoggerConstants.SCHEDULER_PLATFORM_START, "All Platforms", maxConcurrency, executionMode);
         syncOrchestrator.syncParallel(maxConcurrency)
-                .doOnSuccess(v -> log.info("Finished scheduled synchronization (global parallel)."))
+                .doOnSuccess(v -> log.info(LoggerConstants.SCHEDULER_ALL_COMPLETE, executionMode))
                 .subscribe();
     }
 

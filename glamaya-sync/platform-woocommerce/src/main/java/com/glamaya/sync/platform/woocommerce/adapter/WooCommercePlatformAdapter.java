@@ -18,11 +18,11 @@ public class WooCommercePlatformAdapter implements PlatformAdapter {
 
     @Override
     public String getPlatformName() {
-        return "woocommerce";
+        return "WooCommerce";
     }
 
     @Override
     public List<ProcessorType> getProcessorTypes() {
-        return List.of(ProcessorType.WOOCOMMERCE_ORDER, ProcessorType.WOOCOMMERCE_USER);
+        return List.of(ProcessorType.WOOCOMMERCE_ORDER, ProcessorType.WOOCOMMERCE_ORDER_TO_CONTACT, ProcessorType.WOOCOMMERCE_USER);
     }
 }

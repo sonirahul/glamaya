@@ -21,12 +21,11 @@ glamaya:
             page-size: 10
             fetch-duration-ms:
               active: 1000
-              passive: 60000
             query-url: "/wp-json/wc/v3/orders"
             notifications:
               KAFKA:
                 enable: true
-                topic: "woocommerce-orders"
+                topic: "ecom-orders"
               WEBHOOK:
                 enable: false
                 url: "some end point"
@@ -37,12 +36,11 @@ glamaya:
             page-size: 10
             fetch-duration-ms:
               active: 1000
-              passive: 60000
             query-url: "/wp-json/wc/v3/customers"
             notifications:
               KAFKA:
                 enable: true
-                topic: "woocommerce-users"
+                topic: "ecom-users"
               WEBHOOK:
                 enable: false
                 url: "some end point"

@@ -3,6 +3,7 @@ package com.glamaya.sync.runner.adapter.notification;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
+import com.glamaya.sync.runner.common.LoggerConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
         this.notifiers = allNotificationPorts.stream()
                 .filter(n -> n != this) // Exclude self to prevent infinite loop
                 .toList();
-        log.info("Initialized CompositeNotificationAdapter with {} leaf notifiers.", notifiers.size());
+        log.info(LoggerConstants.NOTIF_COMPOSITE_INIT, notifiers.size());
     }
 
     @Override

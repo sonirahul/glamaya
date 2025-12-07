@@ -1,5 +1,6 @@
 package com.glamaya.sync.platform.woocommerce.adapter.client;
 
+import com.glamaya.sync.platform.woocommerce.common.LoggerConstants;
 import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.WooCommerceEntityDescriptor;
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
@@ -57,14 +58,15 @@ public class WooCommerceApiService<E> {
                         resp -> resp.bodyToMono(String.class)
                                 .defaultIfEmpty("<empty body>")
                                 .flatMap(body -> {
-                                    log.error("WooCommerce API Error: {} - {}", resp.statusCode(), body);
+                                    String procName = descriptor != null ? descriptor.getClass().getSimpleName() : "WooCommerceApiService";
+                                    log.error(LoggerConstants.WC_API_ERROR, procName, resp.statusCode(), body);
                                     return Mono.error(new RuntimeException("Remote API Error: " + resp.statusCode() + " - " + body));
                                 }))
                 .bodyToMono(descriptor.getListTypeReference())
                 .flatMapMany(list -> list == null ? Flux.empty() : Flux.fromIterable(list))
                 .onErrorResume(DecodingException.class, e -> {
-                    log.error("WebClient-level JSON decoding error. Returning empty Flux for page {}. Error: {}",
-                            status.getNextPage(), e.getMessage());
+                    String procName = descriptor != null ? descriptor.getClass().getSimpleName() : "WooCommerceApiService";
+                    log.error(LoggerConstants.WC_API_JSON_ERROR, procName, status.getNextPage(), e.getMessage());
                     return Flux.empty();
                 });
     }

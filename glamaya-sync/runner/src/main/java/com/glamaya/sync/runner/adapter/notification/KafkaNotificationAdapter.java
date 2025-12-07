@@ -3,6 +3,7 @@ package com.glamaya.sync.runner.adapter.notification;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
+import com.glamaya.sync.runner.common.LoggerConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class KafkaNotificationAdapter implements NotificationPort<Object> {
             return Mono.empty();
         }
         String topic = cfg.getTopic();
-        log.debug("[KafkaNotificationAdapter] Sending payload to Kafka topic='{}'", topic);
+        log.debug(LoggerConstants.NOTIF_KAFKA_SEND, topic);
         return kafkaTemplate.send(topic, payload).then();
     }
 }
