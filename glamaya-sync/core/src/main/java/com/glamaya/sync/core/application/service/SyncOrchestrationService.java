@@ -2,6 +2,7 @@ package com.glamaya.sync.core.application.service;
 
 import com.glamaya.sync.core.application.usecase.SyncOrchestrator;
 import com.glamaya.sync.core.common.LoggerConstants;
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.ProcessorType;
@@ -27,12 +28,12 @@ import java.util.stream.Collectors;
 public class SyncOrchestrationService implements SyncOrchestrator {
 
     private final StatusStorePort statusStorePort;
-    private final NotificationPort<Object> notificationPort;
+    private final NotificationPort<EcomModel<?>> notificationPort;
     private final Map<ProcessorType, SyncProcessor<?, ?, ?>> syncProcessors;
 
     public SyncOrchestrationService(
             StatusStorePort statusStorePort,
-            NotificationPort<Object> notificationPort,
+            NotificationPort<EcomModel<?>> notificationPort,
             List<SyncProcessor<?, ?, ?>> syncProcessors) {
         this.statusStorePort = statusStorePort;
         this.notificationPort = notificationPort;
@@ -91,7 +92,7 @@ public class SyncOrchestrationService implements SyncOrchestrator {
                 .then();
     }
 
-    private <P, C, T> Mono<Void> executeSync(SyncProcessor<P, C, T> processor) {
+    private <P, C extends EcomModel<?>, T> Mono<Void> executeSync(SyncProcessor<P, C, T> processor) {
         ProcessorType processorType = processor.getProcessorType();
         log.info(LoggerConstants.ORCH_EXEC_INVOKED, processorType);
         ProcessorConfiguration<T> config = processor.getConfiguration();
@@ -119,6 +120,8 @@ public class SyncOrchestrationService implements SyncOrchestrator {
                             return Flux.fromArray(NotificationType.values())
                                     .flatMap(type -> notificationPort.notify(canonicalModel, config, type))
                                     .then(Mono.just(1));
+
+
                         })
                         .count()
                         .flatMap(totalItems -> {

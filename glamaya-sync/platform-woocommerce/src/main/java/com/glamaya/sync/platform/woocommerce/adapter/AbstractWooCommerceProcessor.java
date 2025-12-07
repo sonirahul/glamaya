@@ -1,5 +1,6 @@
 package com.glamaya.sync.platform.woocommerce.adapter;
 
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 import com.glamaya.sync.core.domain.port.out.DataMapper;
 import com.glamaya.sync.core.domain.port.out.DataProvider;
@@ -11,7 +12,7 @@ import com.glamaya.sync.platform.woocommerce.config.APIConfig;
  * Abstract base processor to reduce duplication across WooCommerce processors.
  * Provides common wiring for DataProvider, DataMapper, ProcessorType, and configuration.
  */
-public abstract class AbstractWooCommerceProcessor<P, C> implements SyncProcessor<P, C, APIConfig> {
+public abstract class AbstractWooCommerceProcessor<P, C extends EcomModel<?>> implements SyncProcessor<P, C, APIConfig> {
 
     private final DataProvider<P> dataProvider;
     private final DataMapper<P, C> dataMapper;
@@ -49,4 +50,3 @@ public abstract class AbstractWooCommerceProcessor<P, C> implements SyncProcesso
         return configuration;
     }
 }
-

@@ -1,5 +1,6 @@
 package com.glamaya.sync.core.domain.port.out;
 
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.ProcessorType;
 
 /**
@@ -8,10 +9,10 @@ import com.glamaya.sync.core.domain.model.ProcessorType;
  * generic type link between the platform model and the canonical model.
  *
  * @param <P> The Platform-specific model type.
- * @param <C> The Canonical core model type.
+ * @param <C> The Canonical core model type, enforced to be an EcomModel.
  * @param <T> The typed configuration object type.
  */
-public interface SyncProcessor<P, C, T> {
+public interface SyncProcessor<P, C extends EcomModel<?>, T> {
 
     /**
      * Returns the data provider for the platform-specific model.

@@ -1,13 +1,18 @@
 package com.glamaya.sync.runner.adapter.notification;
 
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
+import com.glamaya.sync.runner.common.Constants;
 import com.glamaya.sync.runner.common.LoggerConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Reactive Kafka implementation of the NotificationPort.
@@ -15,7 +20,7 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Component("kafkaNotificationAdapter")
-public class KafkaNotificationAdapter implements NotificationPort<Object> {
+public class KafkaNotificationAdapter implements NotificationPort<EcomModel<?>> {
 
     private final ReactiveKafkaProducerTemplate<String, Object> kafkaTemplate;
 
@@ -30,10 +35,10 @@ public class KafkaNotificationAdapter implements NotificationPort<Object> {
     }
 
     @Override
-    public Mono<Void> notify(Object payload,
+    public Mono<Void> notify(EcomModel<?> payload,
                              ProcessorConfiguration<?> processorConfiguration,
                              NotificationType type) {
-        if (type != NotificationType.KAFKA) {
+        if (!supports(type)) {
             return Mono.empty();
         }
         var cfg = processorConfiguration.getNotificationConfig(NotificationType.KAFKA);
@@ -42,6 +47,10 @@ public class KafkaNotificationAdapter implements NotificationPort<Object> {
         }
         String topic = cfg.getTopic();
         log.debug(LoggerConstants.NOTIF_KAFKA_SEND, topic);
-        return kafkaTemplate.send(topic, payload).then();
+        ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(topic, payload.getId(), payload.getData());
+        if (cfg.getPlatformName() != null) {
+            producerRecord.headers().add(Constants.SOURCE_ACCOUNT_NAME, cfg.getPlatformName().getBytes(StandardCharsets.UTF_8));
+        }
+        return kafkaTemplate.send(producerRecord).then();
     }
 }

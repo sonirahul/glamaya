@@ -1,5 +1,6 @@
 package com.glamaya.sync.runner.adapter.notification;
 
+import com.glamaya.sync.core.domain.model.EcomModel;
 import com.glamaya.sync.core.domain.model.NotificationType;
 import com.glamaya.sync.core.domain.port.out.NotificationPort;
 import com.glamaya.sync.core.domain.port.out.ProcessorConfiguration;
@@ -18,10 +19,10 @@ import java.util.List;
  */
 @Slf4j
 @Component("compositeNotificationAdapter")
-@Primary // Ensures this is the default implementation injected when NotificationPort is requested
-public class CompositeNotificationAdapter implements NotificationPort<Object> {
+@Primary
+public class CompositeNotificationAdapter implements NotificationPort<EcomModel<?>> {
 
-    private final List<NotificationPort<Object>> notifiers;
+    private final List<NotificationPort<EcomModel<?>>> notifiers;
 
     /**
      * Spring injects all available NotificationPort beans.
@@ -29,7 +30,7 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
      *
      * @param allNotificationPorts A list of all NotificationPort beans in the application context.
      */
-    public CompositeNotificationAdapter(List<NotificationPort<Object>> allNotificationPorts) {
+    public CompositeNotificationAdapter(List<NotificationPort<EcomModel<?>>> allNotificationPorts) {
         this.notifiers = allNotificationPorts.stream()
                 .filter(n -> n != this) // Exclude self to prevent infinite loop
                 .toList();
@@ -42,7 +43,7 @@ public class CompositeNotificationAdapter implements NotificationPort<Object> {
     }
 
     @Override
-    public Mono<Void> notify(Object payload,
+    public Mono<Void> notify(EcomModel<?> payload,
                              ProcessorConfiguration<?> processorConfiguration,
                              NotificationType type) {
         // Retrieve channel-specific config once; if absent, skip.
