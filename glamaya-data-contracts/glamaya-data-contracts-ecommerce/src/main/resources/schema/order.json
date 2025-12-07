@@ -5,9 +5,12 @@
   "description": "Unified ecommerce order combining fields from multiple platforms",
   "properties": {
     "id": { "type": ["string", "null"] },
-    "platformType": { "type": "string" },
-    "originalPlatformId": { "type": ["string", "null"] },
-    "originalPlatformNumber": { "type": ["string", "null"] },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "contact.json#/definitions/source"
+      }
+    },
     "status": { "type": ["string", "null"] },
     "financialStatus": { "type": ["string", "null"] },
     "fulfillmentStatus": { "type": ["string", "null"] },

@@ -1,17 +1,21 @@
 package com.glamaya.datacontracts.ecommerce.mapper;
 
-import com.glamaya.datacontracts.ecommerce.Order;
-import com.glamaya.datacontracts.ecommerce.Customer;
 import com.glamaya.datacontracts.ecommerce.BillingAddress;
-import com.glamaya.datacontracts.ecommerce.ShippingAddress;
-import com.glamaya.datacontracts.ecommerce.LineItem;
-import com.glamaya.datacontracts.ecommerce.Payment;
+import com.glamaya.datacontracts.ecommerce.Customer;
 import com.glamaya.datacontracts.ecommerce.Fulfillment;
+import com.glamaya.datacontracts.ecommerce.LineItem;
+import com.glamaya.datacontracts.ecommerce.Order;
+import com.glamaya.datacontracts.ecommerce.Payment;
+import com.glamaya.datacontracts.ecommerce.ShippingAddress;
+import com.glamaya.datacontracts.ecommerce.Source;
+import com.glamaya.datacontracts.ecommerce.SourceType;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.glamaya.datacontracts.commons.constant.Constants.STRING_DATE_TO_INSTANT_FUNCTION;
 
@@ -20,37 +24,74 @@ public class WooOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.
 
     @Override
     public Order toGlamayaOrder(com.glamaya.datacontracts.woocommerce.Order source, String sourceAccountName) {
-
         if (source == null) return null;
+
         var target = Order.builder().build();
-        // Platform identity
-        target.setPlatformType("WOOCOMMERCE");
-        target.setOriginalPlatformId(source.getId() == null ? null : String.valueOf(source.getId()));
-        target.setOriginalPlatformNumber(source.getNumber());
-        // Status fields
+
+        mapSources(source, target, sourceAccountName);
+        mapStatusAndMonetary(source, target);
+        mapCurrency(source, target);
+        mapDates(source, target);
+        mapPayment(source, target);
+        mapFulfillment(target);
+        mapCustomerAndAddresses(source, target);
+        mapLineItems(source, target);
+        aggregateQuantity(target);
+        setNotesAndMetadata(source, target);
+
+
+
+        return target;
+    }
+
+    private void mapSources(com.glamaya.datacontracts.woocommerce.Order source, Order target, String sourceAccountName) {
+        var sourceObj = Source.builder()
+                .withSourceName(sourceAccountName)
+                .withSourceType(SourceType.WOOCOMMERCE_ORDER)
+                .withSourceId(String.valueOf(source.getId()))
+                .withId(String.valueOf(source.getId())).build();
+        var sources = List.of(sourceObj);
+        target.setSources(sources);
+
+        String uuid = UUID.nameUUIDFromBytes((sourceObj.getSourceName() + "-" + sourceObj.getSourceType()
+                + "-" + sourceObj.getSourceId() + "-" + sourceObj.getId()).toUpperCase()
+                .getBytes(StandardCharsets.UTF_8)).toString();
+        target.setId(uuid);
+    }
+
+    private void mapStatusAndMonetary(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         if (source.getStatus() != null) target.setStatus(String.valueOf(source.getStatus()));
-        // Monetary fields (String -> BigDecimal)
         target.setTotalPrice(parseBigDecimal(source.getTotal()));
         target.setDiscountTotal(parseBigDecimal(source.getDiscountTotal()));
         target.setShippingTotal(parseBigDecimal(source.getShippingTotal()));
         target.setTaxTotal(parseBigDecimal(source.getTotalTax()));
-        // Currency
+    }
+
+    private void mapCurrency(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         target.setCurrency(source.getCurrency());
-        // Dates (parse GMT if present else local)
+    }
+
+    private void mapDates(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         target.setCreatedAt(parseInstantPref(source.getDateCreatedGmt(), source.getDateCreated()));
         target.setUpdatedAt(parseInstantPref(source.getDateModifiedGmt(), source.getDateModified()));
-        // Payment
+    }
+
+    private void mapPayment(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         var payment = Payment.builder().build();
         payment.setMethod(source.getPaymentMethod());
         payment.setStatus(source.getPaymentMethodTitle());
         payment.setTransactionId(source.getTransactionId());
         payment.setPaidAt(parseInstantPref(source.getDatePaidGmt(), source.getDatePaid()));
         target.setPayment(payment);
-        // Fulfillment (approx from order status)
+    }
+
+    private void mapFulfillment(Order target) {
         var fulfillment = Fulfillment.builder().build();
         fulfillment.setStatus(target.getStatus());
         target.setFulfillment(fulfillment);
-        // Customer info
+    }
+
+    private void mapCustomerAndAddresses(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         if (source.getBilling() != null) {
             var cust = Customer.builder().build();
             cust.setId(source.getCustomerId());
@@ -64,42 +105,47 @@ public class WooOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.
         if (source.getShipping() != null) {
             target.setShippingAddress(toShippingAddress(source.getShipping()));
         }
-        // Line items mapping
-        if (source.getLineItems() != null) {
-            List<LineItem> items = new ArrayList<>();
-            for (var li : source.getLineItems()) {
-                if (li == null) continue;
-                var uni = LineItem.builder().build();
-                uni.setLineId(li.getId() == null ? null : String.valueOf(li.getId()));
-                uni.setProductId(li.getProductId() == null ? null : String.valueOf(li.getProductId()));
-                uni.setVariantId(li.getVariationId() == null ? null : String.valueOf(li.getVariationId()));
-                uni.setSku(li.getSku());
-                uni.setName(li.getName());
-                uni.setQuantity(li.getQuantity());
-                uni.setUnitPrice(longToBigDecimal(li.getPrice()));
-                uni.setTotalPrice(parseBigDecimal(li.getTotal()));
-                uni.setTaxAmount(parseBigDecimal(li.getTotalTax()));
-                BigDecimal subtotal = parseBigDecimal(li.getSubtotal());
-                BigDecimal total = parseBigDecimal(li.getTotal());
-                if (subtotal != null && total != null && subtotal.compareTo(total) > 0) {
-                    uni.setDiscountAmount(subtotal.subtract(total));
-                }
-                items.add(uni);
+    }
+
+    private void mapLineItems(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
+        if (source.getLineItems() == null) {
+            return;
+        }
+        List<LineItem> items = new ArrayList<>();
+        for (var li : source.getLineItems()) {
+            if (li == null) continue;
+            var uni = LineItem.builder().build();
+            uni.setLineId(li.getId() == null ? null : String.valueOf(li.getId()));
+            uni.setProductId(li.getProductId() == null ? null : String.valueOf(li.getProductId()));
+            uni.setVariantId(li.getVariationId() == null ? null : String.valueOf(li.getVariationId()));
+            uni.setSku(li.getSku());
+            uni.setName(li.getName());
+            uni.setQuantity(li.getQuantity());
+            uni.setUnitPrice(longToBigDecimal(li.getPrice()));
+            uni.setTotalPrice(parseBigDecimal(li.getTotal()));
+            uni.setTaxAmount(parseBigDecimal(li.getTotalTax()));
+
+            BigDecimal subtotal = parseBigDecimal(li.getSubtotal());
+            BigDecimal total = parseBigDecimal(li.getTotal());
+            if (subtotal != null && total != null && subtotal.compareTo(total) > 0) {
+                uni.setDiscountAmount(subtotal.subtract(total));
             }
-            target.setLineItems(items);
+            items.add(uni);
         }
-        // Quantity aggregate
-        if (target.getLineItems() != null) {
-            long qty = target.getLineItems().stream().mapToLong(li -> li.getQuantity() == null ? 0L : li.getQuantity()).sum();
-            target.setTotalQuantity(qty == 0 ? null : qty);
-        }
-        // Notes
+        target.setLineItems(items);
+    }
+
+    private void aggregateQuantity(Order target) {
+        if (target.getLineItems() == null) return;
+        long qty = target.getLineItems().stream().mapToLong(li -> li.getQuantity() == null ? 0L : li.getQuantity()).sum();
+        target.setTotalQuantity(qty == 0 ? null : qty);
+    }
+
+    private void setNotesAndMetadata(com.glamaya.datacontracts.woocommerce.Order source, Order target) {
         target.setNotes(source.getCustomerNote());
-        // Metadata placeholder
         if (target.getPlatformMetadata() == null) {
             target.setPlatformMetadata(com.glamaya.datacontracts.ecommerce.PlatformMetadata.builder().build());
         }
-        return target;
     }
 
     private BillingAddress toBillingAddress(com.glamaya.datacontracts.woocommerce.Address a) {
@@ -146,4 +192,3 @@ public class WooOrderToOrderMapperFactoryImpl implements OrderMapperFactory<com.
         return iso == null || iso.isBlank() ? null : STRING_DATE_TO_INSTANT_FUNCTION.apply(iso);
     }
 }
-

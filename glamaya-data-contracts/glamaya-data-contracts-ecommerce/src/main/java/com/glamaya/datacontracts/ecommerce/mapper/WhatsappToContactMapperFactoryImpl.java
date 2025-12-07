@@ -38,11 +38,11 @@ public class WhatsappToContactMapperFactoryImpl implements ContactMapperFactory<
                 .withSourceName(sourceAccountName)
                 .withSourceType(SourceType.WHATSAPP_CHAT)
                 .withSourceId(chat.getId())
-                .withUserId(chat.getId()).build();
+                .withId(chat.getId()).build();
         var sources = List.of(source);
 
         String uuid = UUID.nameUUIDFromBytes((source.getSourceName() + "-" + source.getSourceType()
-                + "-" + source.getSourceId() + "-" + source.getUserId()).toUpperCase()
+                + "-" + source.getSourceId() + "-" + source.getId()).toUpperCase()
                 .getBytes(StandardCharsets.UTF_8)).toString();
 
         return Contact.builder()
