@@ -48,7 +48,6 @@ public class APIConfig implements ProcessorConfiguration<APIConfig> {
     @NoArgsConstructor
     public static class FetchDurationMs {
         private long active;
-        private long passive;
     }
 
     @Data

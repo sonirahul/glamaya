@@ -69,7 +69,6 @@ public class WooCommerceEndpointConfiguration {
         if (src.getFetchDurationMs() != null) {
             APIConfig.FetchDurationMs fm = new APIConfig.FetchDurationMs();
             fm.setActive(src.getFetchDurationMs().getActive());
-            fm.setPassive(src.getFetchDurationMs().getPassive());
             copy.setFetchDurationMs(fm);
         }
         copy.setQueryUrl(src.getQueryUrl());

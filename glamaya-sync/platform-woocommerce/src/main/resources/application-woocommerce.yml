@@ -40,7 +40,7 @@ glamaya:
             notifications:
               KAFKA:
                 enable: true
-                topic: "ecom-users"
+                topic: "ecom-contacts"
               WEBHOOK:
                 enable: false
                 url: "some end point"
@@ -55,7 +55,7 @@ glamaya:
             notifications:
               KAFKA:
                 enable: true
-                topic: "ecom-users"
+                topic: "ecom-contacts"
               WEBHOOK:
                 enable: false
                 url: "some end point"
