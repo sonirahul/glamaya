@@ -7,13 +7,15 @@ import com.glamaya.datacontracts.ecommerce.Source;
 import com.glamaya.datacontracts.ecommerce.SourceType;
 import com.glamaya.datacontracts.whatsapp.Chat;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WhatsappToContactMapperFactoryImpl implements ContactMapperFactory<Chat> {
@@ -25,14 +27,20 @@ public class WhatsappToContactMapperFactoryImpl implements ContactMapperFactory<
             throw new IllegalArgumentException("Whatsapp chat invalid chat data received");
         }
 
+        if (chat.getId() == null || !chat.getId().contains("@c.us")) {
+            return null;
+        }
+
+        // Convert whatsappId to MSISDN-like string with leading '+', then validate/format to E.164
         var phone = formatPhoneNumber(formatWhatsppPhoneNumber(chat.getId()), "ZZ");
 
         if (phone == null) {
-            throw new IllegalArgumentException(String.format("Whatsapp chat id: %s - phone is null", chat.getId()));
+            log.error("Whatsapp chat id: {} - phone is invalid", chat.getId());
+            return null;
         }
 
-        var phones = StringUtils.hasText(phone) ?
-                List.of(Phone.builder().withPhone(phone).withPrimary(true).build()) : List.of();
+        var phones = StringUtils.isNotBlank(phone) ?
+                List.of(Phone.builder().withPhone(phone).withPrimary(true).withIsPhoneValid(true).build()) : List.of();
 
         var source = Source.builder()
                 .withSourceName(sourceAccountName)
@@ -57,14 +65,33 @@ public class WhatsappToContactMapperFactoryImpl implements ContactMapperFactory<
     }
 
     public String formatWhatsppPhoneNumber(String whatsappId) {
-        if (whatsappId == null || !whatsappId.contains("@")) {
+        if (StringUtils.isBlank(whatsappId) || !whatsappId.contains("@")) {
             return null;
         }
-        return "+" + whatsappId.split("@")[0];
+        String numberPart = whatsappId.split("@")[0].trim();
+        if (StringUtils.isBlank(numberPart)) {
+            return null;
+        }
+        // If already international format, return as-is
+        if (numberPart.startsWith("+")) {
+            return numberPart;
+        }
+        // Remove any non-digit characters just in case
+        String digits = numberPart.replaceAll("\\D", "");
+        if (StringUtils.isBlank(digits)) {
+            return null;
+        }
+        if (numberPart.matches("^\\d{10}$")) {
+            return "+91" + numberPart;
+        }
+        // Do NOT guess country codes; require international format upstream.
+        // If we only have local digits without country code, return null so caller can decide.
+        // Returning null leaves validation to upstream or configuration.
+        return "+" + numberPart;
     }
 
     private Name buildName(String rawName) {
-        if (!StringUtils.hasText(rawName) || !rawName.matches(".*[a-zA-Z].*")) {
+        if (StringUtils.isBlank(rawName) || !rawName.matches(".*[a-zA-Z].*")) {
             return null;
         }
         String[] parts = rawName.trim().split("\\s+");

@@ -47,7 +47,7 @@ public interface ContactMapperFactory<S> {
 
         try {
             Phonenumber.PhoneNumber number = phoneUtil.parse(sanitized, countryCode);
-            if (phoneUtil.isValidNumber(number)) {
+            if (phoneUtil.isValidNumber(number) || phoneUtil.isPossibleNumber(number)) {
                 return phoneUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.E164);
             }
         } catch (NumberParseException e) {

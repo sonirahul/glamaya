@@ -26,6 +26,7 @@
     <modules>
         <module>core</module>
         <module>platform-woocommerce</module>
+        <module>platform-whatsapp</module>
         <module>runner</module>
     </modules>
 
@@ -65,6 +66,11 @@
             <dependency>
                 <groupId>com.glamaya.sync</groupId>
                 <artifactId>platform-woocommerce</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.glamaya.sync</groupId>
+                <artifactId>platform-whatsapp</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

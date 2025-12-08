@@ -10,8 +10,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * This class serves as the entry point for the runner module,
  * enabling component scanning, auto-configuration, and scheduling.
  */
-@SpringBootApplication(scanBasePackages = {"com.glamaya.sync.core", "com.glamaya.sync.platform.woocommerce", "com.glamaya.sync.runner"})
-@EnableScheduling // Enable Spring's scheduled task execution
+@SpringBootApplication(scanBasePackages = {
+        "com.glamaya.sync.core",
+        "com.glamaya.sync.platform.woocommerce",
+        "com.glamaya.sync.platform.whatsapp",
+        "com.glamaya.sync.runner"})
+@EnableScheduling
 @EnableReactiveMongoRepositories(basePackages = "com.glamaya.sync.runner.adapter.store")
 // Enable reactive MongoDB repositories
 public class GlamayaSyncApplication {

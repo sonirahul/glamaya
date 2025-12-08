@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.glamaya.sync</groupId>
+        <artifactId>glamaya-sync</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>platform-whatsapp</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Platform Adapter - Whatsapp</name>
+    <description>The adapter module for integrating with the Whatsapp platform.</description>
+    <properties>
+        <glamaya-data-contracts-ecommerce.version>1.0-SNAPSHOT</glamaya-data-contracts-ecommerce.version>
+    </properties>
+
+    <dependencies>
+        <!-- Internal dependency on the core module -->
+        <dependency>
+            <groupId>com.glamaya.sync</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.glamaya</groupId>
+            <artifactId>glamaya-data-contracts-ecommerce</artifactId>
+            <version>${glamaya-data-contracts-ecommerce.version}</version>
+        </dependency>
+
+        <!-- Resilience4j for Circuit Breaker, Rate Limiter, etc. -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-reactor</artifactId>
+        </dependency>
+
+        <!-- Compile time only dependencies -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -26,6 +26,10 @@
             <groupId>com.glamaya.sync</groupId>
             <artifactId>platform-woocommerce</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.glamaya.sync</groupId>
+            <artifactId>platform-whatsapp</artifactId>
+        </dependency>
 
         <!-- Spring Boot Starter -->
         <dependency>

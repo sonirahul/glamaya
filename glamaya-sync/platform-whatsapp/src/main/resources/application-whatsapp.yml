@@ -1,0 +1,30 @@
+# Default properties for the WooCommerce module
+glamaya:
+  sync:
+    whatsapp:
+      api:
+        # --- IMPORTANT ---
+        # These are environment-specific secrets and should be defined here or in a profile.
+        baseUrl: http://waha-url.com
+        apiKey: ck_your_consumer_key
+        # Max response size to buffer in memory (in bytes).
+        max-in-memory-size: 10485760 # 10MB
+        # Timeout for waiting for a response from the server (in milliseconds).
+        response-timeout-in-millis: 30000 # 30 seconds
+        # Endpoint configurations mapped dynamically
+        endpoint-configs:
+          WHATSAPP:
+            enable: true
+            reset-on-startup: false
+            init-page: 1
+            page-size: 10
+            fetch-duration-ms:
+              active: 1000
+            query-url: "/api/default/chats"
+            notifications:
+              KAFKA:
+                enable: true
+                topic: "ecom-contacts"
+              WEBHOOK:
+                enable: false
+                url: "some end point"

@@ -42,9 +42,9 @@ public class WixContactMapperFactoryImpl implements ContactMapperFactory<com.gla
         }
 
         var emails = StringUtils.hasText(email) ?
-                List.of(Email.builder().withEmail(email).withPrimary(true).build()) : List.of();
+                List.of(Email.builder().withEmail(email).withPrimary(true).withIsEmailValid(true).build()) : List.of();
         var phones = StringUtils.hasText(phone) ?
-                List.of(Phone.builder().withPhone(phone).withPrimary(true).build()) : List.of();
+                List.of(Phone.builder().withPhone(phone).withPrimary(true).withIsPhoneValid(true).build()) : List.of();
 
         addresses.forEach(address -> {
             address.setPhone(phone);
