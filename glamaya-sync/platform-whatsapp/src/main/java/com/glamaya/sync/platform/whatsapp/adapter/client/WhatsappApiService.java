@@ -5,6 +5,7 @@ import com.glamaya.sync.platform.whatsapp.common.LoggerConstants;
 import com.glamaya.sync.platform.whatsapp.adapter.client.descriptor.WhatsappEntityDescriptor;
 import com.glamaya.sync.platform.whatsapp.config.APIConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +37,7 @@ public class WhatsappApiService<E> {
      * @param apiKey    The API key for authentication.
      */
     public WhatsappApiService(
-            WebClient webClient,
+            @Qualifier("whatsappWebClient") WebClient webClient,
             @Value("${glamaya.sync.whatsapp.api.apiKey}") String apiKey) {
         this.webClient = webClient;
         this.apiKey = apiKey;

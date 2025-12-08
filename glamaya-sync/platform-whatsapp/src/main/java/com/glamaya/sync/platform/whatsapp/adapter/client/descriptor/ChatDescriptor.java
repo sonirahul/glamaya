@@ -16,7 +16,7 @@ import static com.glamaya.sync.platform.whatsapp.adapter.util.WhatsappDateParsin
  * Provides type information and last-modified extraction logic for WhatsApp Chat entities.
  */
 @Component
-public class UserDescriptor implements WhatsappEntityDescriptor<Chat> {
+public class ChatDescriptor implements WhatsappEntityDescriptor<Chat> {
 
     /**
      * Type reference for a list of WhatsApp Chat entities.

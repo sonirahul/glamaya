@@ -9,7 +9,7 @@ import com.glamaya.datacontracts.whatsapp.SortOrder;
 import com.glamaya.sync.core.domain.model.ProcessorStatus;
 import com.glamaya.sync.core.domain.model.SyncContext;
 import com.glamaya.sync.core.domain.port.out.DataProvider;
-import com.glamaya.sync.platform.whatsapp.adapter.client.descriptor.UserDescriptor;
+import com.glamaya.sync.platform.whatsapp.adapter.client.descriptor.ChatDescriptor;
 import com.glamaya.sync.platform.whatsapp.adapter.util.WhatsappPagination;
 import com.glamaya.sync.platform.whatsapp.config.APIConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -27,19 +27,19 @@ import java.util.Map;
 public class WhatsappUserDataProvider implements DataProvider<Chat> {
 
     private final WhatsappApiService<Chat> apiService;
-    private final UserDescriptor userDescriptor;
+    private final ChatDescriptor chatDescriptor;
     private final ObjectMapper objectMapper;
 
     /**
      * Constructs the WhatsappUserDataProvider with required dependencies.
      *
      * @param apiService     The API service for WhatsApp data fetching.
-     * @param userDescriptor The descriptor for WhatsApp user entities.
+     * @param chatDescriptor The descriptor for WhatsApp user entities.
      * @param objectMapper   The object mapper for query param conversion.
      */
-    public WhatsappUserDataProvider(WhatsappApiService<Chat> apiService, UserDescriptor userDescriptor, ObjectMapper objectMapper) {
+    public WhatsappUserDataProvider(WhatsappApiService<Chat> apiService, ChatDescriptor chatDescriptor, ObjectMapper objectMapper) {
         this.apiService = apiService;
-        this.userDescriptor = userDescriptor;
+        this.chatDescriptor = chatDescriptor;
         this.objectMapper = objectMapper;
     }
 
@@ -55,10 +55,10 @@ public class WhatsappUserDataProvider implements DataProvider<Chat> {
         var status = context.status();
         var queryParams = buildQueryParams(status, config);
 
-        return apiService.fetchPage(userDescriptor, queryParams, status, config)
+        return apiService.fetchPage(chatDescriptor, queryParams, status, config)
                 .collectList()
                 .doOnNext(pageItems -> WhatsappPagination.updateStatusAfterPage(status, pageItems, config,
-                        userDescriptor.getLastModifiedExtractor()))
+                        chatDescriptor.getLastModifiedExtractor()))
                 .flatMapMany(Flux::fromIterable);
     }
 

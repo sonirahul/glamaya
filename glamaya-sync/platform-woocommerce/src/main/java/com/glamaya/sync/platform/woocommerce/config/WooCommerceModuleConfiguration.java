@@ -46,7 +46,7 @@ public class WooCommerceModuleConfiguration {
      * @param builder WebClient.Builder provided by Spring.
      * @return Configured WebClient instance.
      */
-    @Bean
+    @Bean("woocommerceWebClient")
     public WebClient woocommerceWebClient(WebClient.Builder builder) {
         // Configure buffer size for large responses
         final ExchangeStrategies strategies = ExchangeStrategies.builder()

@@ -5,6 +5,7 @@ import com.glamaya.sync.platform.woocommerce.adapter.client.descriptor.WooCommer
 import com.glamaya.sync.platform.woocommerce.config.APIConfig;
 import com.glamaya.sync.platform.woocommerce.port.out.OAuthSignerPort;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.codec.DecodingException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class WooCommerceApiService<E> {
     private final OAuthSignerPort oAuthSigner;
 
     public WooCommerceApiService(
-            WebClient webClient,
+            @Qualifier("woocommerceWebClient") WebClient webClient,
             OAuthSignerPort oAuthSigner) {
         this.webClient = webClient;
         this.oAuthSigner = oAuthSigner;
